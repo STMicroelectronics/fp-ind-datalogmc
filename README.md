@@ -2,6 +2,8 @@
 
 ![latest tag](https://img.shields.io/github/v/tag/STMicroelectronics/fp-ind-datalogmc.svg?color=brightgreen)
 
+**Please check st.com where a more recent version of the software might be available.**
+
 The **FP-IND-DATALOGMC** function pack for **STEVAL-STWINBX1** and **EVLSPIN32G4-ACT** is a powerful integrated toolkit for the next generation of smart
 actuators. It is derived from a **FP-SNS-DATALOG2** function pack and it allows the collection of heterogeneous data, combining STWIN.box sensor information with
 STSPIN32G4 motor control data and it provides a comprehensive view of the system’s operational conditions. This enables both real-time monitoring and accurate
