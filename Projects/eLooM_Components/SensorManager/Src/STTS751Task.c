@@ -183,7 +183,6 @@ static sys_error_code_t STTS751TaskConfigureIrqPin(const STTS751Task *_this, boo
 static void STTS751TaskTimerCallbackFunction(ULONG param);
 
 
-
 /* Inline function forward declaration */
 /***************************************/
 
@@ -232,48 +231,33 @@ static STTS751TaskClass_t sTheClass =
     STTS751Task_vtblOnEnterPowerMode
   },
 
-    /* class::sensor_if_vtbl virtual table */
+  /* class::sensor_if_vtbl virtual table */
+  {
     {
-        {
-            {
-                STTS751Task_vtblTempGetId,
-                STTS751Task_vtblTempGetEventSourceIF,
-                STTS751Task_vtblTempGetDataInfo },
-            STTS751Task_vtblSensorEnable,
-            STTS751Task_vtblSensorDisable,
-            STTS751Task_vtblSensorIsEnabled,
-            STTS751Task_vtblSensorGetDescription,
-            STTS751Task_vtblSensorGetStatus },
-        STTS751Task_vtblTempGetODR,
-        STTS751Task_vtblTempGetFS,
-        STTS751Task_vtblTempGetSensitivity,
-        STTS751Task_vtblSensorSetODR,
-        STTS751Task_vtblSensorSetFS,
-        STTS751Task_vtblSensorSetFifoWM, },
+      {
+        STTS751Task_vtblTempGetId,
+        STTS751Task_vtblTempGetEventSourceIF,
+        STTS751Task_vtblTempGetDataInfo
+      },
+      STTS751Task_vtblSensorEnable,
+      STTS751Task_vtblSensorDisable,
+      STTS751Task_vtblSensorIsEnabled,
+      STTS751Task_vtblSensorGetDescription,
+      STTS751Task_vtblSensorGetStatus,
+      STTS751Task_vtblSensorGetStatusPointer
+    },
+    STTS751Task_vtblTempGetODR,
+    STTS751Task_vtblTempGetFS,
+    STTS751Task_vtblTempGetSensitivity,
+    STTS751Task_vtblSensorSetODR,
+    STTS751Task_vtblSensorSetFS,
+    STTS751Task_vtblSensorSetFifoWM,
+  },
 
   /* TEMPERATURE DESCRIPTOR */
   {
     "stts751",
-    COM_TYPE_TEMP,
-    {
-      1.0f,
-      2.0f,
-      4.0f,
-      8.0f,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      100.0f,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      "temp",
-    },
-    "Celsius",
-    {
-      0,
-      1000,
-    }
+    COM_TYPE_TEMP
   },
 
   /* class (PM_STATE, ExecuteStepFunc) map */
@@ -559,9 +543,11 @@ sys_error_code_t STTS751Task_vtblDoEnterPowerMode(AManagedTask *_this, const EPo
   {
     if (ActivePowerMode == E_POWER_MODE_SENSORS_ACTIVE)
     {
-      /* Deactivate the sensor */
-      stts751_temp_data_rate_set(p_sensor_drv, STTS751_TEMP_ODR_OFF);
-
+      if (STTS751TaskSensorIsActive(p_obj))
+      {
+        /* Deactivate the sensor */
+        stts751_temp_data_rate_set(p_sensor_drv, STTS751_TEMP_ODR_OFF);
+      }
       /* Empty the task queue and disable INT or timer */
       tx_queue_flush(&p_obj->in_queue);
       if (p_obj->pIRQConfig == NULL)
@@ -618,7 +604,7 @@ sys_error_code_t STTS751Task_vtblOnEnterTaskControlLoop(AManagedTask *_this)
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
 
-  SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("STTS751: start.\r\n"));
+  SYS_DEBUGF(SYS_DBG_LEVEL_DEFAULT, ("STTS751: start.\r\n"));
 
 #if defined(ENABLE_THREADX_DBG_PIN) && defined (STTS751_TASK_CFG_TAG)
   STTS751Task *p_obj = (STTS751Task *) _this;
@@ -764,6 +750,11 @@ sys_error_code_t STTS751Task_vtblSensorSetODR(ISensorMems_t *_this, float odr)
   }
   else
   {
+    if (odr > 1.0f)
+    {
+      p_if_owner->sensor_status.type.mems.odr = odr;
+      p_if_owner->sensor_status.type.mems.measured_odr = 0.0f;
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -793,6 +784,10 @@ sys_error_code_t STTS751Task_vtblSensorSetFS(ISensorMems_t *_this, float fs)
   }
   else
   {
+    if (fs == 100.0f)
+    {
+      p_if_owner->sensor_status.type.mems.fs = fs;
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -832,6 +827,7 @@ sys_error_code_t STTS751Task_vtblSensorEnable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = TRUE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -860,6 +856,7 @@ sys_error_code_t STTS751Task_vtblSensorDisable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = FALSE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -905,6 +902,14 @@ SensorStatus_t STTS751Task_vtblSensorGetStatus(ISensor_t *_this)
   STTS751Task *p_if_owner = (STTS751Task *)((uint32_t) _this - offsetof(STTS751Task, sensor_if));
 
   return p_if_owner->sensor_status;
+}
+
+SensorStatus_t *STTS751Task_vtblSensorGetStatusPointer(ISensor_t *_this)
+{
+  assert_param(_this != NULL);
+  STTS751Task *p_if_owner = (STTS751Task *)((uint32_t) _this - offsetof(STTS751Task, sensor_if));
+
+  return &p_if_owner->sensor_status;
 }
 
 /* Private function definition */
@@ -1202,7 +1207,10 @@ static sys_error_code_t STTS751TaskSensorInit(STTS751Task *_this)
     _this->sensor_status.is_active = false;
   }
 
-  _this->task_delay = (uint16_t)(1000.0f / _this->sensor_status.type.mems.odr);
+  if (_this->sensor_status.is_active)
+  {
+    _this->task_delay = (uint16_t)(1000.0f / _this->sensor_status.type.mems.odr);
+  }
 
   return res;
 }

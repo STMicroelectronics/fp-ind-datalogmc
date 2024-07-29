@@ -13,6 +13,7 @@
 # ******************************************************************************
 #
 
+import numpy as np
 class TypeConversion:
 
     @staticmethod
@@ -32,6 +33,7 @@ class TypeConversion:
             'int32': 'int32',
             'float': 'float32',
             'double': 'double',
+            'enum': 'uint8'
         }
         return switcher.get(check_type, "error")
 
@@ -53,6 +55,7 @@ class TypeConversion:
             'float': 4,
             'float32': 4,
             'double': 8,
+            'enum':1
         }
         return switcher.get(check_type, "error")
     
@@ -74,6 +77,7 @@ class TypeConversion:
             'float': 'f',
             'float32': 'f',
             'double': 'd',
+            'enum': 'B'
         }
         return switcher.get(check_type, "error")
     
@@ -95,5 +99,26 @@ class TypeConversion:
             'float': '{:.6f}',
             'float32': '{:.6f}',
             'double': '{:.6f}',
+        }
+        return switcher.get(check_type, "error")
+    
+    @staticmethod
+    def get_np_dtype(check_type):
+        switcher = {
+            'uint8_t': np.uint8,
+            'uint8': np.uint8,
+            'int8_t': np.int8,
+            'int8': np.int8,
+            'uint16_t': np.uint16,
+            'uint16': np.uint16,
+            'int16_t': np.int16,
+            'int16': np.int16,
+            'uint32_t': np.uint32,
+            'uint32': np.uint32,
+            'int32_t': np.int32,
+            'int32': np.int32,
+            'float': np.float32,
+            'float32': np.float32,
+            'double': np.double,
         }
         return switcher.get(check_type, "error")

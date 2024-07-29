@@ -1,6 +1,9 @@
 st_pnpl
-numpy
+numpy==1.26.4
+pyserial
 pandas
+fastparquet
 colorama
 click
 matplotlib
+setuptools

@@ -24,8 +24,6 @@ extern "C" {
 #endif
 
 
-
-
 // AManagedTaskEx virtual functions
 sys_error_code_t LIS2MDLTask_vtblHardwareInit(AManagedTask *_this, void *pParams); ///< @sa AMTHardwareInit
 sys_error_code_t LIS2MDLTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_function_t *pvTaskCode, CHAR **pcName,
@@ -57,6 +55,7 @@ sys_error_code_t LIS2MDLTask_vtblSensorDisable(ISensor_t *_this);
 boolean_t LIS2MDLTask_vtblSensorIsEnabled(ISensor_t *_this);
 SensorDescriptor_t LIS2MDLTask_vtblSensorGetDescription(ISensor_t *_this);
 SensorStatus_t LIS2MDLTask_vtblSensorGetStatus(ISensor_t *_this);
+SensorStatus_t *LIS2MDLTask_vtblSensorGetStatusPointer(ISensor_t *_this);
 
 #ifdef __cplusplus
 }

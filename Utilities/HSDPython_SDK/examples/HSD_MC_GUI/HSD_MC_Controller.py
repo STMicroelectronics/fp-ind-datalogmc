@@ -138,12 +138,31 @@ class HSD_MC_Controller(HSD_Controller):
                             dimensions = c_status_value["dim"]
                             
                         elif c_status_value["c_type"] == ComponentType.ALGORITHM.value:
-                            spts = 0
-                            dimensions = c_status_value["dim"]
-                            if "algorithm_type" in c_status_value:
-                                algorithm_type = c_status_value["algorithm_type"]
-                            if algorithm_type == 0 or algorithm_type == 1:
-                                interleaved_data = False
+                            spts = 0 #spts override (no timestamps in algorithms @ the moment)
+                            algorithm_type = c_status_value.get("algorithm_type")
+                            if algorithm_type == DTDLUtils.AlgorithmTypeEnum.IALGORITHM_TYPE_FFT.value \
+                                or algorithm_type == DTDLUtils.AlgorithmTypeEnum.IALGORITHM_TYPE_ANOMALY_DETECTOR.value:
+                                dimensions = c_status_value["dim"]
+                                
+                                if algorithm_type == DTDLUtils.AlgorithmTypeEnum.IALGORITHM_TYPE_FFT.value:
+                                    dimensions = c_status_value.get("fft_length")
+                                    
+                            if algorithm_type == DTDLUtils.AlgorithmTypeEnum.IALGORITHM_TYPE_CLASSIFIER.value:
+                                 # Get ai classifier content:
+                                ai_classifier_contents = c_status[DTDLUtils.AI_CLASSIFIER_COMP_NAME]
+                                # Get  ai classifier sub properties
+                                ai_classifier_sub_properties = ai_classifier_contents[DTDLUtils.ST_BLE_STREAM]
+                                dimensions = 0
+                                for t in ai_classifier_sub_properties:
+                                    if t != 'id':
+                                    # Check enable condition
+                                        t_enabled = ai_classifier_sub_properties[t].get("enable")
+                                        if t_enabled:
+                                            #get format 
+                                            t_format = ai_classifier_sub_properties[t].get("format")
+                                            dimensions += TypeConversion.check_type_length(t_format)
+
+                            interleaved_data = False
                         
                         elif c_status_value["c_type"] == ComponentType.ACTUATOR.value:
                             spts = 1

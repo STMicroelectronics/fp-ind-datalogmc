@@ -30,4 +30,5 @@
 | SensorManager_threadx  		| STMicroelectronics				| SLA0094	            |
 | TagManager			      	| STMicroelectronics				| SLA0094	            |
 | STWIN.box/DATALOGMC		  	| STMicroelectronics				| SLA0094	            |
+| STWIN.box/DATALOGMC_AI	  	| STMicroelectronics				| SLA0094	            |
 | HSDPython_SDK					| STMicroelectronics				| BSD-3-Clause	        |

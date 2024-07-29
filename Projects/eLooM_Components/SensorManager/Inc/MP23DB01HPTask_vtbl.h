@@ -24,7 +24,6 @@ extern "C" {
 #endif
 
 
-
 /* AManagedTask virtual functions */
 sys_error_code_t MP23DB01HPTask_vtblHardwareInit(AManagedTask *_this, void *pParams); ///< @sa AMTHardwareInit
 sys_error_code_t MP23DB01HPTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_function_t *pvTaskCode, CHAR **pcName,
@@ -49,6 +48,7 @@ sys_error_code_t MP23DB01HPTask_vtblSensorDisable(ISensor_t *_this);
 boolean_t MP23DB01HPTask_vtblSensorIsEnabled(ISensor_t *_this);
 SensorDescriptor_t MP23DB01HPTask_vtblSensorGetDescription(ISensor_t *_this);
 SensorStatus_t MP23DB01HPTask_vtblSensorGetStatus(ISensor_t *_this);
+SensorStatus_t *MP23DB01HPTask_vtblSensorGetStatusPointer(ISensor_t *_this);
 uint32_t MP23DB01HPTask_vtblMicGetFrequency(ISensorAudio_t *_this);
 uint8_t MP23DB01HPTask_vtblMicGetVolume(ISensorAudio_t *_this);
 uint8_t MP23DB01HPTask_vtblMicGetResolution(ISensorAudio_t *_this);

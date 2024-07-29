@@ -62,7 +62,7 @@
 #endif
 
 #if (HSD_USE_DUMMY_DATA == 1)
-static uint16_t dummyDataCounter = 0;
+static uint32_t dummyDataCounter = 0;
 #endif
 
 
@@ -183,7 +183,6 @@ static sys_error_code_t VL53L8CXTaskConfigureIrqPin(const VL53L8CXTask *_this, b
 static void VL53L8CXTaskTimerCallbackFunction(ULONG param);
 
 
-
 /* Inline function forward declaration */
 // ***********************************
 /**
@@ -242,7 +241,8 @@ static VL53L8CXTaskClass_t sTheClass =
       VL53L8CXTask_vtblSensorDisable,
       VL53L8CXTask_vtblSensorIsEnabled,
       VL53L8CXTask_vtblSensorGetDescription,
-      VL53L8CXTask_vtblSensorGetStatus
+      VL53L8CXTask_vtblSensorGetStatus,
+      VL53L8CXTask_vtblSensorGetStatusPointer
     },
 
     VL53L8CXTask_vtblTofGetProfile,
@@ -260,36 +260,7 @@ static VL53L8CXTaskClass_t sTheClass =
   /* TIME-OF-FLIGHT DESCRIPTOR */
   {
     "vl53l8cx",
-    COM_TYPE_TOF,
-    {
-      1.6f,
-      12.5f,
-      25.0f,
-      50.0f,
-      100.0f,
-      200.0f,
-      400.0f,
-      800.0f,
-      1600.0f,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      2.0f,
-      4.0f,
-      8.0f,
-      16.0f,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      "x",
-      "y",
-      "z",
-    },
-    "g",
-    {
-      0,
-      1000,
-    }
+    COM_TYPE_TOF
   },
   /* class (PM_STATE, ExecuteStepFunc) map */
   {
@@ -308,7 +279,7 @@ ISourceObservable *VL53L8CXTaskGetTofSensorIF(VL53L8CXTask *_this)
   return (ISourceObservable *) & (_this->sensor_if);
 }
 
-AManagedTaskEx *VL53L8CXTaskAlloc(const void *pIRQConfig, const void *pCSConfig)
+AManagedTaskEx *VL53L8CXTaskAlloc(const void *pIRQConfig, const void *pCSConfig, const void *pBSConfig)
 {
   VL53L8CXTask *p_new_obj = SysAlloc(sizeof(VL53L8CXTask));
 
@@ -323,15 +294,17 @@ AManagedTaskEx *VL53L8CXTaskAlloc(const void *pIRQConfig, const void *pCSConfig)
 
     p_new_obj->pIRQConfig = (MX_GPIOParams_t *) pIRQConfig;
     p_new_obj->pCSConfig = (MX_GPIOParams_t *) pCSConfig;
+    p_new_obj->pBSConfig = (MX_GPIOParams_t *) pBSConfig;
 
     strcpy(p_new_obj->sensor_status.p_name, sTheClass.class_descriptor.p_name);
   }
   return (AManagedTaskEx *) p_new_obj;
 }
 
-AManagedTaskEx *VL53L8CXTaskAllocSetName(const void *pIRQConfig, const void *pCSConfig, const char *p_name)
+AManagedTaskEx *VL53L8CXTaskAllocSetName(const void *pIRQConfig, const void *pCSConfig, const void *pBSConfig,
+                                         const char *p_name)
 {
-  VL53L8CXTask *p_new_obj = (VL53L8CXTask *)VL53L8CXTaskAlloc(pIRQConfig, pCSConfig);
+  VL53L8CXTask *p_new_obj = (VL53L8CXTask *)VL53L8CXTaskAlloc(pIRQConfig, pCSConfig, pBSConfig);
 
   /* Overwrite default name with the one selected by the application */
   strcpy(p_new_obj->sensor_status.p_name, p_name);
@@ -339,7 +312,8 @@ AManagedTaskEx *VL53L8CXTaskAllocSetName(const void *pIRQConfig, const void *pCS
   return (AManagedTaskEx *) p_new_obj;
 }
 
-AManagedTaskEx *VL53L8CXTaskStaticAlloc(void *p_mem_block, const void *pIRQConfig, const void *pCSConfig)
+AManagedTaskEx *VL53L8CXTaskStaticAlloc(void *p_mem_block, const void *pIRQConfig, const void *pCSConfig,
+                                        const void *pBSConfig)
 {
   VL53L8CXTask *p_obj = (VL53L8CXTask *)p_mem_block;
 
@@ -355,15 +329,17 @@ AManagedTaskEx *VL53L8CXTaskStaticAlloc(void *p_mem_block, const void *pIRQConfi
 
     p_obj->pIRQConfig = (MX_GPIOParams_t *) pIRQConfig;
     p_obj->pCSConfig = (MX_GPIOParams_t *) pCSConfig;
+    p_obj->pBSConfig = (MX_GPIOParams_t *) pBSConfig;
   }
 
   return (AManagedTaskEx *)p_obj;
 }
 
 AManagedTaskEx *VL53L8CXTaskStaticAllocSetName(void *p_mem_block, const void *pIRQConfig, const void *pCSConfig,
-                                              const char *p_name)
+                                               const void *pBSConfig,
+                                               const char *p_name)
 {
-  VL53L8CXTask *p_obj = (VL53L8CXTask *)VL53L8CXTaskStaticAlloc(p_mem_block, pIRQConfig, pCSConfig);
+  VL53L8CXTask *p_obj = (VL53L8CXTask *)VL53L8CXTaskStaticAlloc(p_mem_block, pIRQConfig, pCSConfig, pBSConfig);
 
   /* Overwrite default name with the one selected by the application */
   strcpy(p_obj->sensor_status.p_name, p_name);
@@ -399,6 +375,14 @@ sys_error_code_t VL53L8CXTask_vtblHardwareInit(AManagedTask *_this, void *pParam
   {
     p_obj->pCSConfig->p_mx_init_f();
   }
+  else if (p_obj->pBSConfig != NULL)
+  {
+    p_obj->pBSConfig->p_mx_init_f();
+  }
+  else
+  {
+    /**/
+  }
 
   return res;
 }
@@ -423,7 +407,7 @@ sys_error_code_t VL53L8CXTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_fun
     return res;
   }
   if (TX_SUCCESS != tx_queue_create(&p_obj->in_queue, "VL53L8CX_Q", item_size / 4u, p_queue_items_buff,
-                                         VL53L8CX_TASK_CFG_IN_QUEUE_LENGTH * item_size))
+                                    VL53L8CX_TASK_CFG_IN_QUEUE_LENGTH * item_size))
   {
     res = SYS_TASK_HEAP_OUT_OF_MEMORY_ERROR_CODE;
     SYS_SET_SERVICE_LEVEL_ERROR_CODE(res);
@@ -431,8 +415,8 @@ sys_error_code_t VL53L8CXTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_fun
   }
   /* create the software timer*/
   if (TX_SUCCESS
-           != tx_timer_create(&p_obj->read_timer, "VL53L8CX_T", VL53L8CXTaskTimerCallbackFunction, (ULONG)_this,
-                              AMT_MS_TO_TICKS(VL53L8CX_TASK_CFG_TIMER_PERIOD_MS), 0, TX_NO_ACTIVATE))
+      != tx_timer_create(&p_obj->read_timer, "VL53L8CX_T", VL53L8CXTaskTimerCallbackFunction, (ULONG)_this,
+                         AMT_MS_TO_TICKS(VL53L8CX_TASK_CFG_TIMER_PERIOD_MS), 0, TX_NO_ACTIVATE))
   {
     res = SYS_TASK_HEAP_OUT_OF_MEMORY_ERROR_CODE;
     SYS_SET_SERVICE_LEVEL_ERROR_CODE(res);
@@ -450,11 +434,23 @@ sys_error_code_t VL53L8CXTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_fun
   }
   else
   {
-    p_obj->p_sensor_bus_if = I2CBusIFAlloc16(VL53L8CX_ID, VL53L8CX_DEVICE_ADDRESS, 0);
-    if (p_obj->p_sensor_bus_if == NULL)
+    if (p_obj->pBSConfig != NULL)
     {
-      res = SYS_TASK_HEAP_OUT_OF_MEMORY_ERROR_CODE;
-      SYS_SET_SERVICE_LEVEL_ERROR_CODE(res);
+      p_obj->p_sensor_bus_if = I2CBSBusIFAlloc16(VL53L8CX_ID, VL53L8CX_DEVICE_ADDRESS, p_obj->pBSConfig->port, (uint16_t) p_obj->pBSConfig->pin, 0);
+      if (p_obj->p_sensor_bus_if == NULL)
+      {
+        res = SYS_TASK_HEAP_OUT_OF_MEMORY_ERROR_CODE;
+        SYS_SET_SERVICE_LEVEL_ERROR_CODE(res);
+      }
+    }
+    else
+    {
+      p_obj->p_sensor_bus_if = I2CBusIFAlloc16(VL53L8CX_ID, VL53L8CX_DEVICE_ADDRESS, 0);
+      if (p_obj->p_sensor_bus_if == NULL)
+      {
+        res = SYS_TASK_HEAP_OUT_OF_MEMORY_ERROR_CODE;
+        SYS_SET_SERVICE_LEVEL_ERROR_CODE(res);
+      }
     }
   }
 
@@ -462,16 +458,16 @@ sys_error_code_t VL53L8CXTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_fun
   {
     return res;
   }
-    /* Initialize the EventSrc interface */
-    p_obj->p_event_src = DataEventSrcAlloc();
-    if (p_obj->p_event_src == NULL)
-    {
+  /* Initialize the EventSrc interface */
+  p_obj->p_event_src = DataEventSrcAlloc();
+  if (p_obj->p_event_src == NULL)
+  {
     SYS_SET_SERVICE_LEVEL_ERROR_CODE(SYS_OUT_OF_MEMORY_ERROR_CODE);
     res = SYS_OUT_OF_MEMORY_ERROR_CODE;
     return res;
-    }
+  }
 
-      IEventSrcInit(p_obj->p_event_src);
+  IEventSrcInit(p_obj->p_event_src);
 
   if (!MTMap_IsInitialized(&sTheClass.task_map))
   {
@@ -492,35 +488,35 @@ sys_error_code_t VL53L8CXTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_fun
       return res;
     }
   }
-      memset(p_obj->p_sensor_data_buff, 0, sizeof(p_obj->p_sensor_data_buff));
-      p_obj->id = 0;
-      p_obj->prev_timestamp = 0.0f;
-      _this->m_pfPMState2FuncMap = sTheClass.p_pm_state2func_map;
+  memset(p_obj->p_sensor_data_buff, 0, sizeof(p_obj->p_sensor_data_buff));
+  p_obj->id = 0;
+  p_obj->prev_timestamp = 0.0f;
+  _this->m_pfPMState2FuncMap = sTheClass.p_pm_state2func_map;
 
-      *pTaskCode = AMTExRun;
-      *pName = "VL53L8CX";
-      *pvStackStart = NULL; // allocate the task stack in the system memory pool.
-      *pStackDepth = VL53L8CX_TASK_CFG_STACK_DEPTH;
-      *pParams = (ULONG) _this;
-      *pPriority = VL53L8CX_TASK_CFG_PRIORITY;
-      *pPreemptThreshold = VL53L8CX_TASK_CFG_PRIORITY;
-      *pTimeSlice = TX_NO_TIME_SLICE;
-      *pAutoStart = TX_AUTO_START;
+  *pTaskCode = AMTExRun;
+  *pName = "VL53L8CX";
+  *pvStackStart = NULL; // allocate the task stack in the system memory pool.
+  *pStackDepth = VL53L8CX_TASK_CFG_STACK_DEPTH;
+  *pParams = (ULONG) _this;
+  *pPriority = VL53L8CX_TASK_CFG_PRIORITY;
+  *pPreemptThreshold = VL53L8CX_TASK_CFG_PRIORITY;
+  *pTimeSlice = TX_NO_TIME_SLICE;
+  *pAutoStart = TX_AUTO_START;
 
-      res = VL53L8CXTaskSensorInitTaskParams(p_obj);
-      if (SYS_IS_ERROR_CODE(res))
-      {
+  res = VL53L8CXTaskSensorInitTaskParams(p_obj);
+  if (SYS_IS_ERROR_CODE(res))
+  {
     res = SYS_TASK_HEAP_OUT_OF_MEMORY_ERROR_CODE;
     SYS_SET_SERVICE_LEVEL_ERROR_CODE(res);
     return res;
-      }
+  }
 
-        res = VL53L8CXTaskSensorRegister(p_obj);
-        if (SYS_IS_ERROR_CODE(res))
-        {
-          SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("VL53L8CX: unable to register with DB\r\n"));
-          sys_error_handler();
-        }
+  res = VL53L8CXTaskSensorRegister(p_obj);
+  if (SYS_IS_ERROR_CODE(res))
+  {
+    SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("VL53L8CX: unable to register with DB\r\n"));
+    sys_error_handler();
+  }
 
   return res;
 }
@@ -538,30 +534,58 @@ sys_error_code_t VL53L8CXTask_vtblDoEnterPowerMode(AManagedTask *_this, const EP
   {
     if (VL53L8CXTaskSensorIsActive(p_obj))
     {
-      SMMessage report =
-      {
-        .sensorMessage.messageId = SM_MESSAGE_ID_SENSOR_CMD,
-        .sensorMessage.nCmdID = SENSOR_CMD_ID_INIT
-      };
+      /* Default TOF initialization procedure requires a great number of instructions */
+      /* Must be executed in priority */
+      /* By executing here, no other sensor task can interrupt it */
+      uint32_t id;
+      uint8_t device_id = 0;
+      uint8_t revision_id = 0;
+      uint8_t status = VL53L8CX_STATUS_OK;
 
-      if (tx_queue_send(&p_obj->in_queue, &report, AMT_MS_TO_TICKS(100)) != TX_SUCCESS)
+      status |= WrByte(p_platform_drv, 0x7fff, 0x00);
+      status |= RdByte(p_platform_drv, 0, &device_id);
+      status |= RdByte(p_platform_drv, 1, &revision_id);
+      status |= WrByte(p_platform_drv, 0x7fff, 0x02);
+
+      if (status == 0U)
       {
-        res = SYS_SENSOR_TASK_MSG_LOST_ERROR_CODE;
-        SYS_SET_SERVICE_LEVEL_ERROR_CODE(SYS_SENSOR_TASK_MSG_LOST_ERROR_CODE);
+        id = ((uint32_t) device_id << 8) + revision_id;
+        ABusIFSetWhoAmI(p_obj->p_sensor_bus_if, id);
+        SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("VL53L8CX: sensor - I am 0x%x.\r\n", id));
+
+        /* Initialize as default */
+        status = vl53l8cx_init(&p_obj->tof_driver_if);
+        if (status == 0U)
+        {
+          SMMessage report =
+          {
+            .sensorMessage.messageId = SM_MESSAGE_ID_SENSOR_CMD,
+            .sensorMessage.nCmdID = SENSOR_CMD_ID_INIT
+          };
+
+          if (tx_queue_send(&p_obj->in_queue, &report, AMT_MS_TO_TICKS(100)) != TX_SUCCESS)
+          {
+            res = SYS_SENSOR_TASK_MSG_LOST_ERROR_CODE;
+            SYS_SET_SERVICE_LEVEL_ERROR_CODE(SYS_SENSOR_TASK_MSG_LOST_ERROR_CODE);
+          }
+
+          // reset the variables for the time stamp computation.
+          p_obj->prev_timestamp = 0.0f;
+        }
+
+        SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("VL53L8CX: -> SENSORS_ACTIVE\r\n"));
       }
-
-      // reset the variables for the time stamp computation.
-      p_obj->prev_timestamp = 0.0f;
     }
-
-    SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("VL53L8CX: -> SENSORS_ACTIVE\r\n"));
   }
   else if (NewPowerMode == E_POWER_MODE_STATE1)
   {
     if (ActivePowerMode == E_POWER_MODE_SENSORS_ACTIVE)
     {
-      /* Deactivate the sensor */
-      vl53l8cx_stop_ranging(&p_obj->tof_driver_if);
+      if (VL53L8CXTaskSensorIsActive(p_obj))
+      {
+        /* Deactivate the sensor */
+        vl53l8cx_stop_ranging(&p_obj->tof_driver_if);
+      }
 
       /* Empty the task queue and disable INT or timer */
       tx_queue_flush(&p_obj->in_queue);
@@ -620,7 +644,7 @@ sys_error_code_t VL53L8CXTask_vtblOnEnterTaskControlLoop(AManagedTask *_this)
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
 
-  SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("VL53L8CX: start.\r\n"));
+  SYS_DEBUGF(SYS_DBG_LEVEL_DEFAULT, ("VL53L8CX: start.\r\n"));
 
 #if defined(ENABLE_THREADX_DBG_PIN) && defined (VL53L8CX_TASK_CFG_TAG)
   VL53L8CXTask *p_obj = (VL53L8CXTask *) _this;
@@ -770,6 +794,31 @@ sys_error_code_t VL53L8CXTask_vtblSensorSetFrequency(ISensorRanging_t *_this, ui
   }
   else
   {
+    if (p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_4x4_CONTINUOUS
+        || p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_4x4_AUTONOMOUS)
+    {
+      /* 4x4 resolution supports odr range [1, 60] */
+      if (frequency < 61)
+      {
+        p_if_owner->sensor_status.type.ranging.profile_config.frequency = frequency;
+      }
+      else
+      {
+        return SYS_INVALID_PARAMETER_ERROR_CODE;
+      }
+    }
+    else
+    {
+      /* 8x8 resolution supports odr range [1, 15] */
+      if (frequency < 16)
+      {
+        p_if_owner->sensor_status.type.ranging.profile_config.frequency = frequency;
+      }
+      else
+      {
+        return SYS_INVALID_PARAMETER_ERROR_CODE;
+      }
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -799,6 +848,39 @@ sys_error_code_t VL53L8CXTask_vtblSensorSetResolution(ISensorRanging_t *_this, u
   }
   else
   {
+    if (resolution == VL53L8CX_RESOLUTION_4X4)
+    {
+      if (p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_4x4_CONTINUOUS
+          || p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_8x8_CONTINUOUS)
+      {
+        p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile = VL53L8CX_PROFILE_4x4_CONTINUOUS;
+      }
+      else
+      {
+        p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile = VL53L8CX_PROFILE_4x4_AUTONOMOUS;
+      }
+    }
+    else if (resolution == VL53L8CX_RESOLUTION_8X8)
+    {
+      if (p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_4x4_CONTINUOUS
+          || p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_8x8_CONTINUOUS)
+      {
+        p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile = VL53L8CX_PROFILE_8x8_CONTINUOUS;
+      }
+      else
+      {
+        p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile = VL53L8CX_PROFILE_8x8_AUTONOMOUS;
+      }
+      /* 8x8 resolution supports odr range [1, 15] */
+      if (p_if_owner->sensor_status.type.ranging.profile_config.frequency > 15)
+      {
+        p_if_owner->sensor_status.type.ranging.profile_config.frequency = 15;
+      }
+    }
+    else
+    {
+      /**/
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -828,6 +910,34 @@ sys_error_code_t VL53L8CXTask_vtblSensorSetRangingMode(ISensorRanging_t *_this, 
   }
   else
   {
+    p_if_owner->sensor_status.type.ranging.profile_config.mode = mode;
+
+    if (mode == VL53L8CX_MODE_BLOCKING_ONESHOT || mode == VL53L8CX_MODE_ASYNC_ONESHOT)
+    {
+      if (p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_4x4_CONTINUOUS)
+      {
+        p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile = VL53L8CX_PROFILE_4x4_AUTONOMOUS;
+      }
+      else if (p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_8x8_CONTINUOUS)
+      {
+        p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile = VL53L8CX_PROFILE_8x8_AUTONOMOUS;
+      }
+    }
+    else if (mode == VL53L8CX_MODE_BLOCKING_CONTINUOUS || mode == VL53L8CX_MODE_ASYNC_CONTINUOUS)
+    {
+      if (p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_4x4_AUTONOMOUS)
+      {
+        p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile = VL53L8CX_PROFILE_4x4_CONTINUOUS;
+      }
+      else if (p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_8x8_AUTONOMOUS)
+      {
+        p_if_owner->sensor_status.type.ranging.profile_config.ranging_profile = VL53L8CX_PROFILE_8x8_CONTINUOUS;
+      }
+    }
+    else
+    {
+      /**/
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -857,6 +967,7 @@ sys_error_code_t VL53L8CXTask_vtblSensorSetIntegrationTime(ISensorRanging_t *_th
   }
   else
   {
+    p_if_owner->sensor_status.type.ranging.profile_config.timing_budget = timing_budget;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -886,15 +997,20 @@ sys_error_code_t VL53L8CXTask_vtblSensorConfigIT(ISensorRanging_t *_this, ITConf
   }
   else
   {
+    p_if_owner->sensor_status.type.ranging.it_config.criteria = p_it_config->criteria;
+    if (p_if_owner->sensor_status.type.ranging.it_config.criteria != VL53L8CX_IT_DEFAULT)
+    {
+      p_if_owner->sensor_status.type.ranging.it_config.high_threshold = p_it_config->high_threshold;
+      p_if_owner->sensor_status.type.ranging.it_config.low_threshold = p_it_config->low_threshold;
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
       .sensorMessage.messageId = SM_MESSAGE_ID_SENSOR_CMD,
       .sensorMessage.nCmdID = SENSOR_CMD_ID_CONFIG_IT,
-      .sensorMessage.nSensorId = sensor_id
-//      .sensorMessage.nParam = (uint32_t) p_it_config
+      .sensorMessage.nSensorId = sensor_id,
+      .sensorMessage.nParam = (uint32_t) p_it_config
     };
-    *(uint32_t*)&report.sensorMessage.nParam = (uint32_t) p_it_config;
     res = VL53L8CXTaskPostReportToBack(p_if_owner, (SMMessage *) &report);
   }
 
@@ -917,6 +1033,7 @@ sys_error_code_t VL53L8CXTask_vtblSensorSetAddress(ISensorRanging_t *_this, uint
   }
   else
   {
+    p_if_owner->sensor_status.type.ranging.address = address;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -946,6 +1063,7 @@ sys_error_code_t VL53L8CXTask_vtblSensorSetPowerMode(ISensorRanging_t *_this, ui
   }
   else
   {
+    p_if_owner->sensor_status.type.ranging.power_mode = power_mode;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -975,6 +1093,7 @@ sys_error_code_t VL53L8CXTask_vtblSensorEnable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = TRUE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -1003,6 +1122,7 @@ sys_error_code_t VL53L8CXTask_vtblSensorDisable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = FALSE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -1049,6 +1169,14 @@ SensorStatus_t VL53L8CXTask_vtblSensorGetStatus(ISensor_t *_this)
   VL53L8CXTask *p_if_owner = (VL53L8CXTask *)((uint32_t) _this - offsetof(VL53L8CXTask, sensor_if));
 
   return p_if_owner->sensor_status;
+}
+
+SensorStatus_t *VL53L8CXTask_vtblSensorGetStatusPointer(ISensor_t *_this)
+{
+  assert_param(_this != NULL);
+  VL53L8CXTask *p_if_owner = (VL53L8CXTask *)((uint32_t) _this - offsetof(VL53L8CXTask, sensor_if));
+
+  return &p_if_owner->sensor_status;
 }
 
 /* Private function definition */
@@ -1160,21 +1288,10 @@ static sys_error_code_t VL53L8CXTaskExecuteStepDatalog(AManagedTask *_this)
       case SM_MESSAGE_ID_DATA_READY:
       {
         SYS_DEBUGF(SYS_DBG_LEVEL_ALL, ("VL53L8CX: new data.\r\n"));
-//        if (p_obj->pIRQConfig == NULL)
-//        {
-//          //if(TX_SUCCESS != tx_timer_change(&p_obj->read_timer, AMT_MS_TO_TICKS(VL53L8CX_TASK_CFG_TIMER_PERIOD_MS), AMT_MS_TO_TICKS(VL53L8CX_TASK_CFG_TIMER_PERIOD_MS)))
-//          if (TX_SUCCESS
-//              != tx_timer_change(&p_obj->read_timer, AMT_MS_TO_TICKS(p_obj->vl53l8cx_task_cfg_timer_period_ms),
-//                                 AMT_MS_TO_TICKS(p_obj->vl53l8cx_task_cfg_timer_period_ms)))
-//          {
-//            return SYS_UNDEFINED_ERROR_CODE;
-//          }
-//        }
         res = VL53L8CXTaskSensorReadData(p_obj);
 
         uint8_t resolution;
         uint32_t profile = p_obj->sensor_status.type.ranging.profile_config.ranging_profile;
-
         switch (profile)
         {
           case VL53L8CX_PROFILE_4x4_CONTINUOUS:
@@ -1187,28 +1304,24 @@ static sys_error_code_t VL53L8CXTaskExecuteStepDatalog(AManagedTask *_this)
             break;
           default:
             resolution = 0; /* silence MISRA rule 1.3 warning */
-            res = VL53L8CX_INVALID_PARAM;
+            res = SYS_INVALID_PARAMETER_ERROR_CODE;
             break;
         }
-
         if (!SYS_IS_ERROR_CODE(res))
         {
-            // notify the listeners...
-            double timestamp = report.sensorDataReadyMessage.fTimestamp;
-
-            EMD_Init(&p_obj->data, (uint8_t*) &p_obj->p_sensor_data_buff[0], E_EM_UINT32, E_EM_MODE_INTERLEAVED, 3, 1, resolution, 8);
-            DataEvent_t evt;
-
-            DataEventInit((IEvent *) &evt, p_obj->p_event_src, &p_obj->data, timestamp, p_obj->id);
-            IEventSrcSendEvent(p_obj->p_event_src, (IEvent *) &evt, NULL);
+          // notify the listeners...
+          double timestamp = report.sensorDataReadyMessage.fTimestamp;
+#ifdef TOF_EXTENDED
+          EMD_Init(&p_obj->data, (uint8_t *) &p_obj->p_sensor_data_buff[0], E_EM_UINT32, E_EM_MODE_INTERLEAVED, 3, 1, resolution,
+                   8);
+#else
+          EMD_Init(&p_obj->data, (uint8_t *) &p_obj->p_sensor_data_buff[0], E_EM_UINT32, E_EM_MODE_INTERLEAVED, 3, 1, resolution,
+                   2);
+#endif
+          DataEvent_t evt;
+          DataEventInit((IEvent *) &evt, p_obj->p_event_src, &p_obj->data, timestamp, p_obj->id);
+          IEventSrcSendEvent(p_obj->p_event_src, (IEvent *) &evt, NULL);
           SYS_DEBUGF(SYS_DBG_LEVEL_ALL, ("VL53L8CX: ts = %f\r\n", (float)timestamp));
-//          if (p_obj->pIRQConfig == NULL)
-//          {
-//            if (TX_SUCCESS != tx_timer_activate(&p_obj->read_timer))
-//            {
-//              res = SYS_UNDEFINED_ERROR_CODE;
-//            }
-//          }
         }
         break;
       }
@@ -1354,105 +1467,89 @@ static sys_error_code_t VL53L8CXTaskSensorInit(VL53L8CXTask *_this)
   VL53L8CX_Platform *p_platform_drv = (VL53L8CX_Platform *) &_this->p_sensor_bus_if->m_xConnector;
   _this->tof_driver_if.platform = *p_platform_drv;
 
-  uint32_t id;
-  uint8_t device_id = 0;
-  uint8_t revision_id = 0;
-  uint8_t status = VL53L8CX_STATUS_OK;
-
-  /* Toggle EVK PWR EN board and Lpn pins */
-  HAL_GPIO_WritePin(TOF_LPn_GPIO_Port, TOF_LPn_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(TOF_LPn_GPIO_Port, TOF_LPn_Pin, GPIO_PIN_SET);
-
-  status |= WrByte(p_platform_drv, 0x7fff, 0x00);
-  status |= RdByte(p_platform_drv, 0, &device_id);
-  status |= RdByte(p_platform_drv, 1, &revision_id);
-  status |= WrByte(p_platform_drv, 0x7fff, 0x02);
-
-  if (status == 0U)
+  if (_this->sensor_status.is_active)
   {
-    id = ((uint32_t) device_id << 8) + revision_id;
-    ABusIFSetWhoAmI(_this->p_sensor_bus_if, id);
-    SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("VL53L8CX: sensor - I am 0x%x.\r\n", id));
-
-    /* Initialize as default */
-    status = vl53l8cx_init(&_this->tof_driver_if);
-
-    if (status == 0U && _this->sensor_status.is_active)
+    /* Setup Power mode*/
+    if (vl53l8cx_set_power_mode(&_this->tof_driver_if,
+                                (uint8_t) _this->sensor_status.type.ranging.power_mode) != VL53L8CX_STATUS_OK)
     {
-      /* Setup Power mode*/
-      if (vl53l8cx_set_power_mode(&_this->tof_driver_if,
-                                  (uint8_t) _this->sensor_status.type.ranging.power_mode) != VL53L8CX_STATUS_OK)
-      {
-        res = VL53L8CX_ERROR;
-      }
-      else
-      {
-        res = VL53L8CX_OK;
-      }
+      res = VL53L8CX_ERROR;
+    }
+    else
+    {
+      res = VL53L8CX_OK;
+    }
 
-      /* Setup Config Profile */
-      uint8_t resolution;
-      uint8_t ranging_mode;
-      uint8_t profile = _this->sensor_status.type.ranging.profile_config.ranging_profile;
-      uint8_t ranging_frequency = (uint8_t) _this->sensor_status.type.ranging.profile_config.frequency;
-      uint32_t integration_time = _this->sensor_status.type.ranging.profile_config.timing_budget;
+    /* Setup Config Profile */
+    uint8_t resolution;
+    uint8_t ranging_mode;
+    uint8_t profile = _this->sensor_status.type.ranging.profile_config.ranging_profile;
+    uint8_t ranging_frequency = (uint8_t) _this->sensor_status.type.ranging.profile_config.frequency;
+    uint32_t integration_time = _this->sensor_status.type.ranging.profile_config.timing_budget;
 
-      switch (profile)
-      {
-        case VL53L8CX_PROFILE_4x4_CONTINUOUS:
-          resolution = VL53L8CX_RESOLUTION_4X4;
-          ranging_mode = VL53L8CX_RANGING_MODE_CONTINUOUS;
-          break;
-        case VL53L8CX_PROFILE_4x4_AUTONOMOUS:
-          resolution = VL53L8CX_RESOLUTION_4X4;
-          ranging_mode = VL53L8CX_RANGING_MODE_AUTONOMOUS;
-          break;
-        case VL53L8CX_PROFILE_8x8_CONTINUOUS:
-          resolution = VL53L8CX_RESOLUTION_8X8;
-          ranging_mode = VL53L8CX_RANGING_MODE_CONTINUOUS;
-          break;
-        case VL53L8CX_PROFILE_8x8_AUTONOMOUS:
-          resolution = VL53L8CX_RESOLUTION_8X8;
-          ranging_mode = VL53L8CX_RANGING_MODE_AUTONOMOUS;
-          break;
-        default:
-          resolution = 0; /* silence MISRA rule 1.3 warning */
-          ranging_mode = 0; /* silence MISRA rule 1.3 warning */
-          res = VL53L8CX_INVALID_PARAM;
-          break;
-      }
+    switch (profile)
+    {
+      case VL53L8CX_PROFILE_4x4_CONTINUOUS:
+        resolution = VL53L8CX_RESOLUTION_4X4;
+        ranging_mode = VL53L8CX_RANGING_MODE_CONTINUOUS;
+        break;
+      case VL53L8CX_PROFILE_4x4_AUTONOMOUS:
+        resolution = VL53L8CX_RESOLUTION_4X4;
+        ranging_mode = VL53L8CX_RANGING_MODE_AUTONOMOUS;
+        break;
+      case VL53L8CX_PROFILE_8x8_CONTINUOUS:
+        resolution = VL53L8CX_RESOLUTION_8X8;
+        ranging_mode = VL53L8CX_RANGING_MODE_CONTINUOUS;
+        break;
+      case VL53L8CX_PROFILE_8x8_AUTONOMOUS:
+        resolution = VL53L8CX_RESOLUTION_8X8;
+        ranging_mode = VL53L8CX_RANGING_MODE_AUTONOMOUS;
+        break;
+      default:
+        resolution = 0; /* silence MISRA rule 1.3 warning */
+        ranging_mode = 0; /* silence MISRA rule 1.3 warning */
+        res = SYS_INVALID_PARAMETER_ERROR_CODE;
+        break;
+    }
 
-      if (res != VL53L8CX_OK)
-      {
-        return res;
-      }
-      else if (vl53l8cx_set_resolution(&_this->tof_driver_if, resolution) != VL53L8CX_STATUS_OK)
-      {
-        res = VL53L8CX_ERROR;
-      }
-      else if (vl53l8cx_set_ranging_mode(&_this->tof_driver_if, ranging_mode) != VL53L8CX_STATUS_OK)
-      {
-        res = VL53L8CX_ERROR;
-      }
-      else if (vl53l8cx_set_integration_time_ms(&_this->tof_driver_if, integration_time) != VL53L8CX_STATUS_OK)
-      {
-        res = VL53L8CX_ERROR;
-      }
-      else if (vl53l8cx_set_ranging_frequency_hz(&_this->tof_driver_if, ranging_frequency) != VL53L8CX_STATUS_OK)
-      {
-        res = VL53L8CX_ERROR;
-      }
-      else
-      {
-        res = VL53L8CX_OK;
-      }
+    if (res != VL53L8CX_OK)
+    {
+      return res;
+    }
+    else if (vl53l8cx_set_resolution(&_this->tof_driver_if, resolution) != VL53L8CX_STATUS_OK)
+    {
+      res = VL53L8CX_ERROR;
+    }
+    else if (vl53l8cx_set_ranging_mode(&_this->tof_driver_if, ranging_mode) != VL53L8CX_STATUS_OK)
+    {
+      res = VL53L8CX_ERROR;
+    }
+    else if (vl53l8cx_set_integration_time_ms(&_this->tof_driver_if, integration_time) != VL53L8CX_STATUS_OK)
+    {
+      res = VL53L8CX_ERROR;
+    }
+    else if (vl53l8cx_set_ranging_frequency_hz(&_this->tof_driver_if, ranging_frequency) != VL53L8CX_STATUS_OK)
+    {
+      res = VL53L8CX_ERROR;
+    }
+    else
+    {
+      res = VL53L8CX_OK;
+    }
 
-      /* Setup Config IT*/
+    /* Setup Config IT*/
+    if (_this->pIRQConfig != NULL)
+    {
       uint8_t i;
       uint8_t status = 0U;
       static VL53L8CX_DetectionThresholds thresholds[VL53L8CX_NB_THRESHOLDS];
 
       if (_this->sensor_status.type.ranging.it_config.criteria == VL53L8CX_IT_DEFAULT)
+      {
+        /* disable thresholds detection */
+        status |= vl53l8cx_set_detection_thresholds_enable(&_this->tof_driver_if, 0U);
+      }
+      else
       {
         (void) vl53l8cx_get_resolution(&_this->tof_driver_if, &resolution);
 
@@ -1478,51 +1575,23 @@ static sys_error_code_t VL53L8CXTaskSensorInit(VL53L8CXTask *_this)
 
         res = (status != 0U) ? VL53L8CX_ERROR : VL53L8CX_OK;
       }
-
-      /* Start the sensor */
-      if (vl53l8cx_start_ranging(&_this->tof_driver_if) == VL53L8CX_STATUS_OK)
-      {
-        switch (_this->sensor_status.type.ranging.profile_config.mode)
-        {
-          case VL53L8CX_MODE_BLOCKING_CONTINUOUS:
-            _this->IsContinuous = 1U;
-            _this->IsBlocking = 1U;
-            break;
-
-          case VL53L8CX_MODE_BLOCKING_ONESHOT:
-            _this->IsContinuous = 0U;
-            _this->IsBlocking = 1U;
-            break;
-
-          case VL53L8CX_MODE_ASYNC_CONTINUOUS:
-            _this->IsContinuous = 1U;
-            _this->IsBlocking = 0U;
-            break;
-
-          case VL53L8CX_MODE_ASYNC_ONESHOT:
-            _this->IsContinuous = 0U;
-            _this->IsBlocking = 0U;
-            break;
-
-          default:
-            _this->sensor_status.is_active = false;
-            res = VL53L8CX_INVALID_PARAM;
-            break;
-        }
-      }
-      else
-      {
-        res = VL53L8CX_ERROR;
-      }
     }
-    else
+
+    /* Start the sensor */
+    if (vl53l8cx_start_ranging(&_this->tof_driver_if) != VL53L8CX_STATUS_OK)
     {
-      vl53l8cx_stop_ranging(&_this->tof_driver_if);
-      _this->sensor_status.is_active = false;
+      res = VL53L8CX_ERROR;
     }
+  }
+  else
+  {
+    vl53l8cx_stop_ranging(&_this->tof_driver_if);
+    _this->sensor_status.is_active = false;
+  }
 
+  if (_this->sensor_status.is_active)
+  {
     _this->vl53l8cx_task_cfg_timer_period_ms = (uint16_t)(1000.0f / _this->sensor_status.type.ranging.profile_config.frequency);
-
   }
 
   return res;
@@ -1536,36 +1605,6 @@ static sys_error_code_t VL53L8CXTaskSensorReadData(VL53L8CXTask *_this)
   _this->tof_driver_if.platform = *p_platform_drv;
 
   if (_this->sensor_status.is_active)
-  {
-    uint32_t timeout;
-    uint32_t tick_start;
-    uint8_t new_data_ready = 0;
-
-    if (_this->IsBlocking == 1U)
-    {
-      timeout = _this->vl53l8cx_task_cfg_timer_period_ms;
-    }
-    else
-    {
-      timeout = 0;
-    }
-
-    tick_start = HAL_GetTick();
-
-    do
-    {
-      (void) vl53l8cx_check_data_ready(&_this->tof_driver_if, &new_data_ready);
-
-      if (new_data_ready == 1U)
-      {
-        res = VL53L8CX_OK;
-        break;
-      }
-    } while ((HAL_GetTick() - tick_start) < timeout);
-  }
-
-  /* a new measure is available if no error is returned by the poll function */
-  if (res == VL53L8CX_OK)
   {
     uint8_t i;
     uint8_t resolution;
@@ -1583,6 +1622,7 @@ static sys_error_code_t VL53L8CXTaskSensorReadData(VL53L8CXTask *_this)
     {
       for (i = 0; i < resolution; i++)
       {
+#ifdef TOF_EXTENDED
         _this->p_sensor_data_buff[i][0] = data.nb_target_detected[i];
 
         /* return Ambient value if ambient rate output is enabled */
@@ -1600,49 +1640,57 @@ static sys_error_code_t VL53L8CXTaskSensorReadData(VL53L8CXTask *_this)
         /* return Signal value if signal rate output is enabled */
         if (_this->sensor_status.type.ranging.profile_config.enable_signal == true)
         {
-          _this->p_sensor_data_buff[i][2] = data.signal_per_spad[2*i];
+          _this->p_sensor_data_buff[i][2] = data.signal_per_spad[2 * i];
         }
         else
         {
           _this->p_sensor_data_buff[i][2] = 0;
         }
 
-        _this->p_sensor_data_buff[i][3] = data.target_status[2*i];
+        _this->p_sensor_data_buff[i][3] = data.target_status[2 * i];
 
-        _this->p_sensor_data_buff[i][4] = data.distance_mm[2*i];
+        _this->p_sensor_data_buff[i][4] = data.distance_mm[2 * i];
 
         /*** TARGET 2 OUTPUT VALUES ***/
         /* return Signal value if signal rate output is enabled */
         if (_this->sensor_status.type.ranging.profile_config.enable_signal == true)
         {
-          _this->p_sensor_data_buff[i][5] = data.signal_per_spad[2*i + 1];
+          _this->p_sensor_data_buff[i][5] = data.signal_per_spad[2 * i + 1];
         }
         else
         {
           _this->p_sensor_data_buff[i][5] = 0;
         }
 
-        _this->p_sensor_data_buff[i][6] = data.target_status[2*i + 1];
+        _this->p_sensor_data_buff[i][6] = data.target_status[2 * i + 1];
 
-        _this->p_sensor_data_buff[i][7] = data.distance_mm[2*i +1];
+        _this->p_sensor_data_buff[i][7] = data.distance_mm[2 * i + 1];
+
+#if (HSD_USE_DUMMY_DATA == 1)
+        uint8_t jj;
+        int32_t *p32 = (int32_t *)_this->p_sensor_data_buff[i];
+        for (jj = 0; jj < 8; jj++)
+        {
+          *p32++ = dummyDataCounter++;
+        }
+#endif
+#else
+        /*** TARGET OUTPUT VALUES (status + distance) are saved in a 2 x resolution matrix ***/
+        _this->p_sensor_data_buff[i][0] = data.target_status[i];
+        _this->p_sensor_data_buff[i][1] = data.distance_mm[i];
+#if (HSD_USE_DUMMY_DATA == 1)
+        uint8_t jj;
+        int32_t *p32 = (int32_t *)_this->p_sensor_data_buff[i];
+        for (jj = 0; jj < 2; jj++)
+        {
+          *p32++ = dummyDataCounter++;
+        }
+#endif
+#endif
       }
       res = VL53L8CX_OK;
     }
   }
-
-//
-//#if (HSD_USE_DUMMY_DATA == 1)
-//  uint16_t i = 0;
-//  int16_t *p16 = (int16_t *)_this->p_sensor_data_buff;
-//
-//  if(_this->fifo_level >= _this->samples_per_it)
-//  {
-//  for (i = 0; i < _this->samples_per_it * 3 ; i++)
-//  {
-//    *p16++ = dummyDataCounter++;
-//  }
-//  }
-//#endif
 
   return res;
 }
@@ -1676,7 +1724,13 @@ static sys_error_code_t VL53L8CXTaskSensorInitTaskParams(VL53L8CXTask *_this)
   _this->sensor_status.type.ranging.it_config.criteria = VL53L8CX_IT_DEFAULT;
   _this->sensor_status.type.ranging.address = VL53L8CX_DEVICE_ADDRESS;
   _this->sensor_status.type.ranging.power_mode = VL53L8CX_POWER_MODE_WAKEUP;
-  EMD_Init(&_this->data, (uint8_t *) &_this->p_sensor_data_buff[0], E_EM_UINT32, E_EM_MODE_INTERLEAVED, 3, 1, VL53L8CX_RESOLUTION_4X4, 8);
+#ifdef TOF_EXTENDED
+  EMD_Init(&_this->data, (uint8_t *) &_this->p_sensor_data_buff[0], E_EM_UINT32, E_EM_MODE_INTERLEAVED, 3, 1,
+           VL53L8CX_RESOLUTION_4X4, 8);
+#else
+  EMD_Init(&_this->data, (uint8_t *) &_this->p_sensor_data_buff[0], E_EM_UINT32, E_EM_MODE_INTERLEAVED, 3, 1,
+           VL53L8CX_RESOLUTION_4X4, 2);
+#endif
 
   return res;
 }
@@ -1711,7 +1765,8 @@ static sys_error_code_t VL53L8CXTaskSensorSetResolution(VL53L8CXTask *_this, SMM
   {
     if (resolution == VL53L8CX_RESOLUTION_4X4)
     {
-      if (_this->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_4x4_CONTINUOUS || _this->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_8x8_CONTINUOUS)
+      if (_this->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_4x4_CONTINUOUS
+          || _this->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_8x8_CONTINUOUS)
       {
         _this->sensor_status.type.ranging.profile_config.ranging_profile = VL53L8CX_PROFILE_4x4_CONTINUOUS;
       }
@@ -1722,7 +1777,8 @@ static sys_error_code_t VL53L8CXTaskSensorSetResolution(VL53L8CXTask *_this, SMM
     }
     else if (resolution == VL53L8CX_RESOLUTION_8X8)
     {
-      if (_this->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_4x4_CONTINUOUS || _this->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_8x8_CONTINUOUS)
+      if (_this->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_4x4_CONTINUOUS
+          || _this->sensor_status.type.ranging.profile_config.ranging_profile == VL53L8CX_PROFILE_8x8_CONTINUOUS)
       {
         _this->sensor_status.type.ranging.profile_config.ranging_profile = VL53L8CX_PROFILE_8x8_CONTINUOUS;
       }
@@ -1735,7 +1791,13 @@ static sys_error_code_t VL53L8CXTaskSensorSetResolution(VL53L8CXTask *_this, SMM
     {
       res = SYS_INVALID_PARAMETER_ERROR_CODE;
     }
-    EMD_Init(&_this->data, (uint8_t *) &_this->p_sensor_data_buff[0], E_EM_UINT32, E_EM_MODE_INTERLEAVED, 3, 1, resolution, 8);
+#ifdef TOF_EXTENDED
+    EMD_Init(&_this->data, (uint8_t *) &_this->p_sensor_data_buff[0], E_EM_UINT32, E_EM_MODE_INTERLEAVED, 3, 1, resolution,
+             8);
+#else
+    EMD_Init(&_this->data, (uint8_t *) &_this->p_sensor_data_buff[0], E_EM_UINT32, E_EM_MODE_INTERLEAVED, 3, 1, resolution,
+             2);
+#endif
   }
   else
   {
@@ -1814,7 +1876,7 @@ static sys_error_code_t VL53L8CXTaskSensorConfigIt(VL53L8CXTask *_this, SMMessag
 {
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
-  ITConfig_t *pConfig = (ITConfig_t *)*(uint32_t*)&report.sensorMessage.nParam;
+  ITConfig_t *pConfig = (ITConfig_t *) report.sensorMessage.nParam;
   uint8_t id = report.sensorMessage.nSensorId;
 
   if (id == _this->id)

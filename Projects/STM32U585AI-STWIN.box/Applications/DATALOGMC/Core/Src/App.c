@@ -50,7 +50,6 @@
 #include "Imp23absu_Mic_PnPL.h"
 #include "Ism330dhcx_Acc_PnPL.h"
 #include "Ism330dhcx_Gyro_PnPL.h"
-#include "Ism330dhcx_Mlc_PnPL.h"
 #include "Stts22h_Temp_PnPL.h"
 #include "Log_Controller_PnPL.h"
 #include "Motor_Controller_PnPL.h"
@@ -96,7 +95,6 @@ static AManagedTaskEx *sI2C3BusObj = NULL;
   * Sensor task object.
   */
 static AManagedTaskEx *sIIS3DWBObj = NULL;
-static AManagedTaskEx *sIIS3DWBExtObj = NULL;
 static AManagedTaskEx *sILPS22QSObj = NULL;
 static AManagedTaskEx *sIMP23ABSUObj = NULL;
 static AManagedTaskEx *sISM330DHCXObj = NULL;
@@ -112,34 +110,6 @@ static AManagedTaskEx *sDatalogAppObj = NULL;
  */
 static AManagedTaskEx *sMCPObj = NULL;
 
-/**
-  * specifies the map (PM_APP, PM_SM). It re-map the state of the application into the state of the Sensor Manager.
-  */
-static EPowerMode spAppPMState2SMPMStateMap[] =
-{
-  E_POWER_MODE_STATE1,
-  E_POWER_MODE_SLEEP_1,
-  E_POWER_MODE_SENSORS_ACTIVE,
-  E_POWER_MODE_RESERVED
-};
-
-/* Private functions declaration */
-/*********************************/
-
-/**
-  * Re-map the PM State Machine of the Sensor Manager managed tasks used in the application according to the following map:
-  *
-  * | App State                      | Sensor Manager State         |
-  * | :----------------------------- | ---------------------------: |
-  * | E_POWER_MODE_STATE1            | E_POWER_MODE_STATE1          |
-  * | E_POWER_MODE_SLEEP_1           | E_POWER_MODE_SLEEP_1         |
-  * | E_POWER_MODE_SENSORS_ACTIVE    | E_POWER_MODE_SENSORS_ACTIVE  |
-  * | E_POWER_MODE_STARTING          | E_POWER_MODE_STATE1          |
-  *
-  * @param pPMState2PMStateMap [IN] specifies the map (PM_APP, PM_SM).
-  * @return SYS_NO_ERROR_CODE if success, an error code otherwise.
-  */
-static sys_error_code_t SensorManagerStateMachineRemap(EPowerMode *pPMState2PMStateMap);
 
 /**
  *  Flags for external Add-on
@@ -158,8 +128,7 @@ sys_error_code_t SysLoadApplicationContext(ApplicationContext *pAppContext)
   uint8_t stts22h_address;
   hwd_st25dv_version st25dv_version;
 
-  /* Workaround to set malloc/free function even if BLE Init fails */
-  json_set_allocation_functions(SysAlloc, SysFree);
+  PnPLSetAllocationFunctions(SysAlloc, SysFree);
 
   /* Check the HW configuration to load the tasks accordingly */
   sExtIis3dwb = HardwareDetection_Check_Ext_IIS3DWB();
@@ -249,10 +218,6 @@ sys_error_code_t SysOnStartApplication(ApplicationContext *pAppContext)
 {
   UNUSED(pAppContext);
 
-  /* Re-map the state machine of the Integrated tasks */
-
-  SensorManagerStateMachineRemap(spAppPMState2SMPMStateMap);
-
   /* Connect the sensor task to the bus. */
   if(sI2C3BusObj)
   {
@@ -299,8 +264,8 @@ sys_error_code_t SysOnStartApplication(ApplicationContext *pAppContext)
   Ism330dhcx_Acc_PnPLInit(pIsm330dhcx_Acc_PnPLObj);
   Ism330dhcx_Gyro_PnPLInit(pIsm330dhcx_Gyro_PnPLObj);
   Stts22h_Temp_PnPLInit(pStts22h_Temp_PnPLObj);
-  Log_Controller_PnPLInit(pLog_Controller_PnPLObj, DatalogAppTask_GetILogControllerIF((DatalogAppTask *) sDatalogAppObj));
-  Motor_Controller_PnPLInit(pMotor_Controller_PnPLObj, MCPTask_GetIMotorControllerIF((MCPTask_t *)sMCPObj));
+  Log_Controller_PnPLInit(pLog_Controller_PnPLObj);
+  Motor_Controller_PnPLInit(pMotor_Controller_PnPLObj);
   Tags_Info_PnPLInit(pTags_Info_PnPLObj);
   Acquisition_Info_PnPLInit(pAcquisition_Info_PnPLObj);
   Firmware_Info_PnPLInit(pFirmware_Info_PnPLObj);
@@ -324,34 +289,7 @@ IAppPowerModeHelper *SysGetPowerModeHelper(void)
 /* Private function definition */
 /*******************************/
 
-static sys_error_code_t SensorManagerStateMachineRemap(EPowerMode *pPMState2PMStateMap)
-{
-  assert_param(pPMState2PMStateMap != NULL);
-
-  AMTSetPMStateRemapFunc((AManagedTask *) sI2C2BusObj, pPMState2PMStateMap);
-  if(sExtIis3dwb)
-  {
-    AMTSetPMStateRemapFunc((AManagedTask*) sI2C3BusObj, pPMState2PMStateMap);
-  }
-  AMTSetPMStateRemapFunc((AManagedTask *) sSPI2BusObj, pPMState2PMStateMap);
-  AMTSetPMStateRemapFunc((AManagedTask *) sILPS22QSObj, pPMState2PMStateMap);
-  AMTSetPMStateRemapFunc((AManagedTask *) sIMP23ABSUObj, pPMState2PMStateMap);
-  AMTSetPMStateRemapFunc((AManagedTask *) sISM330DHCXObj, pPMState2PMStateMap);
-  AMTSetPMStateRemapFunc((AManagedTask *) sSTTS22HObj, pPMState2PMStateMap);
-  if (sIIS3DWBExtObj)
-  {
-    AMTSetPMStateRemapFunc((AManagedTask *) sIIS3DWBExtObj, pPMState2PMStateMap);
-  }
-
-  AMTSetPMStateRemapFunc((AManagedTask *) sMCPObj, pPMState2PMStateMap);
-
-
-  return SYS_NO_ERROR_CODE;
-}
-
-
 void EXT_INT1_EXTI_Callback(uint16_t nPin)
-
 {
 
   if (sIIS3DWBObj)

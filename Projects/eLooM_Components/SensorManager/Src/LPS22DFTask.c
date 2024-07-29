@@ -185,7 +185,6 @@ static sys_error_code_t LPS22DFTaskConfigureIrqPin(const LPS22DFTask *_this, boo
 static void LPS22DFTaskTimerCallbackFunction(ULONG param);
 
 
-
 /* Inline function forward declaration */
 /***************************************/
 
@@ -234,53 +233,33 @@ static LPS22DFTaskClass_t sTheClass =
     LPS22DFTask_vtblOnEnterPowerMode
   },
 
-    /* class::sensor_if_vtbl virtual table */
+  /* class::sensor_if_vtbl virtual table */
+  {
     {
-        {
-            {
-                LPS22DFTask_vtblPressGetId,
-                LPS22DFTask_vtblPressGetEventSourceIF,
-                LPS22DFTask_vtblPressGetDataInfo },
-            LPS22DFTask_vtblSensorEnable,
-            LPS22DFTask_vtblSensorDisable,
-            LPS22DFTask_vtblSensorIsEnabled,
-            LPS22DFTask_vtblPressGetDescription,
-            LPS22DFTask_vtblPressGetStatus },
-        LPS22DFTask_vtblPressGetODR,
-        LPS22DFTask_vtblPressGetFS,
-        LPS22DFTask_vtblPressGetSensitivity,
-        LPS22DFTask_vtblSensorSetODR,
-        LPS22DFTask_vtblSensorSetFS,
-        LPS22DFTask_vtblSensorSetFifoWM },
+      {
+        LPS22DFTask_vtblPressGetId,
+        LPS22DFTask_vtblPressGetEventSourceIF,
+        LPS22DFTask_vtblPressGetDataInfo
+      },
+      LPS22DFTask_vtblSensorEnable,
+      LPS22DFTask_vtblSensorDisable,
+      LPS22DFTask_vtblSensorIsEnabled,
+      LPS22DFTask_vtblPressGetDescription,
+      LPS22DFTask_vtblPressGetStatus,
+      LPS22DFTask_vtblPressGetStatusPointer
+    },
+    LPS22DFTask_vtblPressGetODR,
+    LPS22DFTask_vtblPressGetFS,
+    LPS22DFTask_vtblPressGetSensitivity,
+    LPS22DFTask_vtblSensorSetODR,
+    LPS22DFTask_vtblSensorSetFS,
+    LPS22DFTask_vtblSensorSetFifoWM
+  },
 
   /* PRESSURE DESCRIPTOR */
   {
     "lps22df",
-    COM_TYPE_PRESS,
-    {
-      1.0f,
-      4.0f,
-      10.0f,
-      25.0f,
-      50.0f,
-      75.0f,
-      100.0f,
-      200.0f,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      1260.0f,
-      4060.0f,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      "prs",
-    },
-    "hPa",
-    {
-      0,
-      1000,
-    }
+    COM_TYPE_PRESS
   },
 
   /* class (PM_STATE, ExecuteStepFunc) map */
@@ -560,19 +539,21 @@ sys_error_code_t LPS22DFTask_vtblDoEnterPowerMode(AManagedTask *_this, const EPo
   {
     if (ActivePowerMode == E_POWER_MODE_SENSORS_ACTIVE)
     {
-      /* Deactivate the sensor */
-      lps22df_md_t val;
-      lps22df_mode_get(p_sensor_drv, &val);
-      val.odr = LPS22DF_ONE_SHOT;
+      if (LPS22DFTaskSensorIsActive(p_obj))
+      {
+        /* Deactivate the sensor */
+        lps22df_md_t val;
+        lps22df_mode_get(p_sensor_drv, &val);
+        val.odr = LPS22DF_ONE_SHOT;
 
-      lps22df_fifo_md_t fifo_md;
-      fifo_md.watermark = 1;
-      fifo_md.operation = LPS22DF_BYPASS;
+        lps22df_fifo_md_t fifo_md;
+        fifo_md.watermark = 1;
+        fifo_md.operation = LPS22DF_BYPASS;
 
-      lps22df_fifo_mode_set(p_sensor_drv, &fifo_md);
+        lps22df_fifo_mode_set(p_sensor_drv, &fifo_md);
 
-      lps22df_mode_set(p_sensor_drv, &val);
-
+        lps22df_mode_set(p_sensor_drv, &val);
+      }
       /* Empty the task queue and disable INT or timer */
       tx_queue_flush(&p_obj->in_queue);
       if (p_obj->pIRQConfig == NULL)
@@ -630,7 +611,7 @@ sys_error_code_t LPS22DFTask_vtblOnEnterTaskControlLoop(AManagedTask *_this)
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
 
-  SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("LPS22DF: start.\r\n"));
+  SYS_DEBUGF(SYS_DBG_LEVEL_DEFAULT, ("LPS22DF: start.\r\n"));
 
 #if defined(ENABLE_THREADX_DBG_PIN) && defined (LPS22DF_TASK_CFG_TAG)
   LPS22DFTask *p_obj = (LPS22DFTask *) _this;
@@ -776,6 +757,11 @@ sys_error_code_t LPS22DFTask_vtblSensorSetODR(ISensorMems_t *_this, float odr)
   }
   else
   {
+    if (odr > 0.0f)
+    {
+      p_if_owner->sensor_status.type.mems.odr = odr;
+      p_if_owner->sensor_status.type.mems.measured_odr = 0.0f;
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -804,6 +790,10 @@ sys_error_code_t LPS22DFTask_vtblSensorSetFS(ISensorMems_t *_this, float fs)
   }
   else
   {
+    if (fs == 4060.0f)
+    {
+      p_if_owner->sensor_status.type.mems.fs = fs;
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -863,6 +853,7 @@ sys_error_code_t LPS22DFTask_vtblSensorEnable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = TRUE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -890,6 +881,7 @@ sys_error_code_t LPS22DFTask_vtblSensorDisable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = FALSE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -934,6 +926,14 @@ SensorStatus_t LPS22DFTask_vtblPressGetStatus(ISensor_t *_this)
   LPS22DFTask *p_if_owner = (LPS22DFTask *)((uint32_t) _this - offsetof(LPS22DFTask, sensor_if));
 
   return p_if_owner->sensor_status;
+}
+
+SensorStatus_t *LPS22DFTask_vtblPressGetStatusPointer(ISensor_t *_this)
+{
+  assert_param(_this != NULL);
+  LPS22DFTask *p_if_owner = (LPS22DFTask *)((uint32_t) _this - offsetof(LPS22DFTask, sensor_if));
+
+  return &p_if_owner->sensor_status;
 }
 
 /* Private function definition */
@@ -1340,11 +1340,14 @@ static sys_error_code_t LPS22DFTaskSensorInit(LPS22DFTask *_this)
   }
 #endif
 
+  if (_this->sensor_status.is_active)
+  {
 #if LPS22DF_FIFO_ENABLED
-  _this->task_delay = (uint16_t)((1000.0f / _this->sensor_status.type.mems.odr) * (((float)(_this->samples_per_it)) / 2.0f));
+    _this->task_delay = (uint16_t)((1000.0f / _this->sensor_status.type.mems.odr) * (((float)(_this->samples_per_it)) / 2.0f));
 #else
-  _this->task_delay = (uint16_t)(1000.0f / _this->sensor_status.type.mems.odr);
+    _this->task_delay = (uint16_t)(1000.0f / _this->sensor_status.type.mems.odr);
 #endif
+  }
 
   return res;
 }
@@ -1462,42 +1465,34 @@ static sys_error_code_t LPS22DFTaskSensorSetODR(LPS22DFTask *_this, SMMessage re
     else if (odr < 2.0f)
     {
       odr = 1;
-      _this->task_delay = 2000;
     }
     else if (odr < 5.0f)
     {
       odr = 4;
-      _this->task_delay = 1000;
     }
     else if (odr < 11.0f)
     {
       odr = 10;
-      _this->task_delay = 1000;
     }
     else if (odr < 26.0f)
     {
       odr = 25;
-      _this->task_delay = 1000;
     }
     else if (odr < 51.0f)
     {
       odr = 50;
-      _this->task_delay = 1000;
     }
     else if (odr < 76.0f)
     {
       odr = 75;
-      _this->task_delay = 1000;
     }
     else if (odr < 101.0f)
     {
       odr = 100;
-      _this->task_delay = 1000;
     }
     else
     {
-      odr = 100;
-      _this->task_delay = 500;
+      odr = 200;
     }
 
     if (!SYS_IS_ERROR_CODE(res))

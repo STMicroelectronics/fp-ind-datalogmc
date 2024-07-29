@@ -24,8 +24,6 @@ extern "C" {
 #endif
 
 
-
-
 /* AManagedTask virtual functions */
 sys_error_code_t IIS2ICLXTask_vtblHardwareInit(AManagedTask *_this, void *pParams); ///< @sa AMTHardwareInit
 sys_error_code_t IIS2ICLXTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_function_t *pvTaskCode, CHAR **pcName,
@@ -50,6 +48,7 @@ sys_error_code_t IIS2ICLXTask_vtblSensorDisable(ISensor_t *_this);
 boolean_t IIS2ICLXTask_vtblSensorIsEnabled(ISensor_t *_this);
 SensorDescriptor_t IIS2ICLXTask_vtblSensorGetDescription(ISensor_t *_this);
 SensorStatus_t IIS2ICLXTask_vtblSensorGetStatus(ISensor_t *_this);
+SensorStatus_t *IIS2ICLXTask_vtblSensorGetStatusPointer(ISensor_t *_this);
 sys_error_code_t IIS2ICLXTask_vtblAccGetODR(ISensorMems_t *_this, float *p_measured, float *p_nominal);
 float IIS2ICLXTask_vtblAccGetFS(ISensorMems_t *_this);
 float IIS2ICLXTask_vtblAccGetSensitivity(ISensorMems_t *_this);

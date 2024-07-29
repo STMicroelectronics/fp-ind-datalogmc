@@ -36,17 +36,9 @@ extern "C" {
 #include "ICommandParse_vtbl.h"
 #include "PnPLCompManager.h"
 
-#include "ILog_Controller.h"
-#include "ILog_Controller_vtbl.h"
-//#include "IIsm330dhcx_Mlc.h"
-//#include "IIsm330dhcx_Mlc_vtbl.h"
-//#include "IIsm330is_Ispu.h"
-//#include "IIsm330is_Ispu_vtbl.h"
-#include "IMotor_Controller.h"
-#include "IMotor_Controller_vtbl.h"
-
 /* Datalog messages ID */
 #define DT_USER_BUTTON                            (0x0010)
+#define DT_SWITCH_BANK                            (0x0020)
 #define DT_FORCE_STEP                             (0x00F0)
 
 
@@ -79,9 +71,14 @@ IEventListener *DatalogAppTask_GetActuatorEventListenerIF(DatalogAppTask *_this)
 
 ICommandParse_t *DatalogAppTask_GetICommandParseIF(DatalogAppTask *_this);
 
-ILog_Controller_t *DatalogAppTask_GetILogControllerIF(DatalogAppTask *_this);
-
 sys_error_code_t DatalogAppTask_msg(ULONG msg);
+
+uint8_t DatalogAppTask_start(int32_t interface);
+uint8_t DatalogAppTask_stop(void);
+uint8_t DatalogAppTask_save_config(void);
+uint8_t DatalogAppTask_switch_bank(void);
+uint8_t DatalogAppTask_set_time(const char *datetime);
+uint8_t DatalogAppTask_set_dfu_mode(void);
 
 
 // Inline functions definition

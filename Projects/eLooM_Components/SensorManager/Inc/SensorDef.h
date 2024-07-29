@@ -30,63 +30,64 @@ extern "C" {
 #endif
 
 
-
 #include "services/eloom_sysbase.h"
 
 
-#define COM_TYPE_ACC    1
-#define COM_TYPE_MAG    2
-#define COM_TYPE_GYRO   3
-#define COM_TYPE_TEMP   4
-#define COM_TYPE_PRESS  5
-#define COM_TYPE_HUM    6
-#define COM_TYPE_MIC    7
-#define COM_TYPE_MLC    8
-#define COM_TYPE_ISPU   9
-#define COM_TYPE_TOF   10
-#define COM_TYPE_CAM   11
-#define COM_TYPE_TMOS  12
-#define COM_TYPE_ALS   13
+#define COM_TYPE_ACC     1
+#define COM_TYPE_MAG     2
+#define COM_TYPE_GYRO    3
+#define COM_TYPE_TEMP    4
+#define COM_TYPE_PRESS   5
+#define COM_TYPE_HUM     6
+#define COM_TYPE_MIC     7
+#define COM_TYPE_MLC     8
+#define COM_TYPE_ISPU    9
+#define COM_TYPE_TOF    10
+#define COM_TYPE_CAM    11
+#define COM_TYPE_TMOS   12
+#define COM_TYPE_ALS    13
+#define COM_TYPE_POW 14
 
-#define DATA_TYPE_UINT8     (uint8_t)(0x00)
-#define DATA_TYPE_INT8      (uint8_t)(0x01)
-#define DATA_TYPE_UINT16    (uint8_t)(0x02)
-#define DATA_TYPE_INT16     (uint8_t)(0x03)
-#define DATA_TYPE_UINT32    (uint8_t)(0x04)
-#define DATA_TYPE_INT32     (uint8_t)(0x05)
-#define DATA_TYPE_FLOAT     (uint8_t)(0x06)
+#define DATA_TYPE_UINT8  (uint8_t)(0x00)
+#define DATA_TYPE_INT8   (uint8_t)(0x01)
+#define DATA_TYPE_UINT16 (uint8_t)(0x02)
+#define DATA_TYPE_INT16  (uint8_t)(0x03)
+#define DATA_TYPE_UINT32 (uint8_t)(0x04)
+#define DATA_TYPE_INT32  (uint8_t)(0x05)
+#define DATA_TYPE_FLOAT  (uint8_t)(0x06)
 
-#define COM_END_OF_LIST_INT           -1
-#define COM_END_OF_LIST_FLOAT         -1.0f
+#define COM_END_OF_LIST_INT      -1
+#define COM_END_OF_LIST_FLOAT    -1.0f
 
-#define COM_LIST_SEPARATOR_INT        -2
-#define COM_LIST_SEPARATOR_FLOAT      -2.0f
+#define COM_LIST_SEPARATOR_INT   -2
+#define COM_LIST_SEPARATOR_FLOAT -2.0f
 
 #ifndef SM_MAX_SENSOR_COMBO
-#define SM_MAX_SENSOR_COMBO           4
+#define SM_MAX_SENSOR_COMBO  4
 #endif
 #ifndef SM_MAX_SUPPORTED_ODR
-#define SM_MAX_SUPPORTED_ODR          16
+#define SM_MAX_SUPPORTED_ODR 16
 #endif
 #ifndef SM_MAX_SUPPORTED_FS
-#define SM_MAX_SUPPORTED_FS           16
+#define SM_MAX_SUPPORTED_FS  16
 #endif
 #ifndef SM_MAX_DIM_LABELS
-#define SM_MAX_DIM_LABELS             16U
+#define SM_MAX_DIM_LABELS    16U
 #endif
 #ifndef SM_DIM_LABELS_LENGTH
-#define SM_DIM_LABELS_LENGTH          4U
+#define SM_DIM_LABELS_LENGTH 4U
 #endif
 
-#define ISENSOR_CLASS_MEMS    0U
-#define ISENSOR_CLASS_AUDIO   1U
-#define ISENSOR_CLASS_RANGING 2U
-#define ISENSOR_CLASS_LIGHT   3U
-#define ISENSOR_CLASS_CAMERA  4U
-#define ISENSOR_CLASS_PRESENCE  5U
-#define ISENSOR_CLASS_UNKNOW  255U
+#define ISENSOR_CLASS_MEMS         0U
+#define ISENSOR_CLASS_AUDIO        1U
+#define ISENSOR_CLASS_RANGING      2U
+#define ISENSOR_CLASS_LIGHT        3U
+#define ISENSOR_CLASS_CAMERA       4U
+#define ISENSOR_CLASS_PRESENCE     5U
+#define ISENSOR_CLASS_POWERMONITOR 6U
+#define ISENSOR_CLASS_UNKNOWN      255U
 
-#define ALS_NUM_CHANNELS      6U
+#define ALS_NUM_CHANNELS 6U
 
 /**
   * Create  type name for _SensorDescriptor_t.
@@ -98,7 +99,6 @@ typedef struct _SensorDescriptor_t SensorDescriptor_t;
   */
 struct _SensorDescriptor_t
 {
-
   /**
     * Specifies the sensor name.
     */
@@ -108,31 +108,6 @@ struct _SensorDescriptor_t
     * Specifies the sensor type (ACC, GYRO, TEMP, ...).
     */
   uint8_t sensor_type;
-
-  /**
-    * Specifies the supported data rates.
-    */
-  float p_odr[SM_MAX_SUPPORTED_ODR];
-
-  /**
-    * Specifies the supported full scales.
-    */
-  float p_fs[SM_MAX_SUPPORTED_FS];
-
-  /**
-    * Specifies a label for each axes.
-    */
-  char p_dimensions_label[SM_MAX_DIM_LABELS][SM_DIM_LABELS_LENGTH];
-
-  /**
-    * Specifies the unit of measurement for each axes.
-    */
-  char unit[SM_MAX_DIM_LABELS];
-
-  /**
-    * Specifies the supported values for SamplesPerTimestamp variable.
-    */
-  uint16_t p_samples_per_timestamp[2];
 };
 
 
@@ -160,8 +135,8 @@ typedef struct
 } ITConfig_t;
 
 /**
- * SW Compensation Algorithm Config parameters
- */
+  * SW Compensation Algorithm Config parameters
+  */
 typedef struct
 {
   uint8_t comp_type; /*<! None: 0, Linear: 1, Non-linear: 2 */
@@ -272,8 +247,8 @@ typedef struct SensorStatusPresence_t
   float measured_data_frequency;
 
   /**
-   * Specifies the transmittance of the lens.
-   */
+    * Specifies the transmittance of the lens.
+    */
   float Transmittance;
 
   /**
@@ -342,24 +317,24 @@ typedef struct SensorStatusPresence_t
   uint8_t software_compensation;
 
   /**
-   * Specifies software compensation algorithm parameters.
-   */
+    * Specifies software compensation algorithm parameters.
+    */
   CompensationAlgorithmConfig_t AlgorithmConfig;
-  
+
 } SensorStatusPresence;
 
 
 typedef struct SensorStatusLight_t
 {
   /**
-    * Specifies the nominal data rate.
+    * Specifies the nominal data rate [ms].
     */
   uint32_t intermeasurement_time;
 
   /**
-    * Specifies the exposure time.
+    * Specifies the exposure time [us].
     */
-  float exposure_time;
+  uint32_t exposure_time;
 
   /**
     * Specifies the gain.
@@ -367,10 +342,23 @@ typedef struct SensorStatusLight_t
   float gain[ ALS_NUM_CHANNELS ];
 
   /**
-    * Specifies the effective data rate.
+    * Specifies the effective data rate [ms].
     */
   uint32_t measured_intermeasurement_time;
 } SensorStatusLight;
+
+typedef struct SensorStatusPowerMeter_t
+{
+  /**
+    * Specifies the ADC conversion time [us].
+    */
+  uint32_t adc_conversion_time;
+
+  /**
+    * Specifies the Rshunt resistor value [uohm].
+    */
+  uint32_t r_shunt;
+} SensorStatusPowerMeter;
 
 typedef struct _SensorStatus_t
 {
@@ -397,6 +385,7 @@ typedef struct _SensorStatus_t
     SensorStatusCamera camera;
     SensorStatusPresence presence;
     SensorStatusLight light;
+    SensorStatusPowerMeter power_meter;
   } type;
 
 } SensorStatus_t;

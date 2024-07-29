@@ -180,7 +180,6 @@ static sys_error_code_t ILPS22QSTaskConfigureIrqPin(const ILPS22QSTask *_this, b
 static void ILPS22QSTaskTimerCallbackFunction(ULONG param);
 
 
-
 /* Inline function forward declaration */
 /***************************************/
 
@@ -241,7 +240,8 @@ static ILPS22QSTaskClass_t sTheClass =
       ILPS22QSTask_vtblSensorDisable,
       ILPS22QSTask_vtblSensorIsEnabled,
       ILPS22QSTask_vtblPressGetDescription,
-      ILPS22QSTask_vtblPressGetStatus
+      ILPS22QSTask_vtblPressGetStatus,
+      ILPS22QSTask_vtblPressGetStatusPointer
     },
     ILPS22QSTask_vtblPressGetODR,
     ILPS22QSTask_vtblPressGetFS,
@@ -254,31 +254,7 @@ static ILPS22QSTaskClass_t sTheClass =
   /* PRESSURE DESCRIPTOR */
   {
     "ilps22qs",
-    COM_TYPE_PRESS,
-    {
-      1.0f,
-      4.0f,
-      10.0f,
-      25.0f,
-      50.0f,
-      75.0f,
-      100.0f,
-      200.0f,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      1260.0f,
-      4060.0f,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      "prs",
-    },
-    "hPa",
-    {
-      0,
-      1000,
-    }
+    COM_TYPE_PRESS
   },
 
   /* class (PM_STATE, ExecuteStepFunc) map */
@@ -557,17 +533,19 @@ sys_error_code_t ILPS22QSTask_vtblDoEnterPowerMode(AManagedTask *_this, const EP
   {
     if (ActivePowerMode == E_POWER_MODE_SENSORS_ACTIVE)
     {
-      /* Deactivate the sensor */
-      ilps22qs_md_t val;
-      ilps22qs_mode_get(p_sensor_drv, &val);
-      val.odr = ILPS22QS_ONE_SHOT;
-      ilps22qs_mode_set(p_sensor_drv, &val);
+      if (ILPS22QSTaskSensorIsActive(p_obj))
+      {
+        /* Deactivate the sensor */
+        ilps22qs_md_t val;
+        ilps22qs_mode_get(p_sensor_drv, &val);
+        val.odr = ILPS22QS_ONE_SHOT;
+        ilps22qs_mode_set(p_sensor_drv, &val);
 
-      ilps22qs_fifo_md_t fifo_md;
-      fifo_md.watermark = 1;
-      fifo_md.operation = ILPS22QS_BYPASS;
-      ilps22qs_fifo_mode_set(p_sensor_drv, &fifo_md);
-
+        ilps22qs_fifo_md_t fifo_md;
+        fifo_md.watermark = 1;
+        fifo_md.operation = ILPS22QS_BYPASS;
+        ilps22qs_fifo_mode_set(p_sensor_drv, &fifo_md);
+      }
       /* Empty the task queue and disable INT or timer */
       tx_queue_flush(&p_obj->in_queue);
       if (p_obj->pIRQConfig == NULL)
@@ -625,7 +603,7 @@ sys_error_code_t ILPS22QSTask_vtblOnEnterTaskControlLoop(AManagedTask *_this)
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
 
-  SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("ILPS22QS: start.\r\n"));
+  SYS_DEBUGF(SYS_DBG_LEVEL_DEFAULT, ("ILPS22QS: start.\r\n"));
 
 #if defined(ENABLE_THREADX_DBG_PIN) && defined (ILPS22QS_TASK_CFG_TAG)
   ILPS22QSTask *p_obj = (ILPS22QSTask *) _this;
@@ -772,6 +750,11 @@ sys_error_code_t ILPS22QSTask_vtblSensorSetODR(ISensorMems_t *_this, float odr)
   }
   else
   {
+    if (odr > 0.0f)
+    {
+      p_if_owner->sensor_status.type.mems.odr = odr;
+      p_if_owner->sensor_status.type.mems.measured_odr = 0.0f;
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -800,6 +783,7 @@ sys_error_code_t ILPS22QSTask_vtblSensorSetFS(ISensorMems_t *_this, float fs)
   }
   else
   {
+    p_if_owner->sensor_status.type.mems.fs = fs;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -859,6 +843,7 @@ sys_error_code_t ILPS22QSTask_vtblSensorEnable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = TRUE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -886,6 +871,7 @@ sys_error_code_t ILPS22QSTask_vtblSensorDisable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = FALSE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -930,6 +916,14 @@ SensorStatus_t ILPS22QSTask_vtblPressGetStatus(ISensor_t *_this)
   ILPS22QSTask *p_if_owner = (ILPS22QSTask *)((uint32_t) _this - offsetof(ILPS22QSTask, sensor_if));
 
   return p_if_owner->sensor_status;
+}
+
+SensorStatus_t *ILPS22QSTask_vtblPressGetStatusPointer(ISensor_t *_this)
+{
+  assert_param(_this != NULL);
+  ILPS22QSTask *p_if_owner = (ILPS22QSTask *)((uint32_t) _this - offsetof(ILPS22QSTask, sensor_if));
+
+  return &p_if_owner->sensor_status;
 }
 
 /* Private function definition */
@@ -1331,11 +1325,14 @@ static sys_error_code_t ILPS22QSTaskSensorInit(ILPS22QSTask *_this)
                       _this->samples_per_it * 3);
   }
 
+  if (_this->sensor_status.is_active)
+  {
 #if ILPS22QS_FIFO_ENABLED
-  _this->task_delay = (uint16_t)((1000.0f / ilps22qs_odr) * (((float)(_this->samples_per_it)) / 2.0f));
+    _this->task_delay = (uint16_t)((1000.0f / ilps22qs_odr) * (((float)(_this->samples_per_it)) / 2.0f));
 #else
-  _this->task_delay = (uint16_t)(1000.0f / ilps22qs_odr);
+    _this->task_delay = (uint16_t)(1000.0f / ilps22qs_odr);
 #endif
+  }
 
   return res;
 }
@@ -1506,31 +1503,21 @@ static sys_error_code_t ILPS22QSTaskSensorSetFS(ILPS22QSTask *_this, SMMessage r
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
 
-  stmdev_ctx_t *p_sensor_drv = (stmdev_ctx_t *) &_this->p_sensor_bus_if->m_xConnector;
   float fs = (float) report.sensorMessage.fParam;
   uint8_t id = report.sensorMessage.nSensorId;
-
-  ilps22qs_md_t md;
-  ilps22qs_mode_get(p_sensor_drv, &md);
 
   if (id == _this->press_id)
   {
     if (fs <= 1261.0f)
     {
-      md.fs = ILPS22QS_1260hPa;
       fs = 1260.0f;
     }
     else
     {
-      md.fs = ILPS22QS_4060hPa;
       fs = 4060.0f;
     }
-    ilps22qs_mode_set(p_sensor_drv, &md);
 
-    if (!SYS_IS_ERROR_CODE(res))
-    {
-      _this->sensor_status.type.mems.fs = fs;
-    }
+    _this->sensor_status.type.mems.fs = fs;
   }
   else
   {

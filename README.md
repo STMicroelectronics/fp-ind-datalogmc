@@ -2,33 +2,39 @@
 
 ![latest tag](https://img.shields.io/github/v/tag/STMicroelectronics/fp-ind-datalogmc.svg?color=brightgreen)
 
-**Please check st.com where a more recent version of the software might be available.**
+The **FP-IND-DATALOGMC** function pack for **STEVAL-STWINBX1** and
+**EVLSPIN32G4-ACT** is a powerful integrated toolkit for the next generation of smart
+actuators.
 
-The **FP-IND-DATALOGMC** function pack for **STEVAL-STWINBX1** and **EVLSPIN32G4-ACT** is a powerful integrated toolkit for the next generation of smart
-actuators. It is derived from a **FP-SNS-DATALOG2** function pack and it allows the collection of heterogeneous data, combining STWIN.box sensor information with
-STSPIN32G4 motor control data and it provides a comprehensive view of the system’s operational conditions. This enables both real-time monitoring and accurate
+This toolkit is derived from a FP-SNS-DATALOG2 function pack and it allows the
+collection of heterogeneous data, combining STWIN.box sensor information with
+STSPIN32G4 motor control data and it provides a comprehensive view of the
+system’s operational conditions. This enables both real-time monitoring and accurate
 performance assessment.
 
-EVLSPIN32G4-ACT is designed to drive a variety of three-phase brushless DC motors (not included in the kit) and ready for FOC control algorithms. See UM for
-further details and installation guide. The list of supported motors is provided in the motor control SDK documentation (**X-CUBE-MCSDK-6**).
+The v1.1.0 introduces a further firmware example called **DATALOGMC_AI** that
+implements a motor fault classification based on a machine learning solution
+developed through **NanoEdgeAIStudio**. The machine learning model allows an
+accurate classification of motor behavior into two states: good and faulty.
 
-The function pack includes a Python GUI, hsdatalogMC_GUI that communicates with the STEVAL-STWINBX1 via USB allowing the user to control the motor (start/stop
-commands, set velocity) and select a combination of motor control telemetries and sensor data to be logged. The STEVAL-STWINBX1 communicates with the
-STSPIN32G4 MCU via serial port (UART), using the motor control protocol (MCPv2). This protocol allows both system configuration and data logging.
+Users can also customize the model by adding their own classes, which can be
+achieved by incorporating additional data and modifying the training process.
+The package also includes a portable mechanical setup that can be replicated with a
+3D printer.
 
-The application can be controlled via Bluetooth using the **STBLESensor app** which lets you manage the board and sensor configurations, start/stop data acquisition 
-on SD card and control data labelling.
+EVLSPIN32G4-ACT is designed to drive a variety of three-phase brushless DC
+motors (not included in the kit) and ready for FOC control algorithms. The list of
+supported motors is provided in the motor control SDK documentation (X-CUBEMCSDK-
+6) and installation details are available in the Quick Start guide.
 
-FP-IND-DATALOGMC is based on application-level modules (SensorManager, TagManager, DPU digital processing units) that can be reused and extended to build
-its custom application. To enable this modularity, the function pack has been built on top of eLooM, an embedded light object-oriented framework for STM32 applications
-specifically designed for embedded low power applications powered by STM32. 
+The FP-IND-DATALOGMC, thanks to its data-centric design and user-friendly Python
+SDK, may run with hardware boards that supply real-time data streams and motor
+telemetries, empowering users with full control of the data acquisition process.
 
-The DATALOGMC application can save data to a microSD™ card (secure digital high capacity - SDHC) formatted with the FAT32 file system, or stream data to a PC via
-USB (WCID class). A Python SDK, provided within the function pack, makes it easy to read back and process sensor and motor data acquired using FP-IND-DATALOGMC,
-a few ready-to-use scripts, and notebooks are provided.
-
-This firmware package includes Components Device Drivers, Board Support Package and example applications 
-for the STWIN.box platform (STEVAL-STWINBX1).  
+The included firmware is compatible with the STBLESensor app, which lets you
+manage: the board, motor, and sensor configurations; start/stop data acquisition on
+SD card, and control data labeling. Sensor data and motor telemetries can also be
+stored onto a microSD™ card.  
 
 ![](_htmresc/FP-IND-DATALOGMC_Software_Architecture.jpg)
 
@@ -44,8 +50,8 @@ Here is the list of references to user documents:
 ## Development Toolchains and Compilers
 
 -   IAR Embedded Workbench for ARM (EWARM) toolchain V9.20.1
--   RealView Microcontroller Development Kit (MDK-ARM) toolchain V5.37
--   STM32CubeIDE v1.13.2
+-   RealView Microcontroller Development Kit (MDK-ARM) toolchain V5.38
+-   STM32CubeIDE v1.15.1
 
 ## Supported Devices and Boards
 

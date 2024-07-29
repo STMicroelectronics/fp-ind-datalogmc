@@ -1018,11 +1018,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/AppPowerModeHelper_vtbl.h</locationURI>
 		</link>
 		<link>
-			<name>User/Core/Inc/App_model.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/App_model.h</locationURI>
-		</link>
-		<link>
 			<name>User/Core/Inc/BLE_Implementation.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/BLE_Implementation.h</locationURI>
@@ -1056,26 +1051,6 @@
 			<name>User/Core/Inc/ICommandParse_vtbl.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/ICommandParse_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/Core/Inc/ILog_Controller.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/ILog_Controller.h</locationURI>
-		</link>
-		<link>
-			<name>User/Core/Inc/ILog_Controller_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/ILog_Controller_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/Core/Inc/IMotor_Controller.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/IMotor_Controller.h</locationURI>
-		</link>
-		<link>
-			<name>User/Core/Inc/IMotor_Controller_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/IMotor_Controller_vtbl.h</locationURI>
 		</link>
 		<link>
 			<name>User/Core/Inc/IStream.h</name>
@@ -1116,6 +1091,11 @@
 			<name>User/Core/Inc/SensorManager_conf.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/SensorManager_conf.h</locationURI>
+		</link>
+		<link>
+			<name>User/Core/Inc/TagManager_conf.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/TagManager_conf.h</locationURI>
 		</link>
 		<link>
 			<name>User/Core/Inc/UtilTask.h</name>
@@ -1178,11 +1158,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/hci_tl_interface.h</locationURI>
 		</link>
 		<link>
-			<name>User/Core/Inc/mcp_config.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/mcp_config.h</locationURI>
-		</link>
-		<link>
 			<name>User/Core/Inc/stm32u5xx_hal_conf.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/stm32u5xx_hal_conf.h</locationURI>
@@ -1228,11 +1203,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/AppPowerModeHelper.c</locationURI>
 		</link>
 		<link>
-			<name>User/Core/Src/App_model.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/App_model.c</locationURI>
-		</link>
-		<link>
 			<name>User/Core/Src/BLE_Implementation.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/BLE_Implementation.c</locationURI>
@@ -1251,16 +1221,6 @@
 			<name>User/Core/Src/ICommandParse.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/ICommandParse.c</locationURI>
-		</link>
-		<link>
-			<name>User/Core/Src/ILog_Controller.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/ILog_Controller.c</locationURI>
-		</link>
-		<link>
-			<name>User/Core/Src/IMotor_Controller.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/IMotor_Controller.c</locationURI>
 		</link>
 		<link>
 			<name>User/Core/Src/IStream.c</name>
@@ -1393,11 +1353,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/mcp/Inc/mcp.h</locationURI>
 		</link>
 		<link>
-			<name>User/Mcp/Inc/mcptl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/mcp/Inc/mcptl.h</locationURI>
-		</link>
-		<link>
 			<name>User/Mcp/Inc/register_interface.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/mcp/Inc/register_interface.h</locationURI>
@@ -1406,236 +1361,6 @@
 			<name>User/Mcp/Src/mcp.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/mcp/Src/mcp.c</locationURI>
-		</link>
-		<link>
-			<name>User/Mcp/Src/mcptl.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/mcp/Src/mcptl.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Acquisition_Info_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Acquisition_Info_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Acquisition_Info_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Acquisition_Info_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Deviceinformation_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Deviceinformation_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Deviceinformation_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Deviceinformation_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Fast_Mc_Telemetries_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Fast_Mc_Telemetries_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Fast_Mc_Telemetries_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Fast_Mc_Telemetries_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Firmware_Info_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Firmware_Info_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Firmware_Info_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Firmware_Info_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Iis3dwb_Acc_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Iis3dwb_Acc_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Iis3dwb_Acc_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Iis3dwb_Acc_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Ilps22qs_Press_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Ilps22qs_Press_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Ilps22qs_Press_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Ilps22qs_Press_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Imp23absu_Mic_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Imp23absu_Mic_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Imp23absu_Mic_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Imp23absu_Mic_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Ism330dhcx_Acc_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Ism330dhcx_Acc_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Ism330dhcx_Acc_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Ism330dhcx_Acc_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Ism330dhcx_Gyro_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Ism330dhcx_Gyro_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Ism330dhcx_Gyro_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Ism330dhcx_Gyro_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Ism330dhcx_Mlc_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Ism330dhcx_Mlc_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Ism330dhcx_Mlc_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Ism330dhcx_Mlc_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Log_Controller_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Log_Controller_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Log_Controller_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Log_Controller_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Motor_Controller_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Motor_Controller_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Motor_Controller_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Motor_Controller_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Slow_Mc_Telemetries_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Slow_Mc_Telemetries_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Slow_Mc_Telemetries_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Slow_Mc_Telemetries_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Stts22h_Temp_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Stts22h_Temp_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Stts22h_Temp_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Stts22h_Temp_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Tags_Info_PnPL.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Tags_Info_PnPL.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Inc/Tags_Info_PnPL_vtbl.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Inc/Tags_Info_PnPL_vtbl.h</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Acquisition_Info_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Acquisition_Info_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Deviceinformation_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Deviceinformation_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Fast_Mc_Telemetries_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Fast_Mc_Telemetries_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Firmware_Info_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Firmware_Info_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Iis3dwb_Acc_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Iis3dwb_Acc_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Ilps22qs_Press_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Ilps22qs_Press_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Imp23absu_Mic_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Imp23absu_Mic_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Ism330dhcx_Acc_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Ism330dhcx_Acc_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Ism330dhcx_Gyro_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Ism330dhcx_Gyro_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Ism330dhcx_Mlc_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Ism330dhcx_Mlc_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Log_Controller_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Log_Controller_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Motor_Controller_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Motor_Controller_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Slow_Mc_Telemetries_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Slow_Mc_Telemetries_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Stts22h_Temp_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Stts22h_Temp_PnPL.c</locationURI>
-		</link>
-		<link>
-			<name>User/PnPL/Src/Tags_Info_PnPL.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Src/Tags_Info_PnPL.c</locationURI>
 		</link>
 		<link>
 			<name>User/USBX/App/PCDDriver.c</name>
@@ -2246,6 +1971,306 @@
 			<name>User/Mcp/ASPEP/Src/aspep.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/mcp/ASPEP/Src/aspep.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Acquisition_Info.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Acquisition_Info.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Deviceinformation.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Deviceinformation.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Fast_Mc_Telemetries.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Fast_Mc_Telemetries.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Firmware_Info.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Firmware_Info.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Iis3dwb_Acc.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Iis3dwb_Acc.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Ilps22qs_Press.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Ilps22qs_Press.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Imp23absu_Mic.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Imp23absu_Mic.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Ism330dhcx_Acc.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Ism330dhcx_Acc.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Ism330dhcx_Gyro.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Ism330dhcx_Gyro.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Log_Controller.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Log_Controller.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Motor_Controller.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Motor_Controller.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Slow_Mc_Telemetries.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Slow_Mc_Telemetries.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Stts22h_Temp.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Stts22h_Temp.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/App_model_Tags_Info.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/App_model_Tags_Info.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Inc/PnPLCompManager_conf.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Inc/PnPLCompManager_conf.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Acquisition_Info.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Acquisition_Info.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Deviceinformation.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Deviceinformation.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Fast_Mc_Telemetries.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Fast_Mc_Telemetries.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Firmware_Info.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Firmware_Info.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Iis3dwb_Acc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Iis3dwb_Acc.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Ilps22qs_Press.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Ilps22qs_Press.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Imp23absu_Mic.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Imp23absu_Mic.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Ism330dhcx_Acc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Ism330dhcx_Acc.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Ism330dhcx_Gyro.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Ism330dhcx_Gyro.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Log_Controller.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Log_Controller.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Motor_Controller.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Motor_Controller.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Slow_Mc_Telemetries.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Slow_Mc_Telemetries.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Stts22h_Temp.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Stts22h_Temp.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/AppModel/Src/App_model_Tags_Info.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/AppModel/Src/App_model_Tags_Info.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Acquisition_Info_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Acquisition_Info_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Deviceinformation_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Deviceinformation_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Fast_Mc_Telemetries_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Fast_Mc_Telemetries_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Firmware_Info_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Firmware_Info_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Iis3dwb_Acc_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Iis3dwb_Acc_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Ilps22qs_Press_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Ilps22qs_Press_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Imp23absu_Mic_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Imp23absu_Mic_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Ism330dhcx_Acc_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Ism330dhcx_Acc_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Ism330dhcx_Gyro_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Ism330dhcx_Gyro_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Ism330dhcx_Mlc_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Ism330dhcx_Mlc_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Log_Controller_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Log_Controller_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Motor_Controller_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Motor_Controller_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Slow_Mc_Telemetries_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Slow_Mc_Telemetries_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Stts22h_Temp_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Stts22h_Temp_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Inc/Tags_Info_PnPL.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Inc/Tags_Info_PnPL.h</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Acquisition_Info_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Acquisition_Info_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Deviceinformation_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Deviceinformation_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Fast_Mc_Telemetries_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Fast_Mc_Telemetries_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Firmware_Info_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Firmware_Info_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Iis3dwb_Acc_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Iis3dwb_Acc_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Ilps22qs_Press_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Ilps22qs_Press_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Imp23absu_Mic_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Imp23absu_Mic_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Ism330dhcx_Acc_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Ism330dhcx_Acc_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Ism330dhcx_Gyro_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Ism330dhcx_Gyro_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Log_Controller_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Log_Controller_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Motor_Controller_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Motor_Controller_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Slow_Mc_Telemetries_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Slow_Mc_Telemetries_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Stts22h_Temp_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Stts22h_Temp_PnPL.c</locationURI>
+		</link>
+		<link>
+			<name>User/PnPL/Components/Src/Tags_Info_PnPL.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/PnPL/Components/Src/Tags_Info_PnPL.c</locationURI>
 		</link>
 		<link>
 			<name>User/eLooM_Components/SensorManager/Inc/ABusIF.h</name>
@@ -5216,16 +5241,6 @@
 			<name>Middlewares/ST/usbx/common/core/src/ux_utility_pci_class_scan.c</name>
 			<type>1</type>
 			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/ST/usbx/common/core/src/ux_utility_pci_class_scan.c</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/ST/usbx/common/core/src/ux_utility_pci_read.c</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/ST/usbx/common/core/src/ux_utility_pci_read.c</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/ST/usbx/common/core/src/ux_utility_pci_write.c</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/ST/usbx/common/core/src/ux_utility_pci_write.c</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/ST/usbx/common/core/src/ux_utility_physical_address.c</name>

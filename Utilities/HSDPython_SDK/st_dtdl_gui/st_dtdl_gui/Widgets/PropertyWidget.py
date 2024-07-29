@@ -20,9 +20,10 @@ from PySide6.QtGui import QValidator, QPixmap, QDoubleValidator, QIntValidator
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtDesigner import QPyDesignerCustomWidgetCollection
 from st_dtdl_gui.UI.styles import STDTDL_RadioButton
-from st_dtdl_gui.Utils.DataClass import TypeEnum, UnitMap
+from st_dtdl_gui.Utils.DataClass import TypeEnum
 
-from st_pnpl.DTDL.device_template_model import Content, ContentSchema
+from st_pnpl.DTDL.dtdl_utils import UnitMap
+from st_pnpl.DTDL.device_template_model import Content, ContentSchema, DisplayName
 
 import st_dtdl_gui.UI.icons #NOTE don't delete this! it is used from resource_filename (@row 35..38)
 from pkg_resources import resource_filename
@@ -68,7 +69,7 @@ class SubPropertyWidget(QWidget):
         comp_frame_contents.layout().setContentsMargins(3,0,3,0)
         comp_config_widget.layout().setContentsMargins(0,0,0,0)
         
-        title_label = title_frame.findChild(QLabel,"label_title")
+        title_label = title_frame.findChild(QPushButton,"label_title")
         title_label.setText(self.label.upper())
         self.annotation_label = title_frame.findChild(QLabel,"label_annotation")
         self.annotation_label.setVisible(False)
@@ -187,6 +188,10 @@ class PropertyWidget(QWidget):
         if hasattr(p_content, 'trim_whitespace'):
             self.trim_whitespace = p_content.trim_whitespace if p_content.trim_whitespace is not None else self.trim_whitespace
 
+        self.description = None
+        if hasattr(p_content, 'description'):
+            self.description = p_content.description
+
         label = p_content.display_name if isinstance(p_content.display_name, str) else p_content.display_name.en
         self.label = QLabel(label)
         self.label.setFixedWidth(150)
@@ -209,12 +214,18 @@ class PropertyWidget(QWidget):
                 self.icon.setToolTip(f"Max: {self.max_length} characters")
             if self.initial_value is not None:
                 self.value.setText(self.initial_value)
+            if self.description is not None:
+                description_text = self.description.en if isinstance(self.description, DisplayName) else self.description
+                self.icon.setToolTip(f"{self.icon.toolTip()}\nDescription: {self.wrap_text(description_text,60)}")     
         
         # Double Property
         elif self.prop_type == TypeEnum.DOUBLE.value or self.prop_type == TypeEnum.FLOAT.value:
             self.validator = QDoubleValidator()
             if self.decimal_places is not None:
                 self.validator.setDecimals(self.decimal_places)
+                decimal_places_str = f", Decimal places: {self.decimal_places}"
+            else:
+                decimal_places_str = ""
             if self.max_value is not None:
                 self.validator.setTop(self.max_value)
             if self.min_value is not None:
@@ -224,14 +235,17 @@ class PropertyWidget(QWidget):
             if self.min_value is not None:
                 self.icon.setVisible(True)
                 if self.max_value is None:
-                    self.icon.setToolTip(f"Min: {self.min_value}")
+                    self.icon.setToolTip(f"Min: {self.min_value}{decimal_places_str}")
                 else:
-                    self.icon.setToolTip(f"Min: {self.min_value}, Max: {self.max_value}")
+                    self.icon.setToolTip(f"Min: {self.min_value}, Max: {self.max_value}{decimal_places_str}")
             elif self.max_value is not None:
                 self.icon.setVisible(True)
-                self.icon.setToolTip(f"Max: {self.max_value}")
+                self.icon.setToolTip(f"Max: {self.max_value}{decimal_places_str}")
             if self.initial_value is not None:
                 self.value.setText(str(self.initial_value))
+            if self.description is not None:
+                description_text = self.description.en if isinstance(self.description, DisplayName) else self.description
+                self.icon.setToolTip(f"{self.icon.toolTip()}\nDescription: {self.wrap_text(description_text,60)}")     
         
         # Integer Property
         elif self.prop_type == TypeEnum.INTEGER.value:
@@ -252,6 +266,9 @@ class PropertyWidget(QWidget):
                 self.value.setToolTip(f"Max: {self.max_value}")
             if self.initial_value is not None:
                 self.value.setText(str(self.initial_value))
+            if self.description is not None:
+                description_text = self.description.en if isinstance(self.description, DisplayName) else self.description
+                self.icon.setToolTip(f"{self.icon.toolTip()}\nDescription: {self.wrap_text(description_text,60)}")                     
         
         # Boolean Property
         elif self.prop_type == TypeEnum.BOOLEAN.value:
@@ -269,6 +286,9 @@ class PropertyWidget(QWidget):
             self.value.setAccessibleDescription(true_false_description)
             if self.initial_value is not None:
                 self.value.setChecked(self.initial_value)
+            if self.description is not None:
+                description_text = self.description.en if isinstance(self.description, DisplayName) else self.description
+                self.icon.setToolTip(f"{self.icon.toolTip()}\nDescription: {self.wrap_text(description_text,60)}")                
         
         # Enum Property
         elif self.prop_type == TypeEnum.ENUM.value:
@@ -329,6 +349,20 @@ class PropertyWidget(QWidget):
             self.value.setEnabled(False)
         
         layout.addWidget(self.value)
+
+    def wrap_text(self, text, n):
+        words = text.split()
+        lines = []
+        current_line = ""
+        for word in words:
+            if len(current_line + word) <= n:
+                current_line += word + " "
+            else:
+                lines.append(current_line.strip())
+                current_line = word + " "
+        if current_line:
+            lines.append(current_line.strip())
+        return "\n".join(lines)
 
 class MultiPropertyWidget():
     def __init__(self, widget_list) -> None:

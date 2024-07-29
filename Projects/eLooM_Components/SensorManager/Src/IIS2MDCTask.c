@@ -240,7 +240,8 @@ static IIS2MDCTaskClass_t sTheClass =
       IIS2MDCTask_vtblSensorDisable,
       IIS2MDCTask_vtblSensorIsEnabled,
       IIS2MDCTask_vtblSensorGetDescription,
-      IIS2MDCTask_vtblSensorGetStatus
+      IIS2MDCTask_vtblSensorGetStatus,
+      IIS2MDCTask_vtblSensorGetStatusPointer
     },
     IIS2MDCTask_vtblMagGetODR,
     IIS2MDCTask_vtblMagGetFS,
@@ -253,28 +254,7 @@ static IIS2MDCTaskClass_t sTheClass =
   /* MAGNETOMETER DESCRIPTOR */
   {
     "iis2mdc",
-    COM_TYPE_MAG,
-    {
-      10.0,
-      20.0,
-      50.0,
-      100.0,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      50.0f,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      "x",
-      "y",
-      "z",
-    },
-    "gauss",
-    {
-      0,
-      1000,
-    }
+    COM_TYPE_MAG
   },
 
   /* class (PM_STATE, ExecuteStepFunc) map */
@@ -487,6 +467,7 @@ sys_error_code_t IIS2MDCTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_func
   memset(p_obj->p_sensor_data_buff, 0, sizeof(p_obj->p_sensor_data_buff));
   p_obj->mag_id = 0;
   p_obj->prev_timestamp = 0.0f;
+  p_obj->first_data_ready = 0;
   _this->m_pfPMState2FuncMap = sTheClass.p_pm_state2func_map;
 
   *pTaskCode = AMTExRun;
@@ -551,10 +532,13 @@ sys_error_code_t IIS2MDCTask_vtblDoEnterPowerMode(AManagedTask *_this, const EPo
   {
     if (ActivePowerMode == E_POWER_MODE_SENSORS_ACTIVE)
     {
-      /* Deactivate the sensor */
-      iis2mdc_power_mode_set(p_sensor_drv, IIS2MDC_HIGH_RESOLUTION);
-      iis2mdc_operating_mode_set(p_sensor_drv, IIS2MDC_POWER_DOWN);
-
+      if (IIS2MDCTaskSensorIsActive(p_obj))
+      {
+        /* Deactivate the sensor */
+        iis2mdc_power_mode_set(p_sensor_drv, IIS2MDC_HIGH_RESOLUTION);
+        iis2mdc_operating_mode_set(p_sensor_drv, IIS2MDC_POWER_DOWN);
+      }
+      p_obj->first_data_ready = 0;
       /* Empty the task queue and disable INT or timer */
       tx_queue_flush(&p_obj->in_queue);
       if (p_obj->pIRQConfig == NULL)
@@ -612,7 +596,7 @@ sys_error_code_t IIS2MDCTask_vtblOnEnterTaskControlLoop(AManagedTask *_this)
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
 
-  SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("IIS2MDC: start.\r\n"));
+  SYS_DEBUGF(SYS_DBG_LEVEL_DEFAULT, ("IIS2MDC: start.\r\n"));
 
 #if defined(ENABLE_THREADX_DBG_PIN) && defined (IIS2MDC_TASK_CFG_TAG)
   IIS2MDCTask *p_obj = (IIS2MDCTask *) _this;
@@ -760,6 +744,14 @@ sys_error_code_t IIS2MDCTask_vtblSensorSetODR(ISensorMems_t *_this, float odr)
   }
   else
   {
+    if (odr > 1.0f)
+    {
+      /* ODR = 0 sends only message to switch off the sensor.
+       * Do not update the model in case of odr = 0 */
+
+      p_if_owner->sensor_status.type.mems.odr = odr;
+      p_if_owner->sensor_status.type.mems.measured_odr = 0.0f;
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -789,6 +781,10 @@ sys_error_code_t IIS2MDCTask_vtblSensorSetFS(ISensorMems_t *_this, float fs)
   }
   else
   {
+    if (fs == 50.0f)
+    {
+      p_if_owner->sensor_status.type.mems.fs = fs;
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -828,6 +824,7 @@ sys_error_code_t IIS2MDCTask_vtblSensorEnable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = TRUE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -856,6 +853,7 @@ sys_error_code_t IIS2MDCTask_vtblSensorDisable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = FALSE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -901,6 +899,14 @@ SensorStatus_t IIS2MDCTask_vtblSensorGetStatus(ISensor_t *_this)
   IIS2MDCTask *p_if_owner = (IIS2MDCTask *)((uint32_t) _this - offsetof(IIS2MDCTask, sensor_if));
 
   return p_if_owner->sensor_status;
+}
+
+SensorStatus_t *IIS2MDCTask_vtblSensorGetStatusPointer(ISensor_t *_this)
+{
+  assert_param(_this != NULL);
+  IIS2MDCTask *p_if_owner = (IIS2MDCTask *)((uint32_t) _this - offsetof(IIS2MDCTask, sensor_if));
+
+  return &p_if_owner->sensor_status;
 }
 
 /* Private function definition */
@@ -995,49 +1001,39 @@ static sys_error_code_t IIS2MDCTaskExecuteStepDatalog(AManagedTask *_this)
       case SM_MESSAGE_ID_DATA_READY:
       {
         SYS_DEBUGF(SYS_DBG_LEVEL_ALL, ("IIS2MDC: new data.\r\n"));
-//          if(p_obj->pIRQConfig == NULL)
-//          {
-//            if(TX_SUCCESS
-//                != tx_timer_change(&p_obj->read_timer, AMT_MS_TO_TICKS(p_obj->iis2mdc_task_cfg_timer_period_ms),
-//                                   AMT_MS_TO_TICKS(p_obj->iis2mdc_task_cfg_timer_period_ms)))
-//            {
-//              return SYS_UNDEFINED_ERROR_CODE;
-//            }
-//          }
-
         res = IIS2MDCTaskSensorReadData(p_obj);
         if (!SYS_IS_ERROR_CODE(res))
         {
-          // notify the listeners...
-          double timestamp = report.sensorDataReadyMessage.fTimestamp;
-          double delta_timestamp = timestamp - p_obj->prev_timestamp;
-          p_obj->prev_timestamp = timestamp;
+          if (p_obj->first_data_ready == 1)
+          {
+            // notify the listeners...
+            double timestamp = report.sensorDataReadyMessage.fTimestamp;
+            double delta_timestamp = timestamp - p_obj->prev_timestamp;
+            p_obj->prev_timestamp = timestamp;
 
-          /* update measuredODR: one sample in delta_timestamp time */
-          p_obj->sensor_status.type.mems.measured_odr = 1.0f / (float) delta_timestamp;
+            /* update measuredODR: one sample in delta_timestamp time */
+            p_obj->sensor_status.type.mems.measured_odr = 1.0f / (float) delta_timestamp;
 
-          /* Create a bidimensional data interleaved [m x 3], m is the number of samples in the sensor queue (1):
-           * [X0, Y0, Z0]
-           * [X1, Y1, Z1]
-           * ...
-           * [Xm-1, Ym-1, Zm-1]
-           */
-          EMD_Init(&p_obj->data, p_obj->p_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2, 1, 3);
+            /* Create a bidimensional data interleaved [m x 3], m is the number of samples in the sensor queue (1):
+             * [X0, Y0, Z0]
+             * [X1, Y1, Z1]
+             * ...
+             * [Xm-1, Ym-1, Zm-1]
+             */
+            EMD_Init(&p_obj->data, p_obj->p_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2, 1, 3);
 
-          DataEvent_t evt;
+            DataEvent_t evt;
 
-          DataEventInit((IEvent *) &evt, p_obj->p_mag_event_src, &p_obj->data, timestamp, p_obj->mag_id);
-          IEventSrcSendEvent(p_obj->p_mag_event_src, (IEvent *) &evt, NULL);
+            DataEventInit((IEvent *) &evt, p_obj->p_mag_event_src, &p_obj->data, timestamp, p_obj->mag_id);
+            IEventSrcSendEvent(p_obj->p_mag_event_src, (IEvent *) &evt, NULL);
 
-          SYS_DEBUGF(SYS_DBG_LEVEL_ALL, ("IIS2MDC: ts = %f\r\n", (float)timestamp));
+            SYS_DEBUGF(SYS_DBG_LEVEL_ALL, ("IIS2MDC: ts = %f\r\n", (float)timestamp));
+          }
+          else
+          {
+            p_obj->first_data_ready = 1;
+          }
         }
-//            if(p_obj->pIRQConfig == NULL)
-//            {
-//              if(TX_SUCCESS != tx_timer_activate(&p_obj->read_timer))
-//              {
-//                res = SYS_UNDEFINED_ERROR_CODE;
-//              }
-//            }
         break;
       }
       case SM_MESSAGE_ID_SENSOR_CMD:
@@ -1221,11 +1217,11 @@ static sys_error_code_t IIS2MDCTaskSensorInit(IIS2MDCTask *_this)
   {
     iis2mdc_odr = IIS2MDC_ODR_100Hz;
   }
-  _this->iis2mdc_task_cfg_timer_period_ms = (uint16_t)(1000.0f / _this->sensor_status.type.mems.odr);
 
   if (_this->sensor_status.is_active)
   {
     iis2mdc_data_rate_set(p_sensor_drv, iis2mdc_odr);
+    _this->iis2mdc_task_cfg_timer_period_ms = (uint16_t)(1000.0f / _this->sensor_status.type.mems.odr);
   }
   else
   {

@@ -24,7 +24,6 @@ extern "C" {
 #endif
 
 
-
 /* AManagedTask virtual functions */
 sys_error_code_t IMP34DT05Task_vtblHardwareInit(AManagedTask *_this, void *pParams); ///< @sa AMTHardwareInit
 sys_error_code_t IMP34DT05Task_vtblOnCreateTask(AManagedTask *_this, tx_entry_function_t *pvTaskCode, CHAR **pcName,
@@ -49,6 +48,7 @@ sys_error_code_t IMP34DT05Task_vtblSensorDisable(ISensor_t *_this);
 boolean_t IMP34DT05Task_vtblSensorIsEnabled(ISensor_t *_this);
 SensorDescriptor_t IMP34DT05Task_vtblSensorGetDescription(ISensor_t *_this);
 SensorStatus_t IMP34DT05Task_vtblSensorGetStatus(ISensor_t *_this);
+SensorStatus_t *IMP34DT05Task_vtblSensorGetStatusPointer(ISensor_t *_this);
 uint32_t IMP34DT05Task_vtblMicGetFrequency(ISensorAudio_t *_this);
 uint8_t IMP34DT05Task_vtblMicGetVolume(ISensorAudio_t *_this);
 uint8_t IMP34DT05Task_vtblMicGetResolution(ISensorAudio_t *_this);

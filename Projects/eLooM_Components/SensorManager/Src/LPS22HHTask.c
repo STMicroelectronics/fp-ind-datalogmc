@@ -255,96 +255,60 @@ static LPS22HHTaskClass_t sTheClass =
   },
 
   /* class::temp_sensor_if_vtbl virtual table */
+  {
     {
-        {
-            {
-                LPS22HHTask_vtblTempGetId,
-                LPS22HHTask_vtblTempGetEventSourceIF,
-                LPS22HHTask_vtblTempGetDataInfo },
-            LPS22HHTask_vtblSensorEnable,
-            LPS22HHTask_vtblSensorDisable,
-            LPS22HHTask_vtblSensorIsEnabled,
-            LPS22HHTask_vtblTempGetDescription,
-            LPS22HHTask_vtblTempGetStatus },
-        LPS22HHTask_vtblTempGetODR,
-        LPS22HHTask_vtblTempGetFS,
-        LPS22HHTask_vtblTempGetSensitivity,
-        LPS22HHTask_vtblSensorSetODR,
-        LPS22HHTask_vtblSensorSetFS,
-        LPS22HHTask_vtblSensorSetFifoWM, },
+      {
+        LPS22HHTask_vtblTempGetId,
+        LPS22HHTask_vtblTempGetEventSourceIF,
+        LPS22HHTask_vtblTempGetDataInfo
+      },
+      LPS22HHTask_vtblSensorEnable,
+      LPS22HHTask_vtblSensorDisable,
+      LPS22HHTask_vtblSensorIsEnabled,
+      LPS22HHTask_vtblTempGetDescription,
+      LPS22HHTask_vtblTempGetStatus,
+      LPS22HHTask_vtblTempGetStatusPointer
+    },
+    LPS22HHTask_vtblTempGetODR,
+    LPS22HHTask_vtblTempGetFS,
+    LPS22HHTask_vtblTempGetSensitivity,
+    LPS22HHTask_vtblSensorSetODR,
+    LPS22HHTask_vtblSensorSetFS,
+    LPS22HHTask_vtblSensorSetFifoWM,
+  },
 
   /* class::press_sensor_if_vtbl virtual table */
+  {
     {
-        {
-            {
-                LPS22HHTask_vtblPressGetId,
-                LPS22HHTask_vtblPressGetEventSourceIF,
-                LPS22HHTask_vtblPressGetDataInfo },
-            LPS22HHTask_vtblSensorEnable,
-            LPS22HHTask_vtblSensorDisable,
-            LPS22HHTask_vtblSensorIsEnabled,
-            LPS22HHTask_vtblPressGetDescription,
-            LPS22HHTask_vtblPressGetStatus },
-        LPS22HHTask_vtblPressGetODR,
-        LPS22HHTask_vtblPressGetFS,
-        LPS22HHTask_vtblPressGetSensitivity,
-        LPS22HHTask_vtblSensorSetODR,
-        LPS22HHTask_vtblSensorSetFS,
-        LPS22HHTask_vtblSensorSetFifoWM, },
+      {
+        LPS22HHTask_vtblPressGetId,
+        LPS22HHTask_vtblPressGetEventSourceIF,
+        LPS22HHTask_vtblPressGetDataInfo
+      },
+      LPS22HHTask_vtblSensorEnable,
+      LPS22HHTask_vtblSensorDisable,
+      LPS22HHTask_vtblSensorIsEnabled,
+      LPS22HHTask_vtblPressGetDescription,
+      LPS22HHTask_vtblPressGetStatus,
+      LPS22HHTask_vtblPressGetStatusPointer
+    },
+    LPS22HHTask_vtblPressGetODR,
+    LPS22HHTask_vtblPressGetFS,
+    LPS22HHTask_vtblPressGetSensitivity,
+    LPS22HHTask_vtblSensorSetODR,
+    LPS22HHTask_vtblSensorSetFS,
+    LPS22HHTask_vtblSensorSetFifoWM,
+  },
 
   /* TEMPERATURE DESCRIPTOR */
   {
     "lps22hh",
-    COM_TYPE_TEMP,
-    {
-      1,
-      10,
-      25,
-      50,
-      75,
-      100,
-      200,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      85,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      "temp",
-    },
-    "Celsius",
-    {
-      0,
-      1000,
-    }
+    COM_TYPE_TEMP
   },
   /* PRESSURE DESCRIPTOR */
   {
     "lps22hh",
-    COM_TYPE_PRESS,
-    {
-      1,
-      10,
-      25,
-      50,
-      75,
-      100,
-      200,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      1260,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      "prs",
-    },
-    "hPa",
-    {
-      0,
-      1000,
-    }
+    COM_TYPE_PRESS
   },
 
   /* class (PM_STATE, ExecuteStepFunc) map */
@@ -654,9 +618,11 @@ sys_error_code_t LPS22HHTask_vtblDoEnterPowerMode(AManagedTask *_this, const EPo
   {
     if (ActivePowerMode == E_POWER_MODE_SENSORS_ACTIVE)
     {
-      /* Deactivate the sensor */
-      lps22hh_data_rate_set(p_sensor_drv, (lps22hh_odr_t)(LPS22HH_POWER_DOWN | 0x10));
-
+      if (LPS22HHTaskSensorIsActive(p_obj))
+      {
+        /* Deactivate the sensor */
+        lps22hh_data_rate_set(p_sensor_drv, (lps22hh_odr_t)(LPS22HH_POWER_DOWN | 0x10));
+      }
       /* Empty the task queue and disable INT or timer */
       tx_queue_flush(&p_obj->in_queue);
       if (p_obj->pIRQConfig == NULL)
@@ -714,7 +680,7 @@ sys_error_code_t LPS22HHTask_vtblOnEnterTaskControlLoop(AManagedTask *_this)
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
 
-  SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("LPS22HH: start.\r\n"));
+  SYS_DEBUGF(SYS_DBG_LEVEL_DEFAULT, ("LPS22HH: start.\r\n"));
 
 #if defined(ENABLE_THREADX_DBG_PIN) && defined (LPS22HH_TASK_CFG_TAG)
   LPS22HHTask *p_obj = (LPS22HHTask *) _this;
@@ -928,6 +894,11 @@ sys_error_code_t LPS22HHTask_vtblSensorSetODR(ISensorMems_t *_this, float odr)
   }
   else
   {
+    p_if_owner->press_sensor_status.type.mems.odr = odr;
+    p_if_owner->press_sensor_status.type.mems.measured_odr = 0.0f;
+    p_if_owner->temp_sensor_status.type.mems.odr = odr;
+    p_if_owner->temp_sensor_status.type.mems.measured_odr = 0.0f;
+
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -957,6 +928,9 @@ sys_error_code_t LPS22HHTask_vtblSensorSetFS(ISensorMems_t *_this, float fs)
   }
   else
   {
+    p_if_owner->press_sensor_status.type.mems.fs = fs;
+    p_if_owner->temp_sensor_status.type.mems.fs = fs;
+
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -1017,6 +991,18 @@ sys_error_code_t LPS22HHTask_vtblSensorEnable(ISensor_t *_this)
   }
   else
   {
+    if (sensor_id == p_if_owner->press_id)
+    {
+      p_if_owner->press_sensor_status.is_active = TRUE;
+    }
+    else if (sensor_id == p_if_owner->temp_id)
+    {
+      p_if_owner->temp_sensor_status.is_active = TRUE;
+    }
+    else
+    {
+      /**/
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -1045,6 +1031,18 @@ sys_error_code_t LPS22HHTask_vtblSensorDisable(ISensor_t *_this)
   }
   else
   {
+    if (sensor_id == p_if_owner->press_id)
+    {
+      p_if_owner->press_sensor_status.is_active = FALSE;
+    }
+    else if (sensor_id == p_if_owner->temp_id)
+    {
+      p_if_owner->temp_sensor_status.is_active = FALSE;
+    }
+    else
+    {
+      /**/
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -1101,6 +1099,20 @@ SensorStatus_t LPS22HHTask_vtblPressGetStatus(ISensor_t *_this)
   assert_param(_this != NULL);
   LPS22HHTask *p_if_owner = LPS22HHTaskGetOwnerFromISensorIF(_this);
   return p_if_owner->press_sensor_status;
+}
+
+SensorStatus_t *LPS22HHTask_vtblTempGetStatusPointer(ISensor_t *_this)
+{
+  assert_param(_this != NULL);
+  LPS22HHTask *p_if_owner = LPS22HHTaskGetOwnerFromISensorIF(_this);
+  return &p_if_owner->temp_sensor_status;
+}
+
+SensorStatus_t *LPS22HHTask_vtblPressGetStatusPointer(ISensor_t *_this)
+{
+  assert_param(_this != NULL);
+  LPS22HHTask *p_if_owner = LPS22HHTaskGetOwnerFromISensorIF(_this);
+  return &p_if_owner->press_sensor_status;
 }
 
 /* Private function definition */
@@ -1537,7 +1549,25 @@ static sys_error_code_t LPS22HHTaskSensorInit(LPS22HHTask *_this)
     lps22hh_data_rate_set(p_sensor_drv, LPS22HH_200_Hz);
   }
 
-  _this->task_delay = (uint16_t)(_this->press_sensor_status.type.mems.odr < _this->temp_sensor_status.type.mems.odr ? _this->press_sensor_status.type.mems.odr : _this->temp_sensor_status.type.mems.odr);
+  if ((_this->press_sensor_status.is_active) && (_this->temp_sensor_status.is_active))
+  {
+    _this->task_delay = (uint16_t)(
+                          _this->press_sensor_status.type.mems.odr < _this->temp_sensor_status.type.mems.odr ?
+                          _this->press_sensor_status.type.mems.odr :
+                          _this->temp_sensor_status.type.mems.odr);
+  }
+  else if (_this->press_sensor_status.is_active)
+  {
+    _this->task_delay = (uint16_t)(_this->press_sensor_status.type.mems.odr);
+  }
+  else if (_this->temp_sensor_status.is_active)
+  {
+    _this->task_delay = (uint16_t)(_this->temp_sensor_status.type.mems.odr);
+  }
+  else
+  {
+  }
+
 #if LPS22HH_FIFO_ENABLED
   _this->task_delay = (uint16_t)((1000.0f / _this->task_delay) * (((float)(_this->samples_per_it)) / 2.0f));
 #else

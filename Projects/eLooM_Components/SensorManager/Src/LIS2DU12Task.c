@@ -228,60 +228,32 @@ static LIS2DU12TaskClass_t sTheClass =
     LIS2DU12Task_vtblForceExecuteStep,
     LIS2DU12Task_vtblOnEnterPowerMode
   },
-    /* class::sensor_if_vtbl virtual table */
+  /* class::sensor_if_vtbl virtual table */
+  {
     {
-        {
-            {
-                LIS2DU12Task_vtblAccGetId,
-                LIS2DU12Task_vtblGetEventSourceIF,
-                LIS2DU12Task_vtblAccGetDataInfo
-            },
-            LIS2DU12Task_vtblSensorEnable,
-            LIS2DU12Task_vtblSensorDisable,
-            LIS2DU12Task_vtblSensorIsEnabled,
-            LIS2DU12Task_vtblSensorGetDescription,
-            LIS2DU12Task_vtblSensorGetStatus
-        },
-        LIS2DU12Task_vtblAccGetODR,
-        LIS2DU12Task_vtblAccGetFS,
-        LIS2DU12Task_vtblAccGetSensitivity,
-        LIS2DU12Task_vtblSensorSetODR,
-        LIS2DU12Task_vtblSensorSetFS,
-        LIS2DU12Task_vtblSensorSetFifoWM
+      {
+        LIS2DU12Task_vtblAccGetId,
+        LIS2DU12Task_vtblGetEventSourceIF,
+        LIS2DU12Task_vtblAccGetDataInfo
+      },
+      LIS2DU12Task_vtblSensorEnable,
+      LIS2DU12Task_vtblSensorDisable,
+      LIS2DU12Task_vtblSensorIsEnabled,
+      LIS2DU12Task_vtblSensorGetDescription,
+      LIS2DU12Task_vtblSensorGetStatus,
+      LIS2DU12Task_vtblSensorGetStatusPointer
     },
+    LIS2DU12Task_vtblAccGetODR,
+    LIS2DU12Task_vtblAccGetFS,
+    LIS2DU12Task_vtblAccGetSensitivity,
+    LIS2DU12Task_vtblSensorSetODR,
+    LIS2DU12Task_vtblSensorSetFS,
+    LIS2DU12Task_vtblSensorSetFifoWM
+  },
   /* ACCELEROMETER DESCRIPTOR */
   {
     "lis2du12",
-    COM_TYPE_ACC,
-    {
-      1.6f,
-      12.5f,
-      25.0f,
-      50.0f,
-      100.0f,
-      200.0f,
-      400.0f,
-      800.0f,
-      1600.0f,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      2.0f,
-      4.0f,
-      8.0f,
-      16.0f,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      "x",
-      "y",
-      "z",
-    },
-    "g",
-    {
-      0,
-      1000,
-    }
+    COM_TYPE_ACC
   },
   /* class (PM_STATE, ExecuteStepFunc) map */
   {
@@ -493,6 +465,7 @@ sys_error_code_t LIS2DU12Task_vtblOnCreateTask(AManagedTask *_this, tx_entry_fun
   p_obj->prev_timestamp = 0.0f;
   p_obj->fifo_level = 0;
   p_obj->samples_per_it = 0;
+  p_obj->first_data_ready = 0;
   _this->m_pfPMState2FuncMap = sTheClass.p_pm_state2func_map;
 
   *pTaskCode = AMTExRun;
@@ -557,11 +530,19 @@ sys_error_code_t LIS2DU12Task_vtblDoEnterPowerMode(AManagedTask *_this, const EP
   {
     if (ActivePowerMode == E_POWER_MODE_SENSORS_ACTIVE)
     {
-      /* Deactivate the sensor */
-      lis2du12_md_t mode = { LIS2DU12_OFF, LIS2DU12_2g, LIS2DU12_ODR_div_2 };
-      mode.odr = LIS2DU12_OFF;
-      lis2du12_mode_set(p_sensor_drv, &mode);
-
+      if (LIS2DU12TaskSensorIsActive(p_obj))
+      {
+        /* Deactivate the sensor */
+        lis2du12_md_t mode =
+        {
+          LIS2DU12_OFF,
+          LIS2DU12_2g,
+          LIS2DU12_ODR_div_2
+        };
+        mode.odr = LIS2DU12_OFF;
+        lis2du12_mode_set(p_sensor_drv, &mode);
+      }
+      p_obj->first_data_ready = 0;
       /* Empty the task queue and disable INT or timer */
       tx_queue_flush(&p_obj->in_queue);
       if (p_obj->pIRQConfig == NULL)
@@ -620,7 +601,7 @@ sys_error_code_t LIS2DU12Task_vtblOnEnterTaskControlLoop(AManagedTask *_this)
   sys_error_code_t res = SYS_NO_ERROR_CODE;
 //  LIS2DU12Task *p_obj = (LIS2DU12Task*) _this;
 
-  SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("LIS2DU12: start.\r\n"));
+  SYS_DEBUGF(SYS_DBG_LEVEL_DEFAULT, ("LIS2DU12: start.\r\n"));
 
   // At this point all system has been initialized.
   // Execute task specific delayed one time initialization.
@@ -761,6 +742,14 @@ sys_error_code_t LIS2DU12Task_vtblSensorSetODR(ISensorMems_t *_this, float odr)
   }
   else
   {
+    if (odr > 1.0f)
+    {
+      /* ODR = 0 sends only message to switch off the sensor.
+       * Do not update the model in case of odr = 0 */
+
+      p_if_owner->sensor_status.type.mems.odr = odr;
+      p_if_owner->sensor_status.type.mems.measured_odr = 0.0f;
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -789,6 +778,8 @@ sys_error_code_t LIS2DU12Task_vtblSensorSetFS(ISensorMems_t *_this, float fs)
   }
   else
   {
+    p_if_owner->sensor_status.type.mems.fs = fs;
+    p_if_owner->sensor_status.type.mems.sensitivity = 0.0000305f * p_if_owner->sensor_status.type.mems.fs;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -849,6 +840,7 @@ sys_error_code_t LIS2DU12Task_vtblSensorEnable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = TRUE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -876,6 +868,7 @@ sys_error_code_t LIS2DU12Task_vtblSensorDisable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = FALSE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -921,6 +914,14 @@ SensorStatus_t LIS2DU12Task_vtblSensorGetStatus(ISensor_t *_this)
   LIS2DU12Task *p_if_owner = (LIS2DU12Task *)((uint32_t) _this - offsetof(LIS2DU12Task, sensor_if));
 
   return p_if_owner->sensor_status;
+}
+
+SensorStatus_t *LIS2DU12Task_vtblSensorGetStatusPointer(ISensor_t *_this)
+{
+  assert_param(_this != NULL);
+  LIS2DU12Task *p_if_owner = (LIS2DU12Task *)((uint32_t) _this - offsetof(LIS2DU12Task, sensor_if));
+
+  return &p_if_owner->sensor_status;
 }
 
 /* Private function definition */
@@ -1018,55 +1019,45 @@ static sys_error_code_t LIS2DU12TaskExecuteStepDatalog(AManagedTask *_this)
       case SM_MESSAGE_ID_DATA_READY:
       {
         SYS_DEBUGF(SYS_DBG_LEVEL_ALL, ("LIS2DU12: new data.\r\n"));
-//          if(p_obj->pIRQConfig == NULL)
-//          {
-//            if(TX_SUCCESS
-//                != tx_timer_change(&p_obj->read_timer, AMT_MS_TO_TICKS(p_obj->lis2du12_task_cfg_timer_period_ms),
-//                                   AMT_MS_TO_TICKS(p_obj->lis2du12_task_cfg_timer_period_ms)))
-//            {
-//              return SYS_UNDEFINED_ERROR_CODE;
-//            }
-//          }
-
         res = LIS2DU12TaskSensorReadData(p_obj);
         if (!SYS_IS_ERROR_CODE(res))
         {
-#if LIS2DU12_FIFO_ENABLED
-          if (p_obj->fifo_level != 0)
+          if (p_obj->first_data_ready == 1)
           {
-#endif
-            // notify the listeners...
-            double timestamp = report.sensorDataReadyMessage.fTimestamp;
-            double delta_timestamp = timestamp - p_obj->prev_timestamp;
-            p_obj->prev_timestamp = timestamp;
-
-            /* update measuredODR */
-            p_obj->sensor_status.type.mems.measured_odr = (float) p_obj->samples_per_it / (float) delta_timestamp;
-
-            /* Create a bidimensional data interleaved [m x 3], m is the number of samples in the sensor queue (samples_per_it):
-             * [X0, Y0, Z0]
-             * [X1, Y1, Z1]
-             * ...
-             * [Xm-1, Ym-1, Zm-1]
-             */
-            EMD_Init(&p_obj->data, p_obj->p_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2, p_obj->samples_per_it, 3);
-
-            DataEvent_t evt;
-
-            DataEventInit((IEvent *) &evt, p_obj->p_event_src, &p_obj->data, timestamp, p_obj->acc_id);
-            IEventSrcSendEvent(p_obj->p_event_src, (IEvent *) &evt, NULL);
-            SYS_DEBUGF(SYS_DBG_LEVEL_ALL, ("LIS2DU12: ts = %f\r\n", (float)timestamp));
 #if LIS2DU12_FIFO_ENABLED
-          }
+            if (p_obj->fifo_level != 0)
+            {
 #endif
+              // notify the listeners...
+              double timestamp = report.sensorDataReadyMessage.fTimestamp;
+              double delta_timestamp = timestamp - p_obj->prev_timestamp;
+              p_obj->prev_timestamp = timestamp;
+
+              /* update measuredODR */
+              p_obj->sensor_status.type.mems.measured_odr = (float) p_obj->samples_per_it / (float) delta_timestamp;
+
+              /* Create a bidimensional data interleaved [m x 3], m is the number of samples in the sensor queue (samples_per_it):
+               * [X0, Y0, Z0]
+               * [X1, Y1, Z1]
+               * ...
+               * [Xm-1, Ym-1, Zm-1]
+               */
+              EMD_Init(&p_obj->data, p_obj->p_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2, p_obj->samples_per_it, 3);
+
+              DataEvent_t evt;
+
+              DataEventInit((IEvent *) &evt, p_obj->p_event_src, &p_obj->data, timestamp, p_obj->acc_id);
+              IEventSrcSendEvent(p_obj->p_event_src, (IEvent *) &evt, NULL);
+              SYS_DEBUGF(SYS_DBG_LEVEL_ALL, ("LIS2DU12: ts = %f\r\n", (float)timestamp));
+#if LIS2DU12_FIFO_ENABLED
+            }
+#endif
+          }
+          else
+          {
+            p_obj->first_data_ready = 1;
+          }
         }
-//            if(p_obj->pIRQConfig == NULL)
-//            {
-//              if(TX_SUCCESS != tx_timer_activate(&p_obj->read_timer))
-//              {
-//                res = SYS_UNDEFINED_ERROR_CODE;
-//              }
-//            }
         break;
       }
       case SM_MESSAGE_ID_SENSOR_CMD:
@@ -1350,11 +1341,16 @@ static sys_error_code_t LIS2DU12TaskSensorInit(LIS2DU12Task *_this)
     lis2du12_read_reg(p_sensor_drv, LIS2DU12_OUTX_L, (uint8_t *) _this->p_sensor_data_buff,
                       ((uint16_t)_this->samples_per_it * 6u));
   }
-
-  _this->lis2du12_task_cfg_timer_period_ms = (uint16_t)((1000.0f / _this->sensor_status.type.mems.odr) * (((float)(_this->samples_per_it)) / 2.0f));
-#else
-  _this->lis2du12_task_cfg_timer_period_ms = (uint16_t)(1000.0f / _this->sensor_status.type.mems.odr);
 #endif
+
+  if (_this->sensor_status.is_active)
+  {
+#if LIS2DU12_FIFO_ENABLED
+    _this->lis2du12_task_cfg_timer_period_ms = (uint16_t)((1000.0f / _this->sensor_status.type.mems.odr) * (((float)(_this->samples_per_it)) / 2.0f));
+#else
+    _this->lis2du12_task_cfg_timer_period_ms = (uint16_t)(1000.0f / _this->sensor_status.type.mems.odr);
+#endif
+  }
 
   return res;
 }
@@ -1511,42 +1507,31 @@ static sys_error_code_t LIS2DU12TaskSensorSetFS(LIS2DU12Task *_this, SMMessage r
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
 
-  stmdev_ctx_t *p_sensor_drv = (stmdev_ctx_t *) &_this->p_sensor_bus_if->m_xConnector;
   float fs = (float) report.sensorMessage.fParam;
   uint8_t id = report.sensorMessage.nSensorId;
-
-  lis2du12_md_t mode = { LIS2DU12_OFF, LIS2DU12_2g, LIS2DU12_ODR_div_2 };
 
   if (id == _this->acc_id)
   {
     /* Full scale selection. */
     if (fs < 3.0f)
     {
-      mode.fs = LIS2DU12_2g;
       fs = 2.0f;
     }
     else if (fs < 5.0f)
     {
-      mode.fs = LIS2DU12_4g;
       fs = 4.0f;
     }
     else if (fs < 9.0f)
     {
-      mode.fs = LIS2DU12_8g;
       fs = 8.0f;
     }
     else
     {
-      mode.fs = LIS2DU12_16g;
       fs = 16.0f;
     }
-    lis2du12_mode_set(p_sensor_drv, &mode);
 
-    if (!SYS_IS_ERROR_CODE(res))
-    {
-      _this->sensor_status.type.mems.fs = fs;
-      _this->sensor_status.type.mems.sensitivity = 0.0000305f * _this->sensor_status.type.mems.fs;
-    }
+    _this->sensor_status.type.mems.fs = fs;
+    _this->sensor_status.type.mems.sensitivity = 0.0000305f * _this->sensor_status.type.mems.fs;
   }
   else
   {

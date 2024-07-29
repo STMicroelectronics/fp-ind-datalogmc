@@ -1,9 +1,12 @@
 st_pnpl
 st_dtdl_gui
-numpy
+numpy==1.26.4
+pyserial
 pandas
+fastparquet
 colorama
 click
-PySide6==6.4.3
 pyqtgraph
+PySide6==6.6.1
+setuptools
 matplotlib

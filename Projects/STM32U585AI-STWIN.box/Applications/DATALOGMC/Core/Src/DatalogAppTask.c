@@ -65,6 +65,8 @@
 #define COMM_ID_USB                               1U
 #define COMM_ID_BLE                               2U
 
+#define BOOTLOADER_ADDRESS                        0x0BF90000
+
 #define SYS_DEBUGF(level, message)                SYS_DEBUGF3(SYS_DBG_DT, level, message)
 
 #if defined(DEBUG) || defined (SYS_DEBUG)
@@ -107,9 +109,6 @@ struct _DatalogAppTask
 //TODO could be more useful to have a CommandParse Class? (ICommandParse + PnPLCommand_t)
   PnPLCommand_t outPnPLCommand;
 
-  /** PnPL interface for Log Control **/
-  ILog_Controller_t pnplLogCtrl;
-
   uint8_t iis3dwb_pin;
 
   AppModel_t *datalog_model;
@@ -150,11 +149,6 @@ typedef struct _DatalogAppTaskClass
    * Actuator  IDataEventListener virtual table.
    */
   IDataEventListener_vtbl ActuatorListenerVTBL;
-
-  /**
-    * ILogController virtual table.
-    */
-  ILog_Controller_vtbl logCtrlVTBL;
 
   /**
     * DatalogAppTask (PM_STATE, ExecuteStepFunc) map.
@@ -237,12 +231,6 @@ static const DatalogAppTaskClass_t sTheClass =
         DatalogAppTask_ActuatorListenerGetOwner_vtbl,
         DatalogAppTask_ActuatorListenerOnNewDataReady_vtbl},
 
-    {
-        DatalogAppTask_save_config_vtbl,
-        DatalogAppTask_start_vtbl,
-        DatalogAppTask_stop_vtbl,
-        DatalogAppTask_set_time_vtbl },
-
     /* class (PM_STATE, ExecuteStepFunc) map */
     {
         DatalogAppTaskExecuteStepState1,
@@ -266,11 +254,15 @@ AManagedTaskEx *DatalogAppTaskAlloc()
   sTaskObj.parser.vptr = &sTheClass.parserVTBL;
   sTaskObj.sensorListener.vptr = &sTheClass.ListenerVTBL;
   sTaskObj.actuatorListener.vptr = &sTheClass.ActuatorListenerVTBL;
-  sTaskObj.pnplLogCtrl.vptr = &sTheClass.logCtrlVTBL;
 
   memset(&sTaskObj.outPnPLCommand, 0, sizeof(PnPLCommand_t));
 
   return (AManagedTaskEx *) &sTaskObj;
+}
+
+DatalogAppTask *getDatalogAppTask(void)
+{
+  return (DatalogAppTask *) &sTaskObj;
 }
 
 IEventListener *DatalogAppTask_GetEventListenerIF(DatalogAppTask *_this)
@@ -294,14 +286,6 @@ ICommandParse_t *DatalogAppTask_GetICommandParseIF(DatalogAppTask *_this)
 
   return &p_obj->parser;
 
-}
-
-ILog_Controller_t *DatalogAppTask_GetILogControllerIF(DatalogAppTask *_this)
-{
-  assert_param(_this != NULL);
-  DatalogAppTask *p_obj = (DatalogAppTask *) _this;
-
-  return &p_obj->pnplLogCtrl;
 }
 
 sys_error_code_t DatalogAppTask_msg(ULONG msg)
@@ -468,7 +452,7 @@ sys_error_code_t DatalogAppTask_vtblDoEnterPowerMode(AManagedTask *_this, const 
       {
         if(p_obj->datalog_model->s_models[i] != NULL)
         {
-          if(p_obj->datalog_model->s_models[i]->sensor_status.is_active)
+          if(p_obj->datalog_model->s_models[i]->sensor_status->is_active)
           {
         	stream_id = p_obj->datalog_model->s_models[i]->stream_params.stream_id;
             IStream_dealloc((IStream_t*) p_obj->filex_device, stream_id);
@@ -504,7 +488,7 @@ sys_error_code_t DatalogAppTask_vtblDoEnterPowerMode(AManagedTask *_this, const 
       {
         if(p_obj->datalog_model->s_models[i] != NULL)
         {
-          if(p_obj->datalog_model->s_models[i]->sensor_status.is_active)
+          if(p_obj->datalog_model->s_models[i]->sensor_status->is_active)
           {
             stream_id = p_obj->datalog_model->s_models[i]->stream_params.stream_id;
             IStream_dealloc((IStream_t*) p_obj->usbx_device, stream_id);
@@ -930,7 +914,9 @@ sys_error_code_t DatalogAppTask_vtblICommandParse_t_parse_cmd(ICommandParse_t *_
     {
       if (p_obj->outPnPLCommand.comm_type != PNPL_CMD_GET && p_obj->outPnPLCommand.comm_type != PNPL_CMD_SYSTEM_INFO)
       {
-        IStream_set_mode((IStream_t *) p_obj->ble_device, RECEIVE);
+        /* No need to send response to SET or COMMAND messages, with the current version of the BLE App */
+        /* Since the serialize_response is not called in this case, the outPnPLCommand.response is deallocated here */
+        pnpl_free(p_obj->outPnPLCommand.response);
       }
       else
       {
@@ -1009,9 +995,9 @@ sys_error_code_t DatalogAppTask_vtblICommandParse_t_send_ctrl_msg(ICommandParse_
 }
 
 // ILogController_t virtual functions
-uint8_t DatalogAppTask_start_vtbl(ILog_Controller_t *_this, int32_t interface)
+uint8_t DatalogAppTask_start(int32_t interface)
 {
-  DatalogAppTask *p_obj = (DatalogAppTask *)((uint32_t) _this - offsetof(DatalogAppTask, pnplLogCtrl));
+  DatalogAppTask *p_obj = getDatalogAppTask();
   SysTsStart(SysGetTimestampSrv(), TRUE);
   bool status;
   uint8_t stream_id;
@@ -1044,7 +1030,7 @@ uint8_t DatalogAppTask_start_vtbl(ILog_Controller_t *_this, int32_t interface)
       {
         if(p_obj->datalog_model->s_models[i] != NULL)
         {
-          if(p_obj->datalog_model->s_models[i]->sensor_status.is_active)
+          if(p_obj->datalog_model->s_models[i]->sensor_status->is_active)
           {
             stream_id = p_obj->datalog_model->s_models[i]->stream_params.stream_id;
             sd_dps = p_obj->datalog_model->s_models[i]->stream_params.sd_dps;
@@ -1092,7 +1078,7 @@ uint8_t DatalogAppTask_start_vtbl(ILog_Controller_t *_this, int32_t interface)
       {
         if(p_obj->datalog_model->s_models[i] != NULL)
         {
-          if(p_obj->datalog_model->s_models[i]->sensor_status.is_active)
+          if(p_obj->datalog_model->s_models[i]->sensor_status->is_active)
           {
             stream_id = p_obj->datalog_model->s_models[i]->stream_params.stream_id;
             usb_ep = p_obj->datalog_model->s_models[i]->stream_params.usb_ep;
@@ -1140,9 +1126,9 @@ uint8_t DatalogAppTask_start_vtbl(ILog_Controller_t *_this, int32_t interface)
   return 0;
 }
 
-uint8_t DatalogAppTask_stop_vtbl(ILog_Controller_t *_this)
+uint8_t DatalogAppTask_stop(void)
 {
-  DatalogAppTask *p_obj = (DatalogAppTask *)((uint32_t) _this - offsetof(DatalogAppTask, pnplLogCtrl));
+  DatalogAppTask *p_obj = getDatalogAppTask();
   bool status;
   log_controller_get_log_status(&status);
 
@@ -1160,23 +1146,21 @@ uint8_t DatalogAppTask_stop_vtbl(ILog_Controller_t *_this)
   return 0;
 }
 
-uint8_t DatalogAppTask_save_config_vtbl(ILog_Controller_t *_this)
+uint8_t DatalogAppTask_save_config(void)
 {
-  assert_param(_this != NULL);
-  DatalogAppTask *p_obj = (DatalogAppTask *)((uint32_t) _this - offsetof(DatalogAppTask, pnplLogCtrl));
+  DatalogAppTask *p_obj = getDatalogAppTask();
   //TODO Save current board configuration into the mounted SD Card
   ULONG msg = FILEX_DCTRL_CMD_SET_DEFAULT_STATUS;
   filex_dctrl_msg(p_obj->filex_device, &msg);
   return 0;
 }
 
-uint8_t DatalogAppTask_set_time_vtbl(ILog_Controller_t *_this, const char *datetime)
+uint8_t DatalogAppTask_set_time(const char *datetime)
 {
-  assert_param(_this != NULL);
-
+  uint8_t retval = SYS_NO_ERROR_CODE;
   char datetimeStr[3];
 
-  //internal input format: yyyyMMdd_hh_mm_ss
+  /* internal input format: yyyyMMdd_hh_mm_ss */
 
   RTC_DateTypeDef sdate;
   RTC_TimeTypeDef stime;
@@ -1223,23 +1207,16 @@ uint8_t DatalogAppTask_set_time_vtbl(ILog_Controller_t *_this, const char *datet
 
   if (HAL_RTC_SetTime(&hrtc, &stime, RTC_FORMAT_BIN) != HAL_OK)
   {
-    while (1)
-      ;
+    retval = SYS_BASE_ERROR_CODE;
   }
   if (HAL_RTC_SetDate(&hrtc, &sdate, RTC_FORMAT_BIN) != HAL_OK)
   {
-    while (1)
-      ;
+    retval = SYS_BASE_ERROR_CODE;
   }
 
-  return 0;
+  return retval;
 }
 
-/* Motor controller */
-uint8_t DatalogAppTask_startMotor_vtbl(IMotor_Controller_t *_this)
-{
-  return 0;
-}
 
 // Private function definition
 // ***************************
@@ -1322,6 +1299,34 @@ static VOID DatalogAppTaskAdvOBTimerCallbackFunction(ULONG timer)
   msg.streamID = sTaskObj.ble_device->adv_id;
   ble_stream_msg(&msg);
 
+}
+
+uint8_t DatalogAppTask_switch_bank(void)
+{
+  /*putMessage switch */
+  DatalogAppTask_msg((ULONG) DT_SWITCH_BANK);
+  return 0;
+}
+
+uint8_t DatalogAppTask_set_dfu_mode(void)
+{
+  /*  Disable interrupts for timers */
+  HAL_NVIC_DisableIRQ(TIM6_IRQn);
+
+  /*  Disable ICACHE */
+  HAL_ICACHE_DeInit();
+
+  /* Jump to user application */
+  typedef  void (*pFunction)(void);
+  pFunction JumpToApplication;
+  uint32_t JumpAddress;
+  JumpAddress = *(__IO uint32_t *)(BOOTLOADER_ADDRESS + 4);
+  JumpToApplication = (pFunction) JumpAddress;
+
+  /* Initialize user application's Stack Pointer */
+  __set_MSP(*(__IO uint32_t *) BOOTLOADER_ADDRESS);
+  JumpToApplication();
+  return 0;
 }
 
 

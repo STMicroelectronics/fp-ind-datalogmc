@@ -217,7 +217,8 @@ static IMP34DT05TaskClass_t sTheClass =
       IMP34DT05Task_vtblSensorDisable,
       IMP34DT05Task_vtblSensorIsEnabled,
       IMP34DT05Task_vtblSensorGetDescription,
-      IMP34DT05Task_vtblSensorGetStatus
+      IMP34DT05Task_vtblSensorGetStatus,
+      IMP34DT05Task_vtblSensorGetStatusPointer
     },
     IMP34DT05Task_vtblMicGetFrequency,
     IMP34DT05Task_vtblMicGetVolume,
@@ -230,25 +231,7 @@ static IMP34DT05TaskClass_t sTheClass =
   /* MIC DESCRIPTOR */
   {
     "imp34dt05",
-    COM_TYPE_MIC,
-    {
-      16000.0,
-      32000.0,
-      48000.0,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      130.0,
-      COM_END_OF_LIST_FLOAT,
-    },
-    {
-      "aud",
-    },
-    "Waveform",
-    {
-      0,
-      1000,
-    }
+    COM_TYPE_MIC
   },
   /* class (PM_STATE, ExecuteStepFunc) map */
   {
@@ -364,9 +347,9 @@ sys_error_code_t IMP34DT05Task_vtblHardwareInit(AManagedTask *_this, void *pPara
     if (!SYS_IS_ERROR_CODE(res))
     {
       DFSDMDriverFilterRegisterCallback((DFSDMDriver_t *) p_obj->p_driver, HAL_DFSDM_FILTER_REGCONV_HALFCOMPLETE_CB_ID,
-                                      DFSDM_Filter_0_HalfComplete_Callback);
+                                        DFSDM_Filter_0_HalfComplete_Callback);
       DFSDMDriverFilterRegisterCallback((DFSDMDriver_t *) p_obj->p_driver, HAL_DFSDM_FILTER_REGCONV_COMPLETE_CB_ID,
-                                      DFSDM_Filter_0_Complete_Callback);
+                                        DFSDM_Filter_0_Complete_Callback);
     }
 
     if (!MTMap_IsInitialized(&sTheClass.task_map))
@@ -534,7 +517,7 @@ sys_error_code_t IMP34DT05Task_vtblOnEnterTaskControlLoop(AManagedTask *_this)
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
 
-  SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("IMP34DT05: start.\r\n"));
+  SYS_DEBUGF(SYS_DBG_LEVEL_DEFAULT, ("IMP34DT05: start.\r\n"));
 
 #if defined(ENABLE_THREADX_DBG_PIN) && defined (IMP34DT05_TASK_CFG_TAG)
   IMP34DT05Task *p_obj = (IMP34DT05Task *) _this;
@@ -677,6 +660,7 @@ sys_error_code_t IMP34DT05Task_vtblSensorSetFrequency(ISensorAudio_t *_this, uin
   }
   else
   {
+    p_if_owner->sensor_status.type.audio.frequency = frequency;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -705,6 +689,10 @@ sys_error_code_t IMP34DT05Task_vtblSensorSetVolume(ISensorAudio_t *_this, uint8_
   }
   else
   {
+    if (volume <= 100)
+    {
+      p_if_owner->sensor_status.type.audio.volume = volume;
+    }
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -742,6 +730,7 @@ sys_error_code_t IMP34DT05Task_vtblSensorEnable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = TRUE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -769,6 +758,7 @@ sys_error_code_t IMP34DT05Task_vtblSensorDisable(ISensor_t *_this)
   }
   else
   {
+    p_if_owner->sensor_status.is_active = FALSE;
     /* Set a new command message in the queue */
     SMMessage report =
     {
@@ -813,6 +803,14 @@ SensorStatus_t IMP34DT05Task_vtblSensorGetStatus(ISensor_t *_this)
   IMP34DT05Task *p_if_owner = (IMP34DT05Task *)((uint32_t) _this - offsetof(IMP34DT05Task, sensor_if));
 
   return p_if_owner->sensor_status;
+}
+
+SensorStatus_t *IMP34DT05Task_vtblSensorGetStatusPointer(ISensor_t *_this)
+{
+  assert_param(_this != NULL);
+  IMP34DT05Task *p_if_owner = (IMP34DT05Task *)((uint32_t) _this - offsetof(IMP34DT05Task, sensor_if));
+
+  return &p_if_owner->sensor_status;
 }
 
 /* Private function definition */
@@ -913,29 +911,31 @@ static sys_error_code_t IMP34DT05TaskExecuteStepDatalog(AManagedTask *_this)
         double timestamp = report.sensorDataReadyMessage.fTimestamp;
         p_obj->prev_timestamp = timestamp;
         uint16_t samples = (uint16_t)(p_obj->sensor_status.type.audio.frequency / 1000u);
+
         /* Workaround: IMP34DT05 data are unstable for the first samples -> avoid sending data */
 //        if (timestamp > 0.3f)
 //        {
 #if (HSD_USE_DUMMY_DATA == 1)
-          IMP34DT05TaskWriteDummyData(p_obj);
-          EMD_1dInit(&p_obj->data, (uint8_t *) &p_obj->p_dummy_data_buff[0], E_EM_INT16, samples);
+        IMP34DT05TaskWriteDummyData(p_obj);
+        EMD_1dInit(&p_obj->data, (uint8_t *) &p_obj->p_dummy_data_buff[0], E_EM_INT16, samples);
 #else
+        float gain = (float)p_obj->sensor_status.type.audio.volume * 0.01f; /*volume is expressed as percentage*/
         int32_t *p32 = (int32_t *) &p_obj->p_dma_data_buff[(p_obj->half - 1) * samples];
         int16_t *p16 = p_obj->p_sensor_data_buff;
-          uint16_t idx = 0;
-          for (idx = 0; idx < samples ; idx++)
-          {
-            *p16++ = p_obj->old_out = (0xFC * (p_obj->old_out + ((*p32) >> 11) - p_obj->old_in)) / 0xFF;
-            p_obj->old_in = (*p32++) >> 11;
-          }
-          EMD_1dInit(&p_obj->data, (uint8_t *) p_obj->p_sensor_data_buff, E_EM_INT16, samples);
+        uint16_t idx = 0;
+        for (idx = 0; idx < samples ; idx++)
+        {
+          *p16++ = p_obj->old_out = (int32_t)((0xFC * (p_obj->old_out + ((*p32) >> 11) - p_obj->old_in)) * gain) / 0xFF;
+          p_obj->old_in = (*p32++) >> 11;
+        }
+        EMD_1dInit(&p_obj->data, (uint8_t *) p_obj->p_sensor_data_buff, E_EM_INT16, samples);
 #endif
-          DataEvent_t evt;
+        DataEvent_t evt;
 
-          DataEventInit((IEvent *) &evt, p_obj->p_event_src, &p_obj->data, timestamp, p_obj->mic_id);
-          IEventSrcSendEvent(p_obj->p_event_src, (IEvent *) &evt, NULL);
+        DataEventInit((IEvent *) &evt, p_obj->p_event_src, &p_obj->data, timestamp, p_obj->mic_id);
+        IEventSrcSendEvent(p_obj->p_event_src, (IEvent *) &evt, NULL);
 
-          SYS_DEBUGF(SYS_DBG_LEVEL_ALL, ("IMP34DT05: ts = %f\r\n", (float)timestamp));
+        SYS_DEBUGF(SYS_DBG_LEVEL_ALL, ("IMP34DT05: ts = %f\r\n", (float)timestamp));
 //        }
         break;
       }
@@ -1112,9 +1112,9 @@ static sys_error_code_t IMP34DT05TaskSensorSetFrequency(IMP34DT05Task *_this, SM
     {
       DFSDMSetDFSDMConfig(p_obj->p_driver, ODR);
       DFSDMDriverFilterRegisterCallback((DFSDMDriver_t *) p_obj->p_driver, HAL_DFSDM_FILTER_REGCONV_HALFCOMPLETE_CB_ID,
-                                      DFSDM_Filter_0_HalfComplete_Callback);
+                                        DFSDM_Filter_0_HalfComplete_Callback);
       DFSDMDriverFilterRegisterCallback((DFSDMDriver_t *) p_obj->p_driver, HAL_DFSDM_FILTER_REGCONV_COMPLETE_CB_ID,
-                                      DFSDM_Filter_0_Complete_Callback);
+                                        DFSDM_Filter_0_Complete_Callback);
 
       _this->sensor_status.type.audio.frequency = ODR;
     }
@@ -1137,7 +1137,7 @@ static sys_error_code_t IMP34DT05TaskSensorSetVolume(IMP34DT05Task *_this, SMMes
 
   if (id == _this->mic_id)
   {
-    if (FS != 100.0f)
+    if (FS <= 100.0f)
     {
       res = SYS_INVALID_PARAMETER_ERROR_CODE;
     }
