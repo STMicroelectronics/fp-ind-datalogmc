@@ -102,7 +102,7 @@ uint8_t PnPLParseCommand(char *commandString, PnPLCommand_t *command);
 uint8_t PnPLSerializeResponse(PnPLCommand_t *command, char **SerializedJSON, uint32_t *size, uint8_t pretty);
 uint8_t PnPLSerializeTelemetry(char *compName, PnPLTelemetry_t *telemetryValue, uint8_t telemetryNum,
                                char **telemetryJSON, uint32_t *size, uint8_t pretty);
-uint8_t PnPLSerializeCommandResponse(char **responseJSON, uint32_t *size, uint8_t pretty, const char *message, bool status);
+
 /* Inline functions definition */
 /*******************************/
 

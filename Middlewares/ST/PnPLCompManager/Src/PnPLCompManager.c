@@ -1,9 +1,8 @@
 /**
   ******************************************************************************
   * @file    PnPLCompManager.c
-  * @brief   The PnPLCompManager implements the interface used to handle PnP-like
-  *          commands and properties generated through a Digital Twins Definition
-  *          Language (DTDL)
+  * @author  SRA
+  * @brief
   ******************************************************************************
   * @attention
   *
@@ -433,7 +432,7 @@ uint8_t PnPLGetDeviceStatusJSON(char **serializedJSON, uint32_t *size, uint8_t p
   JSON_DeviceConfig = json_value_get_object(tempJSON);
 
   /*
-      "schema_version": "2.2.0",                 (Reference to the schema version adopted.)
+      "schema_version": "2.1.0",                 (Reference to the schema version adopted.)
       "uuid" : "<uuid-of-the-acquisition>",      (Unique identifier of an acquisition.)​
       "devices":[​
           {​
@@ -442,7 +441,6 @@ uint8_t PnPLGetDeviceStatusJSON(char **serializedJSON, uint32_t *size, uint8_t p
               "protocol_id": <protocol_id>       (Unique identifier of a protocol type: 0:BLE, 1:serial, 2:libusb)​​
               "sn": "<serial_number>",           (Unique serial number of the device that contributes to the acquisition.)​
               "pnpl_responses": true|false       (Optional - Boolean value that identifies whether PnPL Responses are used or not)[*1]​
-              "pnpl_ble_responses": true|false   (Optional - Boolean value that identifies whether BLE PnPL Responses are used or not)[*1]​
               "components": [                    (Array of components of the device; this list has to reflect the device template.)​
                   {​
                       "device_info": {           (Optional - The "device_info" component contains additional information about the device.)​
@@ -456,10 +454,10 @@ uint8_t PnPLGetDeviceStatusJSON(char **serializedJSON, uint32_t *size, uint8_t p
           }​
       ]
 
-      [*1]: [Backward compatibility guaranteed] If this field is not present, then PnPL responses || BLE PnPL responses are not used.​​
+      [*1]: [Backward compatibility guaranteed] If this field is not present, then PnPL responses are not used.​​
   */
 
-  (void)json_object_dotset_string(JSON_DeviceConfig, "schema_version", "2.2.0");
+  (void)json_object_dotset_string(JSON_DeviceConfig, "schema_version", "2.1.0");
   (void)json_object_dotset_string(JSON_DeviceConfig, "uuid", global_uuid);
 
   tempJSONDevice = json_value_init_object();
@@ -490,12 +488,6 @@ uint8_t PnPLGetDeviceStatusJSON(char **serializedJSON, uint32_t *size, uint8_t p
   (void)json_object_dotset_boolean(JSON_Device, "pnpl_responses", true);
 #else
   (void)json_object_dotset_boolean(JSON_Device, "pnpl_responses", false);
-#endif
-
-#ifdef PNPL_BLE_RESPONSES
-  (void)json_object_dotset_boolean(JSON_Device, "pnpl_ble_responses", true);
-#else
-  (void)json_object_dotset_boolean(JSON_Device, "pnpl_ble_responses", false);
 #endif
 
   (void)json_object_set_value(JSON_Device, "components", json_value_init_array());
@@ -560,7 +552,7 @@ uint8_t PnPLGetFilteredDeviceStatusJSON(char **serializedJSON, uint32_t *size, c
   JSON_DeviceConfig = json_value_get_object(tempJSON);
 
   /*
-      "schema_version": "2.2.0",                 (Reference to the schema version adopted.)
+      "schema_version": "2.1.0",                 (Reference to the schema version adopted.)
       "uuid" : "<uuid-of-the-acquisition>",      (Unique identifier of an acquisition.)​
       "devices":[​
           {​
@@ -568,8 +560,7 @@ uint8_t PnPLGetFilteredDeviceStatusJSON(char **serializedJSON, uint32_t *size, c
               "fw_id": <fw_id>,                  (Unique identifier of a firmware type, according to Vespucci catalogs.)
               "protocol_id": <protocol_id>       (Unique identifier of a protocol type: 0:BLE, 1:serial, 2:libusb)​​
               "sn": "<serial_number>",           (Unique serial number of the device that contributes to the acquisition.)​
-              "pnpl_responses": true|false       (Optional - Boolean value that identifies whether PnPL Responses are used or not)[*1]
-              "pnpl_ble_responses": true|false   (Optional - Boolean value that identifies whether BLE PnPL Responses are used or not)[*1]​
+              "pnpl_responses": true|false       (Optional - Boolean value that identifies whether PnPL Responses are used or not)[*1]​
               "components": [                    (Array of components of the device; this list has to reflect the device template.)​
                   {​
                       "device_info": {           (Optional - The "device_info" component contains additional information about the device.)​
@@ -583,10 +574,10 @@ uint8_t PnPLGetFilteredDeviceStatusJSON(char **serializedJSON, uint32_t *size, c
           }​
       ]
 
-      [*1]: [Backward compatibility guaranteed] If this field is not present, then PnPL responses || BLE PnPL responses are not used.​​
+      [*1]: [Backward compatibility guaranteed] If this field is not present, then PnPL responses are not used.​​
   */
 
-  (void)json_object_dotset_string(JSON_DeviceConfig, "schema_version", "2.2.0");
+  (void)json_object_dotset_string(JSON_DeviceConfig, "schema_version", "2.1.0");
   (void)json_object_dotset_string(JSON_DeviceConfig, "uuid", global_uuid);
 
   tempJSONDevice = json_value_init_object();
@@ -617,12 +608,6 @@ uint8_t PnPLGetFilteredDeviceStatusJSON(char **serializedJSON, uint32_t *size, c
   (void)json_object_dotset_boolean(JSON_Device, "pnpl_responses", true);
 #else
   (void)json_object_dotset_boolean(JSON_Device, "pnpl_responses", false);
-#endif
-
-#ifdef PNPL_BLE_RESPONSES
-  (void)json_object_dotset_boolean(JSON_Device, "pnpl_ble_responses", true);
-#else
-  (void)json_object_dotset_boolean(JSON_Device, "pnpl_ble_responses", false);
 #endif
 
   (void)json_object_set_value(JSON_Device, "components", json_value_init_array());
@@ -673,16 +658,6 @@ uint8_t PnPLGetFilteredDeviceStatusJSON(char **serializedJSON, uint32_t *size, c
   return PNPL_NO_ERROR_CODE;
 }
 
-/**
- * @brief Updates the device status from a serialized JSON string.
- *
- * This function takes a serialized JSON string as input and updates the device status
- * based on the information in the JSON.
- *
- * @param serializedJSON A pointer to the serialized JSON string.
- * @return The status of the update operation. This can be used to determine if the update
- *         was successful or if an error occurred.
- */
 uint8_t PnPLUpdateDeviceStatusFromJSON(char *serializedJSON)
 {
   char componentName[COMP_KEY_MAX_LENGTH];
@@ -746,18 +721,6 @@ uint8_t PnPLUpdateDeviceStatusFromJSON(char *serializedJSON)
 }
 
 
-/**
- * @brief Parses a command string and populates a PnPLCommand_t structure.
- *
- * This function takes a command string and a pointer to a PnPLCommand_t structure,
- * and parses the command string to populate the structure with the relevant command
- * information. The command string should be in a specific format that matches the
- * expected command format.
- *
- * @param commandString The command string to parse.
- * @param command A pointer to the PnPLCommand_t structure to populate.
- * @return uint8_t Returns a status code indicating the success or failure of the parsing operation.
- */
 uint8_t PnPLParseCommand(char *commandString, PnPLCommand_t *command)
 {
   if(NULL != pnpl_lock_fp)
@@ -783,7 +746,7 @@ uint8_t PnPLParseCommand(char *commandString, PnPLCommand_t *command)
         IPnPLComponent_t *p_obj = (IPnPLComponent_t *)(spPnPLObj.Components[i]);
         if (strcmp(componentName, IPnPLComponentGetKey(p_obj)) == 0)
         {
-#if defined(PNPL_RESPONSES) || defined(PNPL_BLE_RESPONSES)
+#ifdef PNPL_RESPONSES
           char *set_response = 0;
           uint32_t size = 0;
           (void)IPnPLComponentSetProperty(p_obj, commandString, &set_response, &size, 0);
@@ -806,19 +769,19 @@ uint8_t PnPLParseCommand(char *commandString, PnPLCommand_t *command)
           {
             if (strcmp(IPnPLComponentGetCommandKey(p_obj, j), componentName) == 0)
             {
-#if defined(PNPL_RESPONSES) || defined(PNPL_BLE_RESPONSES)
+#ifdef PNPL_RESPONSES
               char *cmd_response = 0;
               uint32_t size = 0;
               (void)IPnPLCommandExecuteFunction(p_obj, commandString, &cmd_response, &size, 0);
-//              /* CMD Response */
+              /* CMD Response */
               command->comm_type = PNPL_CMD_COMMAND;
-//              command->response = (char*)pnpl_malloc(size);
-//              if (command->response != NULL)
-//              {
-//                strcpy(command->response, cmd_response);
-//                pnpl_free(cmd_response);
-//              }
-//              /* CMD Response*/
+              command->response = (char*)pnpl_malloc(size);
+              if (command->response != NULL)
+              {
+                strcpy(command->response, cmd_response);
+                pnpl_free(cmd_response);
+              }
+              /* CMD Response*/
 #else
               (void)IPnPLCommandExecuteFunction(p_obj, commandString);
 #endif
@@ -834,7 +797,7 @@ uint8_t PnPLParseCommand(char *commandString, PnPLCommand_t *command)
         IPnPLComponent_t *p_obj = (IPnPLComponent_t *)(spPnPLObj.Components[i]);
         if (strcmp(componentName, IPnPLComponentGetKey(p_obj)) == 0)
         {
-#if defined(PNPL_RESPONSES) || defined(PNPL_BLE_RESPONSES)
+#ifdef PNPL_RESPONSES
           char *set_response = 0;
           uint32_t size = 0;
           (void)IPnPLComponentSetProperty(p_obj, commandString, &set_response, &size, 0);
@@ -870,20 +833,6 @@ uint8_t PnPLParseCommand(char *commandString, PnPLCommand_t *command)
   return ret;
 }
 
-/**
- * @brief Serializes a PnPL command response into a JSON string.
- *
- * This function takes a PnPL command and serializes it into a JSON string representation.
- *
- * @param command Pointer to the PnPL command structure.
- * @param SerializedJSON Pointer to the variable that will hold the serialized JSON string.
- *                       The string is allocated within the function and it should be freed after use.
- * @param size Pointer to the variable that will hold the size of the serialized JSON string.
- * @param pretty Flag indicating whether the JSON string should be formatted for readability.
- *               Set to 1 for pretty formatting, or 0 for compact formatting.
- *
- * @return 0 if serialization is successful, or an error code if serialization fails.
- */
 uint8_t PnPLSerializeResponse(PnPLCommand_t *command, char **SerializedJSON, uint32_t *size, uint8_t pretty)
 {
   uint8_t ret = PNPL_NO_ERROR_CODE;
@@ -926,7 +875,7 @@ uint8_t PnPLSerializeResponse(PnPLCommand_t *command, char **SerializedJSON, uin
       ret = PNPL_BASE_ERROR_CODE;
     }
   }
-#if defined(PNPL_RESPONSES) || defined(PNPL_BLE_RESPONSES)
+#ifdef PNPL_RESPONSES
   else if (command->comm_type == PNPL_CMD_SET)
   {
     *size = strlen(command->response) + 1;
@@ -944,7 +893,7 @@ uint8_t PnPLSerializeResponse(PnPLCommand_t *command, char **SerializedJSON, uin
 #endif
   else if (command->comm_type == PNPL_CMD_ERROR)
   {
-    PnPLCreateLogMessage(SerializedJSON, size, command->comp_name, PNPL_LOG_ERROR);
+    PnPLCreateLogMessage(SerializedJSON, size, "", PNPL_LOG_ERROR);
   }
   else
   {
@@ -959,13 +908,6 @@ uint8_t PnPLSerializeResponse(PnPLCommand_t *command, char **SerializedJSON, uin
   return ret;
 }
 
-/**
- * @brief Frees the memory allocated for a serialized string.
- *
- * This function is used to free the memory allocated for a serialized string.
- *
- * @param string Pointer to the serialized string to be freed.
- */
 void PnPLFreeSerializedString(char *string)
 {
 
@@ -982,24 +924,8 @@ void PnPLFreeSerializedString(char *string)
   }
 }
 
-
-/**
- * @brief Serializes telemetry data into JSON format.
- *
- * This function takes the component name, telemetry values, telemetry count, and other parameters
- * to serialize the telemetry data into a JSON string. The serialized JSON string is stored in the
- * `telemetryJSON` parameter, and the size of the JSON string is stored in the `size` parameter.
- *
- * @param compName The name of the component.
- * @param telemetryValue The telemetry values to be serialized.
- * @param telemetryNum The number of telemetry values.
- * @param telemetryJSON Pointer to store the serialized JSON string.
- * @param size Pointer to store the size of the serialized JSON string.
- * @param pretty Flag indicating whether the JSON string should be formatted for readability.
- *               Set to 1 for pretty formatting, or 0 for compact formatting.
- * @return Returns 0 on success, or a non-zero value on failure.
- */
-uint8_t PnPLSerializeTelemetry(char *compName, PnPLTelemetry_t *telemetryValue, uint8_t telemetryNum, char **telemetryJSON, uint32_t *size, uint8_t pretty)
+uint8_t PnPLSerializeTelemetry(char *compName, PnPLTelemetry_t *telemetryValue, uint8_t telemetryNum,
+                               char **telemetryJSON, uint32_t *size, uint8_t pretty)
 {
   if(NULL != pnpl_lock_fp)
   {
@@ -1043,70 +969,9 @@ uint8_t PnPLSerializeTelemetry(char *compName, PnPLTelemetry_t *telemetryValue, 
 }
 
 /**
- * @brief Serializes a command response into a JSON string.
- *
- * This function takes a message and status and serializes them into a JSON string
- * representing a command response. The resulting JSON string is stored in the
- * `responseJSON` parameter, and the size of the string is stored in the `size`
- * parameter.
- *
- * @param responseJSON Pointer to a pointer that will store the resulting JSON string.
- * @param size Pointer to a variable that will store the size of the resulting JSON string.
- * @param pretty Flag indicating whether the resulting JSON string should be formatted for readability.
- * @param message The message to be included in the command response.
- * @param status The status of the command response (true for success, false for failure).
- *
- * @return The function returns 0 on success, or a non-zero value on failure.
- */
-uint8_t PnPLSerializeCommandResponse(char **responseJSON, uint32_t *size, uint8_t pretty, const char *message, bool status)
-{
-  if(NULL != pnpl_lock_fp)
-  {
-    pnpl_lock_fp();
-  }
-
-  JSON_Value *respJSON = json_value_init_object();
-  JSON_Object *respJSONObject = json_value_get_object(respJSON);
-
-  json_object_dotset_string(respJSONObject, "PnPL_Response.message", message);
-  json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", status);
-
-  if (pretty == 1)
-  {
-    *responseJSON = json_serialize_to_string_pretty(respJSON);
-    *size = json_serialization_size_pretty(respJSON);
-  }
-  else
-  {
-    *responseJSON = json_serialize_to_string(respJSON);
-    *size = json_serialization_size(respJSON);
-  }
-
-  json_value_free(respJSON);
-
-  if(NULL != pnpl_unlock_fp)
-  {
-    pnpl_unlock_fp();
-  }
-  return PNPL_NO_ERROR_CODE;
-}
-
-/**
  * Private function definition
  */
 
-
-/**
- * @brief Extracts PnPL command data from the given command string.
- *
- * This function parses the command string and extracts the command type and component name.
- *
- * @param commandString The command string to extract data from.
- * @param commandType Pointer to a variable to store the extracted command type.
- * @param componentName Pointer to a character array to store the extracted component name.
- * 
- * @return The function returns 0 on success, or a non-zero value on failure.
- */
 static uint8_t extract_PnPL_cmd_data(char *commandString, uint8_t *commandType, char *componentName)
 {
   JSON_Value *tempJSON = json_parse_string(commandString);
@@ -1194,14 +1059,8 @@ static uint8_t extract_PnPL_cmd_data(char *commandString, uint8_t *commandType, 
   return PNPL_BASE_ERROR_CODE;
 }
 
-/**
- * @brief Retrieves the unique ID.
- *
- * This function retrieves the unique ID and stores it in the provided buffer.
- * The unique ID is derived from the STM32 UID and converted to a string.
- *
- * @param id Pointer to the buffer where the unique ID will be stored (minimum 25 bytes).
- */
+/* Unique ID is directly derived from STM32 UID and converted to string
+string needs to be 25bytes 24+\0  */
 static void PnPLGetUniqueID(char *id)
 {
   uint32_t stm32_UID[3];
@@ -1214,18 +1073,6 @@ static void PnPLGetUniqueID(char *id)
                 (unsigned long)stm32_UID[2]);
 }
 
-/**
- * @brief Sets the telemetry value in the JSON object.
- *
- * This function sets the telemetry value in the JSON object based on the telemetry type.
- *
- * @param type The telemetry data type.
- * @param json_obj The JSON object to set the telemetry value in.
- * @param name The name of the telemetry value.
- * @param value The telemetry value.
- * @param n_sub_telemetries The number of sub-telemetries.
- * @return The function returns 0 on success, or a non-zero value on failure.
- */
 static uint8_t setTelemetryValue(uint8_t type, JSON_Object *json_obj, char *name, void *value,
                                  uint8_t n_sub_telemetries)
 {
@@ -1263,13 +1110,6 @@ static uint8_t setTelemetryValue(uint8_t type, JSON_Object *json_obj, char *name
 }
 
 
-/**
- * @brief Retrieves the presentation JSON including board and firmware IDs.
- *
- * @param[out] serializedJSON Pointer to a pointer that will store the serialized JSON.
- *                            The string is allocated within the function and should be freed after use.
- * @param[out] size Pointer to a variable that will store the size of the serialized JSON.
- */
 static uint8_t _PnPLGetPresentationJSON(char **serializedJSON, uint32_t *size)
 {
   JSON_Value *tempJSON;
@@ -1297,18 +1137,6 @@ static uint8_t _PnPLGetPresentationJSON(char **serializedJSON, uint32_t *size)
   return PNPL_NO_ERROR_CODE;
 }
 
-/**
- * @brief Retrieves the device status in JSON format.
- *
- * This function retrieves the device status and serializes it into a JSON string.
- *
- * @param serializedJSON Pointer to a char pointer that will store the serialized JSON string.
- *                       The string is allocated within the function and should be freed after use.
- * @param size Pointer to a uint32_t variable that will store the size of the serialized JSON string.
- * @param pretty Flag indicating whether the JSON string should be formatted for readability (1) or not (0).
- *
- * @return 0 if successful, non-zero otherwise.
- */
 static uint8_t _PnPLGetDeviceStatusJSON(char **serializedJSON, uint32_t *size, uint8_t pretty)
 {
   char serial_number[25];
@@ -1328,7 +1156,7 @@ static uint8_t _PnPLGetDeviceStatusJSON(char **serializedJSON, uint32_t *size, u
   JSON_DeviceConfig = json_value_get_object(tempJSON);
 
   /*
-      "schema_version": "2.2.0",                 (Reference to the schema version adopted.)
+      "schema_version": "2.1.0",                 (Reference to the schema version adopted.)
       "uuid" : "<uuid-of-the-acquisition>",      (Unique identifier of an acquisition.)​
       "devices":[​
           {​
@@ -1336,8 +1164,7 @@ static uint8_t _PnPLGetDeviceStatusJSON(char **serializedJSON, uint32_t *size, u
               "fw_id": <fw_id>,                  (Unique identifier of a firmware type, according to Vespucci catalogs.)
               "protocol_id": <protocol_id>       (Unique identifier of a protocol type: 0:BLE, 1:serial, 2:libusb)​​
               "sn": "<serial_number>",           (Unique serial number of the device that contributes to the acquisition.)​
-              "pnpl_responses": true|false       (Optional - Boolean value that identifies whether PnPL Responses are used or not)[*1]
-              "pnpl_ble_responses": true|false   (Optional - Boolean value that identifies whether BLE PnPL Responses are used or not)[*1]​​
+              "pnpl_responses": true|false       (Optional - Boolean value that identifies whether PnPL Responses are used or not)[*1]​
               "components": [                    (Array of components of the device; this list has to reflect the device template.)​
                   {​
                       "device_info": {           (Optional - The "device_info" component contains additional information about the device.)​
@@ -1354,7 +1181,7 @@ static uint8_t _PnPLGetDeviceStatusJSON(char **serializedJSON, uint32_t *size, u
       [*1]: [Backward compatibility guaranteed] If this field is not present, then PnPL responses are not used.​​
   */
 
-  (void)json_object_dotset_string(JSON_DeviceConfig, "schema_version", "2.2.0");
+  (void)json_object_dotset_string(JSON_DeviceConfig, "schema_version", "2.1.0");
   (void)json_object_dotset_string(JSON_DeviceConfig, "uuid", global_uuid);
 
   tempJSONDevice = json_value_init_object();
@@ -1387,12 +1214,6 @@ static uint8_t _PnPLGetDeviceStatusJSON(char **serializedJSON, uint32_t *size, u
   (void)json_object_dotset_boolean(JSON_Device, "pnpl_responses", false);
 #endif
 
-#ifdef PNPL_BLE_RESPONSES
-  (void)json_object_dotset_boolean(JSON_Device, "pnpl_ble_responses", true);
-#else
-  (void)json_object_dotset_boolean(JSON_Device, "pnpl_ble_responses", false);
-#endif
-
   (void)json_object_set_value(JSON_Device, "components", json_value_init_array());
   JSON_ComponentArray = json_object_dotget_array(JSON_Device, "components");
 
@@ -1423,17 +1244,6 @@ static uint8_t _PnPLGetDeviceStatusJSON(char **serializedJSON, uint32_t *size, u
   return PNPL_NO_ERROR_CODE;
 }
 
-/**
- * @brief Updates the device status from a serialized JSON string.
- *
- * This function takes a serialized JSON string as input and updates the device status
- * accordingly. The device status is updated based on the information extracted from
- * the JSON string.
- *
- * @param serializedJSON The serialized JSON string containing the device status information.
- * @return The status of the update operation. Returns 0 if the update was successful, or
- *         a non-zero value indicating an error occurred.
- */
 static uint8_t _PnPLUpdateDeviceStatusFromJSON(char *serializedJSON)
 {
   char componentName[COMP_KEY_MAX_LENGTH];
@@ -1485,16 +1295,6 @@ static uint8_t _PnPLUpdateDeviceStatusFromJSON(char *serializedJSON)
   return PNPL_NO_ERROR_CODE;
 }
 
-/**
- * @brief Parses a command string and populates a PnPLCommand_t structure.
- *
- * This function takes a command string and a pointer to a PnPLCommand_t structure
- * and parses the command string to populate the structure with the relevant data.
- *
- * @param commandString The command string to be parsed.
- * @param command Pointer to the PnPLCommand_t structure to be populated.
- * @return uint8_t Returns 0 if the command string was successfully parsed, or an error code otherwise.
- */
 static uint8_t _PnPLParseCommand(char *commandString, PnPLCommand_t *command)
 {
   uint8_t commandType = 0;
@@ -1515,7 +1315,7 @@ static uint8_t _PnPLParseCommand(char *commandString, PnPLCommand_t *command)
         IPnPLComponent_t *p_obj = (IPnPLComponent_t *)(spPnPLObj.Components[i]);
         if (strcmp(componentName, IPnPLComponentGetKey(p_obj)) == 0)
         {
-#if defined(PNPL_RESPONSES) || defined(PNPL_BLE_RESPONSES)
+#ifdef PNPL_RESPONSES
           char *set_response = 0;
           uint32_t size = 0;
           (void)IPnPLComponentSetProperty(p_obj, commandString, &set_response, &size, 0);
@@ -1538,19 +1338,19 @@ static uint8_t _PnPLParseCommand(char *commandString, PnPLCommand_t *command)
           {
             if (strcmp(IPnPLComponentGetCommandKey(p_obj, j), componentName) == 0)
             {
-#if defined(PNPL_RESPONSES) || defined(PNPL_BLE_RESPONSES)
+#ifdef PNPL_RESPONSES
               char *cmd_response = 0;
               uint32_t size = 0;
               (void)IPnPLCommandExecuteFunction(p_obj, commandString, &cmd_response, &size, 0);
-//              /* CMD Response */
+              /* CMD Response */
               command->comm_type = PNPL_CMD_COMMAND;
-//              command->response = (char*)pnpl_malloc(size);
-//              if (command->response != NULL)
-//              {
-//                strcpy(command->response, cmd_response);
-//                pnpl_free(cmd_response);
-//              }
-//              /* CMD Response*/
+              command->response = (char*)pnpl_malloc(size);
+              if (command->response != NULL)
+              {
+                strcpy(command->response, cmd_response);
+                pnpl_free(cmd_response);
+              }
+              /* CMD Response*/
 #else
               (void)IPnPLCommandExecuteFunction(p_obj, commandString);
 #endif
@@ -1566,7 +1366,7 @@ static uint8_t _PnPLParseCommand(char *commandString, PnPLCommand_t *command)
         IPnPLComponent_t *p_obj = (IPnPLComponent_t *)(spPnPLObj.Components[i]);
         if (strcmp(componentName, IPnPLComponentGetKey(p_obj)) == 0)
         {
-#if defined(PNPL_RESPONSES) || defined(PNPL_BLE_RESPONSES)
+#ifdef PNPL_RESPONSES
           char *set_response = 0;
           uint32_t size = 0;
           (void)IPnPLComponentSetProperty(p_obj, commandString, &set_response, &size, 0);
