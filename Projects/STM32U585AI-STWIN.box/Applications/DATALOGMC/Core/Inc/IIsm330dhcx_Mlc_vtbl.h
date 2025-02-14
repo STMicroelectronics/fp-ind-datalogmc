@@ -42,7 +42,7 @@ typedef struct _IIsm330dhcx_Mlc_vtbl IIsm330dhcx_Mlc_vtbl;
 
 struct _IIsm330dhcx_Mlc_vtbl
 {
-  uint8_t (*ism330dhcx_mlc_load_file)(IIsm330dhcx_Mlc_t * _this, const char *data, int32_t size);
+  uint8_t (*ism330dhcx_mlc_load_file)(IIsm330dhcx_Mlc_t *_this, const char *data, int32_t size);
 };
 
 struct _IIsm330dhcx_Mlc_t

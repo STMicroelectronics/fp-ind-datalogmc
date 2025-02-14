@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:other:acquisition_info;1
+  * dtmi:vespucci:other:acquisition_info;2
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -68,8 +68,6 @@ extern "C" {
 #define HSD_ACQ_INTERNAL_TIMESTAMP_LENGTH 18U
 #define HSD_ACQ_TIMESTAMP_LENGTH 25U
 
-/* USER includes -------------------------------------------------------------*/
-
 typedef struct _AcquisitionInfoModel_t
 {
   char *comp_name;
@@ -77,9 +75,9 @@ typedef struct _AcquisitionInfoModel_t
   char name[HSD_ACQ_NAME_LENGTH];
   char description[HSD_ACQ_DESC_LENGTH];
   int8_t interface;
-  char uuid[37]; /* UUID: 8-4-4-4-12 = 36char + \0 */
-  char start_time[HSD_ACQ_TIMESTAMP_LENGTH]; /* "YYYY-MM-DDTHH:MM:SS.mmmZ" */
-  char end_time[HSD_ACQ_TIMESTAMP_LENGTH]; /* "YYYY-MM-DDTHH:MM:SS.mmmZ" */
+  char uuid[37]; // UUID: 8-4-4-4-12 = 36char + \0
+  char start_time[HSD_ACQ_TIMESTAMP_LENGTH];// "YYYY-MM-DDTHH:MM:SS.mmmZ"
+  char end_time[HSD_ACQ_TIMESTAMP_LENGTH];// "YYYY-MM-DDTHH:MM:SS.mmmZ"
 } AcquisitionInfoModel_t;
 
 /* Acquisition Information PnPL Component ------------------------------------- */
@@ -95,8 +93,8 @@ uint8_t acquisition_info_get_data_fmt(char **value);
 uint8_t acquisition_info_get_tags(JSON_Value *value);
 uint8_t acquisition_info_get_interface(pnpl_acquisition_info_interface_t *enum_id);
 uint8_t acquisition_info_get_schema_version(char **value);
-uint8_t acquisition_info_set_name(const char *value);
-uint8_t acquisition_info_set_description(const char *value);
+uint8_t acquisition_info_set_name(const char *value, char **response_message);
+uint8_t acquisition_info_set_description(const char *value, char **response_message);
 
 
 #ifdef __cplusplus

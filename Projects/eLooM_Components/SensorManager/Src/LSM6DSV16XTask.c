@@ -65,6 +65,10 @@
 
 #define SYS_DEBUGF(level, message)                   SYS_DEBUGF3(SYS_DBG_LSM6DSV16X, level, message)
 
+#ifndef LSM6DSV16X_TASK_CFG_I2C_ADDRESS
+#define LSM6DSV16X_TASK_CFG_I2C_ADDRESS              LSM6DSV16X_I2C_ADD_H
+#endif
+
 #ifndef HSD_USE_DUMMY_DATA
 #define HSD_USE_DUMMY_DATA 0
 #endif
@@ -612,7 +616,7 @@ sys_error_code_t LSM6DSV16XTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_f
   }
   else
   {
-    p_obj->p_sensor_bus_if = I2CBusIFAlloc(LSM6DSV16X_ID, LSM6DSV16X_I2C_ADD_H, 0);
+    p_obj->p_sensor_bus_if = I2CBusIFAlloc(LSM6DSV16X_ID, LSM6DSV16X_TASK_CFG_I2C_ADDRESS, 0);
     if (p_obj->p_sensor_bus_if == NULL)
     {
       res = SYS_TASK_HEAP_OUT_OF_MEMORY_ERROR_CODE;
@@ -1609,47 +1613,59 @@ static sys_error_code_t LSM6DSV16XTaskExecuteStepDatalog(AManagedTask *_this)
 #if LSM6DSV16X_FIFO_ENABLED
               if ((p_obj->acc_sensor_status.is_active) && (p_obj->gyro_sensor_status.is_active)) /* Read both ACC and GYRO */
               {
-                /* update measuredODR */
-                p_obj->acc_sensor_status.type.mems.measured_odr = (float) p_obj->acc_samples_count / (float) delta_timestamp;
-                p_obj->gyro_sensor_status.type.mems.measured_odr = (float) p_obj->gyro_samples_count / (float) delta_timestamp;
-
                 if (p_obj->acc_sensor_status.type.mems.odr > p_obj->gyro_sensor_status.type.mems.odr) /* Acc is faster than Gyro */
                 {
+                  /* update measuredODR */
+                  p_obj->acc_sensor_status.type.mems.measured_odr = (float) p_obj->acc_samples_count / (float) delta_timestamp;
+                  p_obj->gyro_sensor_status.type.mems.measured_odr = (p_obj->gyro_sensor_status.type.mems.odr / p_obj->acc_sensor_status.type.mems.odr) * p_obj->acc_sensor_status.type.mems.measured_odr;
+
                   /* Create a bidimensional data interleaved [m x 3], m is the number of samples in the sensor queue:
                    * [X0, Y0, Z0]
                    * [X1, Y1, Z1]
                    * ...
                    * [Xm-1, Ym-1, Zm-1]
                    */
-                  EMD_Init(&p_obj->data_acc, p_obj->p_fast_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2,
-                           p_obj->acc_samples_count, 3);
-                  DataEventInit((IEvent *) &evt_acc, p_obj->p_acc_event_src, &p_obj->data_acc, timestamp, p_obj->acc_id);
-
-                  EMD_Init(&p_obj->data_gyro, p_obj->p_slow_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2,
-                           p_obj->gyro_samples_count, 3);
-                  DataEventInit((IEvent *) &evt_gyro, p_obj->p_gyro_event_src, &p_obj->data_gyro, timestamp, p_obj->gyro_id);
-
-                  IEventSrcSendEvent(p_obj->p_acc_event_src, (IEvent *) &evt_acc, NULL);
-                  IEventSrcSendEvent(p_obj->p_gyro_event_src, (IEvent *) &evt_gyro, NULL);
+                  if (p_obj->acc_samples_count != 0)
+                  {
+                    EMD_Init(&p_obj->data_acc, p_obj->p_fast_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2,
+                             p_obj->acc_samples_count, 3);
+                    DataEventInit((IEvent *) &evt_acc, p_obj->p_acc_event_src, &p_obj->data_acc, timestamp, p_obj->acc_id);
+                    IEventSrcSendEvent(p_obj->p_acc_event_src, (IEvent *) &evt_acc, NULL);
+                  }
+                  if (p_obj->gyro_samples_count != 0)
+                  {
+                    EMD_Init(&p_obj->data_gyro, p_obj->p_slow_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2,
+                             p_obj->gyro_samples_count, 3);
+                    DataEventInit((IEvent *) &evt_gyro, p_obj->p_gyro_event_src, &p_obj->data_gyro, timestamp, p_obj->gyro_id);
+                    IEventSrcSendEvent(p_obj->p_gyro_event_src, (IEvent *) &evt_gyro, NULL);
+                  }
                 }
                 else
                 {
+                  /* update measuredODR */
+                  p_obj->gyro_sensor_status.type.mems.measured_odr = (float) p_obj->gyro_samples_count / (float) delta_timestamp;
+                  p_obj->acc_sensor_status.type.mems.measured_odr = (p_obj->acc_sensor_status.type.mems.odr / p_obj->gyro_sensor_status.type.mems.odr) * p_obj->gyro_sensor_status.type.mems.measured_odr;
+
                   /* Create a bidimensional data interleaved [m x 3], m is the number of samples in the sensor queue:
                    * [X0, Y0, Z0]
                    * [X1, Y1, Z1]
                    * ...
                    * [Xm-1, Ym-1, Zm-1]
                    */
-                  EMD_Init(&p_obj->data_acc, p_obj->p_slow_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2,
-                           p_obj->acc_samples_count, 3);
-                  DataEventInit((IEvent *) &evt_acc, p_obj->p_acc_event_src, &p_obj->data_acc, timestamp, p_obj->acc_id);
-
-                  EMD_Init(&p_obj->data_gyro, p_obj->p_fast_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2,
-                           p_obj->gyro_samples_count, 3);
-                  DataEventInit((IEvent *) &evt_gyro, p_obj->p_gyro_event_src, &p_obj->data_gyro, timestamp, p_obj->gyro_id);
-
-                  IEventSrcSendEvent(p_obj->p_acc_event_src, (IEvent *) &evt_acc, NULL);
-                  IEventSrcSendEvent(p_obj->p_gyro_event_src, (IEvent *) &evt_gyro, NULL);
+                  if (p_obj->acc_samples_count != 0)
+                  {
+                    EMD_Init(&p_obj->data_acc, p_obj->p_slow_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2,
+                             p_obj->acc_samples_count, 3);
+                    DataEventInit((IEvent *) &evt_acc, p_obj->p_acc_event_src, &p_obj->data_acc, timestamp, p_obj->acc_id);
+                    IEventSrcSendEvent(p_obj->p_acc_event_src, (IEvent *) &evt_acc, NULL);
+                  }
+                  if (p_obj->gyro_samples_count != 0)
+                  {
+                    EMD_Init(&p_obj->data_gyro, p_obj->p_fast_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2,
+                             p_obj->gyro_samples_count, 3);
+                    DataEventInit((IEvent *) &evt_gyro, p_obj->p_gyro_event_src, &p_obj->data_gyro, timestamp, p_obj->gyro_id);
+                    IEventSrcSendEvent(p_obj->p_gyro_event_src, (IEvent *) &evt_gyro, NULL);
+                  }
                 }
 
               }
@@ -2153,10 +2169,6 @@ static sys_error_code_t LSM6DSV16XTaskSensorInit(LSM6DSV16XTask *_this)
     {
       lsm6dsv16x_wtm_level = LSM6DSV16X_MAX_WTM_LEVEL;
     }
-    else if (lsm6dsv16x_wtm_level < LSM6DSV16X_MIN_WTM_LEVEL)
-    {
-      lsm6dsv16x_wtm_level = LSM6DSV16X_MIN_WTM_LEVEL;
-    }
     _this->samples_per_it = lsm6dsv16x_wtm_level;
   }
 
@@ -2254,7 +2266,7 @@ static sys_error_code_t LSM6DSV16XTaskSensorInit(LSM6DSV16XTask *_this)
   if ((_this->acc_sensor_status.is_active) && (_this->gyro_sensor_status.is_active))
   {
     _this->lsm6dsv16x_task_cfg_timer_period_ms = (uint16_t)(
-                                                   _this->acc_sensor_status.type.mems.odr < _this->gyro_sensor_status.type.mems.odr ?
+                                                   _this->acc_sensor_status.type.mems.odr > _this->gyro_sensor_status.type.mems.odr ?
                                                    _this->acc_sensor_status.type.mems.odr :
                                                    _this->gyro_sensor_status.type.mems.odr);
   }
@@ -2297,96 +2309,98 @@ static sys_error_code_t LSM6DSV16XTaskSensorReadData(LSM6DSV16XTask *_this)
 
   if (((reg[1]) & 0x80) && (_this->fifo_level >= samples_per_it))
   {
-    lsm6dsv16x_read_reg(p_sensor_drv, LSM6DSV16X_FIFO_DATA_OUT_TAG, _this->p_fast_sensor_data_buff, samples_per_it * 7);
+    res = lsm6dsv16x_read_reg(p_sensor_drv, LSM6DSV16X_FIFO_DATA_OUT_TAG, _this->p_fast_sensor_data_buff, samples_per_it * 7);
 
+    if (!SYS_IS_ERROR_CODE(res))
+    {
 #if (HSD_USE_DUMMY_DATA == 1)
-    int16_t *p16 = (int16_t *)(_this->p_fast_sensor_data_buff);
-
-    for (i = 0; i < samples_per_it; i++)
-    {
-      p16 = (int16_t *)(&_this->p_fast_sensor_data_buff[i * 7] + 1);
-      if ((_this->p_fast_sensor_data_buff[i * 7] >> 3) == LSM6DSV16X_TAG_ACC)
-      {
-        *p16++ = dummyDataCounter_acc++;
-        *p16++ = dummyDataCounter_acc++;
-        *p16++ = dummyDataCounter_acc++;
-      }
-      else
-      {
-        *p16++ = dummyDataCounter_gyro++;
-        *p16++ = dummyDataCounter_gyro++;
-        *p16++ = dummyDataCounter_gyro++;
-      }
-    }
-#endif
-    if ((_this->acc_sensor_status.is_active) && (_this->gyro_sensor_status.is_active))
-    {
-      /* Read both ACC and GYRO */
-
-      uint32_t odr_acc = (uint32_t) _this->acc_sensor_status.type.mems.odr;
-      uint32_t odr_gyro = (uint32_t) _this->gyro_sensor_status.type.mems.odr;
-
-      int16_t *p16_src = (int16_t *) _this->p_fast_sensor_data_buff;
-      int16_t *p_acc, *p_gyro;
-
-      _this->acc_samples_count = 0;
-      _this->gyro_samples_count = 0;
-
-      if (odr_acc > odr_gyro) /* Acc is faster than Gyro */
-      {
-        p_acc = (int16_t *) _this->p_fast_sensor_data_buff;
-        p_gyro = (int16_t *) _this->p_slow_sensor_data_buff;
-      }
-      else
-      {
-        p_acc = (int16_t *) _this->p_slow_sensor_data_buff;
-        p_gyro = (int16_t *) _this->p_fast_sensor_data_buff;
-      }
-
-      uint8_t *p_tag = (uint8_t *) p16_src;
+      int16_t *p16 = (int16_t *)(_this->p_fast_sensor_data_buff);
 
       for (i = 0; i < samples_per_it; i++)
       {
-        if (((*p_tag) >> 3) == LSM6DSV16X_TAG_ACC)
+        p16 = (int16_t *)(&_this->p_fast_sensor_data_buff[i * 7] + 1);
+        if ((_this->p_fast_sensor_data_buff[i * 7] >> 3) == LSM6DSV16X_TAG_ACC)
         {
-          p16_src = (int16_t *)(p_tag + 1);
-          *p_acc++ = *p16_src++;
-          *p_acc++ = *p16_src++;
-          *p_acc++ = *p16_src++;
-          _this->acc_samples_count++;
+          *p16++ = dummyDataCounter_acc++;
+          *p16++ = dummyDataCounter_acc++;
+          *p16++ = dummyDataCounter_acc++;
         }
         else
         {
-          p16_src = (int16_t *)(p_tag + 1);
-          *p_gyro++ = *p16_src++;
-          *p_gyro++ = *p16_src++;
-          *p_gyro++ = *p16_src++;
-          _this->gyro_samples_count++;
+          *p16++ = dummyDataCounter_gyro++;
+          *p16++ = dummyDataCounter_gyro++;
+          *p16++ = dummyDataCounter_gyro++;
         }
-        p_tag += 7;
       }
-    }
-    else /* 1 subsensor active only --> simply drop TAGS */
-    {
-      int16_t *p16_src = (int16_t *) _this->p_fast_sensor_data_buff;
-      int16_t *p16_dest = (int16_t *) _this->p_fast_sensor_data_buff;
-      for (i = 0; i < samples_per_it; i++)
+#endif
+      if ((_this->acc_sensor_status.is_active) && (_this->gyro_sensor_status.is_active))
       {
-        p16_src = (int16_t *) & ((uint8_t *)(p16_src))[1];
-        *p16_dest++ = *p16_src++;
-        *p16_dest++ = *p16_src++;
-        *p16_dest++ = *p16_src++;
-      }
-      if (_this->acc_sensor_status.is_active)
-      {
-        _this->acc_samples_count = samples_per_it;
-      }
-      else
-      {
-        _this->gyro_samples_count = samples_per_it;
-      }
-    }
+        /* Read both ACC and GYRO */
 
+        uint32_t odr_acc = (uint32_t) _this->acc_sensor_status.type.mems.odr;
+        uint32_t odr_gyro = (uint32_t) _this->gyro_sensor_status.type.mems.odr;
+
+        int16_t *p16_src = (int16_t *) _this->p_fast_sensor_data_buff;
+        int16_t *p_acc, *p_gyro;
+
+        _this->acc_samples_count = 0;
+        _this->gyro_samples_count = 0;
+
+        if (odr_acc > odr_gyro) /* Acc is faster than Gyro */
+        {
+          p_acc = (int16_t *) _this->p_fast_sensor_data_buff;
+          p_gyro = (int16_t *) _this->p_slow_sensor_data_buff;
+        }
+        else
+        {
+          p_acc = (int16_t *) _this->p_slow_sensor_data_buff;
+          p_gyro = (int16_t *) _this->p_fast_sensor_data_buff;
+        }
+
+        uint8_t *p_tag = (uint8_t *) p16_src;
+
+        for (i = 0; i < samples_per_it; i++)
+        {
+          if (((*p_tag) >> 3) == LSM6DSV16X_TAG_ACC)
+          {
+            p16_src = (int16_t *)(p_tag + 1);
+            *p_acc++ = *p16_src++;
+            *p_acc++ = *p16_src++;
+            *p_acc++ = *p16_src++;
+            _this->acc_samples_count++;
+          }
+          else
+          {
+            p16_src = (int16_t *)(p_tag + 1);
+            *p_gyro++ = *p16_src++;
+            *p_gyro++ = *p16_src++;
+            *p_gyro++ = *p16_src++;
+            _this->gyro_samples_count++;
+          }
+          p_tag += 7;
+        }
+      }
+      else /* 1 subsensor active only --> simply drop TAGS */
+      {
+        int16_t *p16_src = (int16_t *) _this->p_fast_sensor_data_buff;
+        int16_t *p16_dest = (int16_t *) _this->p_fast_sensor_data_buff;
+        for (i = 0; i < samples_per_it; i++)
+        {
+          p16_src = (int16_t *) & ((uint8_t *)(p16_src))[1];
+          *p16_dest++ = *p16_src++;
+          *p16_dest++ = *p16_src++;
+          *p16_dest++ = *p16_src++;
+        }
+        if (_this->acc_sensor_status.is_active)
+        {
+          _this->acc_samples_count = samples_per_it;
+        }
+        else
+        {
+          _this->gyro_samples_count = samples_per_it;
+        }
+      }
+    }
   }
   else
   {
@@ -2414,56 +2428,72 @@ static sys_error_code_t LSM6DSV16XTaskSensorReadData(LSM6DSV16XTask *_this)
 
     if (val.xlda == 1U)
     {
-      lsm6dsv16x_read_reg(p_sensor_drv, LSM6DSV16X_OUTX_L_A, _this->p_acc_sample, 6);
+      res = lsm6dsv16x_read_reg(p_sensor_drv, LSM6DSV16X_OUTX_L_A, _this->p_acc_sample, 6);
+
+      if (!SYS_IS_ERROR_CODE(res))
+      {
 #if (HSD_USE_DUMMY_DATA == 1)
-      int16_t *p16 = (int16_t *)(_this->p_acc_sample);
-      *p16++ = dummyDataCounter_acc++;
-      *p16++ = dummyDataCounter_acc++;
-      *p16++ = dummyDataCounter_acc++;
+        int16_t *p16 = (int16_t *)(_this->p_acc_sample);
+        *p16++ = dummyDataCounter_acc++;
+        *p16++ = dummyDataCounter_acc++;
+        *p16++ = dummyDataCounter_acc++;
 #endif
-      _this->acc_samples_count = 1U;
-      _this->acc_drdy = 1;
+        _this->acc_samples_count = 1U;
+        _this->acc_drdy = 1;
+      }
     }
     if (val.gda == 1U)
     {
-      lsm6dsv16x_read_reg(p_sensor_drv, LSM6DSV16X_OUTX_L_G, _this->p_gyro_sample, 6);
+      res = lsm6dsv16x_read_reg(p_sensor_drv, LSM6DSV16X_OUTX_L_G, _this->p_gyro_sample, 6);
+
+      if (!SYS_IS_ERROR_CODE(res))
+      {
 #if (HSD_USE_DUMMY_DATA == 1)
-      int16_t *p16 = (int16_t *)(_this->p_gyro_sample);
-      *p16++ = dummyDataCounter_gyro++;
-      *p16++ = dummyDataCounter_gyro++;
-      *p16++ = dummyDataCounter_gyro++;
+        int16_t *p16 = (int16_t *)(_this->p_gyro_sample);
+        *p16++ = dummyDataCounter_gyro++;
+        *p16++ = dummyDataCounter_gyro++;
+        *p16++ = dummyDataCounter_gyro++;
 #endif
-      _this->gyro_samples_count = 1U;
-      _this->gyro_drdy = 1;
+        _this->gyro_samples_count = 1U;
+        _this->gyro_drdy = 1;
+      }
     }
   }
   else if (_this->acc_sensor_status.is_active)
   {
-    lsm6dsv16x_read_reg(p_sensor_drv, LSM6DSV16X_OUTX_L_A, _this->p_acc_sample, samples_per_it * 6);
-#if (HSD_USE_DUMMY_DATA == 1)
-    uint16_t i = 0;
-    int16_t *p16 = (int16_t *)(_this->p_acc_sample);
-    for (i = 0; i < samples_per_it * 3; i++)
+    res = lsm6dsv16x_read_reg(p_sensor_drv, LSM6DSV16X_OUTX_L_A, _this->p_acc_sample, samples_per_it * 6);
+
+    if (!SYS_IS_ERROR_CODE(res))
     {
-      *p16++ = dummyDataCounter_acc++;
-    }
+#if (HSD_USE_DUMMY_DATA == 1)
+      uint16_t i = 0;
+      int16_t *p16 = (int16_t *)(_this->p_acc_sample);
+      for (i = 0; i < samples_per_it * 3; i++)
+      {
+        *p16++ = dummyDataCounter_acc++;
+      }
 #endif
-    _this->acc_samples_count = 1U;
-    _this->acc_drdy = 1;
+      _this->acc_samples_count = 1U;
+      _this->acc_drdy = 1;
+    }
   }
   else if (_this->gyro_sensor_status.is_active)
   {
-    lsm6dsv16x_read_reg(p_sensor_drv, LSM6DSV16X_OUTX_L_G, _this->p_gyro_sample, samples_per_it * 6);
-#if (HSD_USE_DUMMY_DATA == 1)
-    uint16_t i = 0;
-    int16_t *p16 = (int16_t *)(_this->p_gyro_sample);
-    for (i = 0; i < samples_per_it * 3; i++)
+    res = lsm6dsv16x_read_reg(p_sensor_drv, LSM6DSV16X_OUTX_L_G, _this->p_gyro_sample, samples_per_it * 6);
+
+    if (!SYS_IS_ERROR_CODE(res))
     {
-      *p16++ = dummyDataCounter_gyro++;
-    }
+#if (HSD_USE_DUMMY_DATA == 1)
+      uint16_t i = 0;
+      int16_t *p16 = (int16_t *)(_this->p_gyro_sample);
+      for (i = 0; i < samples_per_it * 3; i++)
+      {
+        *p16++ = dummyDataCounter_gyro++;
+      }
 #endif
-    _this->gyro_samples_count = 1U;
-    _this->gyro_drdy = 1;
+      _this->gyro_samples_count = 1U;
+      _this->gyro_drdy = 1;
+    }
   }
   else
   {
@@ -2509,13 +2539,18 @@ static sys_error_code_t LSM6DSV16XTaskSensorRegister(LSM6DSV16XTask *_this)
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
 
+#if !LSM6DSV16X_ACC_DISABLED
   ISensor_t *acc_if = (ISensor_t *) LSM6DSV16XTaskGetAccSensorIF(_this);
-  ISensor_t *gyro_if = (ISensor_t *) LSM6DSV16XTaskGetGyroSensorIF(_this);
-  ISensor_t *mlc_if = (ISensor_t *) LSM6DSV16XTaskGetMlcSensorIF(_this);
-
   _this->acc_id = SMAddSensor(acc_if);
+#endif
+#if !LSM6DSV16X_GYRO_DISABLED
+  ISensor_t *gyro_if = (ISensor_t *) LSM6DSV16XTaskGetGyroSensorIF(_this);
   _this->gyro_id = SMAddSensor(gyro_if);
+#endif
+#if !LSM6DSV16X_MLC_DISABLED
+  ISensor_t *mlc_if = (ISensor_t *) LSM6DSV16XTaskGetMlcSensorIF(_this);
   _this->mlc_id = SMAddSensor(mlc_if);
+#endif
 
   return res;
 }

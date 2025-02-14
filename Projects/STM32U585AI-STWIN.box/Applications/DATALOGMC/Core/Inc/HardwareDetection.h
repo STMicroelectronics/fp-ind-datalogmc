@@ -16,7 +16,7 @@
   *
   ******************************************************************************
   */
-  
+
 #ifndef HARDWAREDETECTION_H_
 #define HARDWAREDETECTION_H_
 

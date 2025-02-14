@@ -56,7 +56,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   uwTimclock = HAL_RCC_GetPCLK1Freq();
 
   /* Compute the prescaler value to have TIM6 counter clock equal to 1MHz */
-  uwPrescalerValue = (uint32_t) ((uwTimclock / 1000000U) - 1U);
+  uwPrescalerValue = (uint32_t)((uwTimclock / 1000000U) - 1U);
 
   /* Initialize TIM6 */
   htim6.Instance = TIM6;
@@ -96,7 +96,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   /* Enable the TIM6 global Interrupt */
   HAL_NVIC_EnableIRQ(TIM6_IRQn);
 
- /* Return function status */
+  /* Return function status */
   return status;
 }
 

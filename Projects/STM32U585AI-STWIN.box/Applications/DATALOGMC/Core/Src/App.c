@@ -16,7 +16,7 @@
   * This software is licensed under terms that can be found in the LICENSE file in
   * the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  *                             
+  *
   *
   ******************************************************************************
   */
@@ -106,14 +106,14 @@ static AManagedTaskEx *sSTTS22HObj = NULL;
 static AManagedTaskEx *sDatalogAppObj = NULL;
 
 /**
- * Motor Control Protocol scheduler task
- */
+  * Motor Control Protocol scheduler task
+  */
 static AManagedTaskEx *sMCPObj = NULL;
 
 
 /**
- *  Flags for external Add-on
- */
+  *  Flags for external Add-on
+  */
 static boolean_t sExtIis3dwb = FALSE;
 static boolean_t sExtStts22h = FALSE;
 
@@ -151,10 +151,10 @@ sys_error_code_t SysLoadApplicationContext(ApplicationContext *pAppContext)
   sI2C2BusObj = I2CBusTaskAlloc(&MX_I2C2InitParams);
   sSPI2BusObj = SPIBusTaskAlloc(&MX_SPI2InitParams);
 
-  if(sExtIis3dwb)
+  if (sExtIis3dwb)
   {
     /* Use the external IIS3DWB */
-	sIIS3DWBObj = IIS3DWBTaskAlloc(&MX_GPIO_INT1_EXTERNAL_DWBInitParams, &MX_GPIO_CS_EXTERNALInitParams);
+    sIIS3DWBObj = IIS3DWBTaskAlloc(&MX_GPIO_INT1_EXTERNAL_DWBInitParams, &MX_GPIO_CS_EXTERNALInitParams);
   }
   else
   {
@@ -162,7 +162,7 @@ sys_error_code_t SysLoadApplicationContext(ApplicationContext *pAppContext)
     sIIS3DWBObj = IIS3DWBTaskAlloc(&MX_GPIO_INT1_DWBInitParams, &MX_GPIO_CS_DWBInitParams);
   }
 
-  if(sExtStts22h)
+  if (sExtStts22h)
   {
     /* Use the external STTS22H on I2C3 */
     sSTTS22HObj = STTS22HTaskAlloc(NULL, NULL, stts22h_address);
@@ -219,7 +219,7 @@ sys_error_code_t SysOnStartApplication(ApplicationContext *pAppContext)
   UNUSED(pAppContext);
 
   /* Connect the sensor task to the bus. */
-  if(sI2C3BusObj)
+  if (sI2C3BusObj)
   {
     /* Use I2C3 for External STTS22H */
     I2CBusTaskConnectDevice((I2CBusTask *) sI2C3BusObj, (I2CBusIF *)STTS22HTaskGetSensorIF((STTS22HTask *) sSTTS22HObj));
@@ -230,13 +230,14 @@ sys_error_code_t SysOnStartApplication(ApplicationContext *pAppContext)
     I2CBusTaskConnectDevice((I2CBusTask *) sI2C2BusObj, (I2CBusIF *)STTS22HTaskGetSensorIF((STTS22HTask *) sSTTS22HObj));
   }
 
-  if(sIIS3DWBObj)
+  if (sIIS3DWBObj)
   {
     SPIBusTaskConnectDevice((SPIBusTask *) sSPI2BusObj, (SPIBusIF *)IIS3DWBTaskGetSensorIF((IIS3DWBTask *) sIIS3DWBObj));
   }
 
   I2CBusTaskConnectDevice((I2CBusTask *) sI2C2BusObj, (I2CBusIF *)ILPS22QSTaskGetSensorIF((ILPS22QSTask *) sILPS22QSObj));
-  SPIBusTaskConnectDevice((SPIBusTask *) sSPI2BusObj, (SPIBusIF *)ISM330DHCXTaskGetSensorIF((ISM330DHCXTask *) sISM330DHCXObj));
+  SPIBusTaskConnectDevice((SPIBusTask *) sSPI2BusObj,
+                          (SPIBusIF *)ISM330DHCXTaskGetSensorIF((ISM330DHCXTask *) sISM330DHCXObj));
 
   /* Connect the Sensor events */
   IEventListener *DatalogAppListener = DatalogAppTask_GetEventListenerIF((DatalogAppTask *) sDatalogAppObj);
@@ -248,9 +249,10 @@ sys_error_code_t SysOnStartApplication(ApplicationContext *pAppContext)
 
   /* Connect MCP events to DatalogApp Task */
   IEventListener *DatalogActuatorListener = DatalogAppTask_GetActuatorEventListenerIF((DatalogAppTask *) sDatalogAppObj);
-  IEventSrcAddEventListener(MCPTask_GetEventSrcIF((MCPTask_t *) sMCPObj), DatalogActuatorListener);
+  IEventSrcAddEventListener(MCPTask_GetSlowTelemetriesEventSrcIF((MCPTask_t *) sMCPObj), DatalogActuatorListener);
+  IEventSrcAddEventListener(MCPTask_GetAsyncTelemetriesEventSrcIF((MCPTask_t *) sMCPObj), DatalogActuatorListener);
 
-  if(sIIS3DWBObj)
+  if (sIIS3DWBObj)
   {
     IEventSrcAddEventListener(IIS3DWBTaskGetEventSrcIF((IIS3DWBTask *) sIIS3DWBObj), DatalogAppListener);
   }

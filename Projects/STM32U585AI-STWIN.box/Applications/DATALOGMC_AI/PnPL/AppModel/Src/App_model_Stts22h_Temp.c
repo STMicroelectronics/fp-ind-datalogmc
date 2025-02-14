@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:stts22h_temp;3
+  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:stts22h_temp;4
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -49,20 +49,27 @@ uint8_t stts22h_temp_comp_init(void)
   SQInit(&querySM, SMGetSensorManager());
   uint16_t id = SQNextByNameAndType(&querySM, "stts22h", COM_TYPE_TEMP);
   stts22h_temp_model.id = id;
+
   stts22h_temp_model.sensor_status = SMSensorGetStatusPointer(id);
   stts22h_temp_model.stream_params.stream_id = -1;
   stts22h_temp_model.stream_params.usb_ep = -1;
 
   addSensorToAppModel(id, &stts22h_temp_model);
 
-  stts22h_temp_set_sensor_annotation("\0");
-  stts22h_temp_set_odr(pnpl_stts22h_temp_odr_hz200);
-  stts22h_temp_set_enable(true);
+  stts22h_temp_set_sensor_annotation("\0", NULL);
+  stts22h_temp_set_odr(pnpl_stts22h_temp_odr_hz200, NULL);
+  stts22h_temp_set_enable(true, NULL);
 #if (HSD_USE_DUMMY_DATA == 1)
-  stts22h_temp_set_samples_per_ts(0);
+  stts22h_temp_set_samples_per_ts(0, NULL);
 #else
-  stts22h_temp_set_samples_per_ts(200);
+  stts22h_temp_set_samples_per_ts(200, NULL);
 #endif
+
+  int32_t value = 0;
+  stts22h_temp_get_dim(&value);
+  float sensitivity = 0.0f;
+  stts22h_temp_get_sensitivity(&sensitivity);
+
   __stream_control(true);
   /* USER Component initialization code */
   return PNPL_NO_ERROR_CODE;
@@ -113,7 +120,7 @@ uint8_t stts22h_temp_get_fs(pnpl_stts22h_temp_fs_t *enum_id)
   }
   else
   {
-	  return 1;
+    return 1;
   }
   return PNPL_NO_ERROR_CODE;
 }
@@ -148,6 +155,7 @@ uint8_t stts22h_temp_get_ioffset(float *value)
 uint8_t stts22h_temp_get_measodr(float *value)
 {
   *value = stts22h_temp_model.sensor_status->type.mems.measured_odr;
+  /* USER Code */
   return PNPL_NO_ERROR_CODE;
 }
 
@@ -168,6 +176,7 @@ uint8_t stts22h_temp_get_sd_dps(int32_t *value)
 uint8_t stts22h_temp_get_sensitivity(float *value)
 {
   *value = stts22h_temp_model.sensor_status->type.mems.sensitivity;
+  /* USER Code */
   return PNPL_NO_ERROR_CODE;
 }
 
@@ -205,43 +214,56 @@ uint8_t stts22h_temp_get_ep_id(int8_t *value)
 }
 
 
-uint8_t stts22h_temp_set_odr(pnpl_stts22h_temp_odr_t enum_id)
+uint8_t stts22h_temp_set_odr(pnpl_stts22h_temp_odr_t enum_id, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
+  uint8_t ret = PNPL_NO_ERROR_CODE;
   float value;
   switch (enum_id)
   {
-  case pnpl_stts22h_temp_odr_hz1:
-    value = 1.0f;
-    break;
-  case pnpl_stts22h_temp_odr_hz25:
-    value = 25.0f;
-    break;
-  case pnpl_stts22h_temp_odr_hz50:
-    value = 50.0f;
-    break;
-  case pnpl_stts22h_temp_odr_hz100:
-    value = 100.0f;
-    break;
-  case pnpl_stts22h_temp_odr_hz200:
-    value = 200.0f;
-    break;
-  default:
-	return 1;
+    case pnpl_stts22h_temp_odr_hz1:
+      value = 1.0f;
+      break;
+    case pnpl_stts22h_temp_odr_hz25:
+      value = 25.0f;
+      break;
+    case pnpl_stts22h_temp_odr_hz50:
+      value = 50.0f;
+      break;
+    case pnpl_stts22h_temp_odr_hz100:
+      value = 100.0f;
+      break;
+    case pnpl_stts22h_temp_odr_hz200:
+      value = 200.0f;
+      break;
+    default:
+      if (response_message != NULL)
+      {
+        *response_message = "Error: Failed to set ODR";
+      }
+      return PNPL_BASE_ERROR_CODE;
   }
-  sys_error_code_t ret = SMSensorSetODR(stts22h_temp_model.id, value);
+  ret = SMSensorSetODR(stts22h_temp_model.id, value);
   if (ret == SYS_NO_ERROR_CODE)
   {
 #if (HSD_USE_DUMMY_DATA != 1)
-    stts22h_temp_set_samples_per_ts((int32_t)value);
+    stts22h_temp_set_samples_per_ts((int32_t)value, NULL);
 #endif
     __stream_control(true);
   }
   return ret;
 }
 
-uint8_t stts22h_temp_set_enable(bool value)
+uint8_t stts22h_temp_set_enable(bool value, char **response_message)
 {
-  sys_error_code_t ret = 1;
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
+  uint8_t ret = PNPL_NO_ERROR_CODE;
   if (value)
   {
     ret = SMSensorEnable(stts22h_temp_model.id);
@@ -255,32 +277,57 @@ uint8_t stts22h_temp_set_enable(bool value)
     /* USER Code */
     __stream_control(true);
   }
+  else
+  {
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Failed to enable the sensor";
+    }
+  }
   return ret;
 }
 
-uint8_t stts22h_temp_set_samples_per_ts(int32_t value)
+uint8_t stts22h_temp_set_samples_per_ts(int32_t value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
+  uint8_t ret = PNPL_NO_ERROR_CODE;
   int32_t min_v = 0;
   int32_t max_v = 200;
   if (value >= min_v && value <= max_v)
   {
-	stts22h_temp_model.stream_params.spts = value;
+    stts22h_temp_model.stream_params.spts = value;
   }
   else if (value > max_v)
   {
-	  stts22h_temp_model.stream_params.spts = max_v;
+    stts22h_temp_model.stream_params.spts = max_v;
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Value setting above maximum threshold (200)";
+    }
   }
   else
   {
-	  stts22h_temp_model.stream_params.spts = min_v;
+    stts22h_temp_model.stream_params.spts = min_v;
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Value setting below minimum threshold (0)";
+    }
   }
-  return PNPL_NO_ERROR_CODE;
+  return ret;
 }
 
-uint8_t stts22h_temp_set_sensor_annotation(const char *value)
+uint8_t stts22h_temp_set_sensor_annotation(const char *value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
+  uint8_t ret = PNPL_NO_ERROR_CODE;
   strcpy(stts22h_temp_model.annotation, value);
-  return PNPL_NO_ERROR_CODE;
+  return ret;
 }
 
 

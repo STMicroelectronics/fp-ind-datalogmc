@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file    aspep.h
   * @author  SRA
-  * @brief   
+  * @brief
   ******************************************************************************
   * @attention
   *
@@ -16,7 +16,7 @@
   ******************************************************************************
   */
 
-/* Define to prevent recursive inclusion -------------------------------------*/  
+/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef aspep_h
 #define aspep_h
 
@@ -29,13 +29,13 @@ extern "C" {
 #include <stdbool.h>
 
 /**
- * @brief Maximum size of the MCP receive sync payload
- */
+  * @brief Maximum size of the MCP receive sync payload
+  */
 #define MCP_RX_SYNC_PAYLOAD_MAX 1024
 
 /**
- * @brief Maximum size of the MCP transmit sync payload
- */
+  * @brief Maximum size of the MCP transmit sync payload
+  */
 #define MCP_TX_SYNC_PAYLOAD_MAX 1024
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -64,16 +64,16 @@ void ASPEP_Init(void);
 void ASPEP_StartConnection(void);
 void ASPEP_Disconnection(void);
 
-uint8_t* ASPEP_RxFrameProcess (uint16_t *packetLength);
-void ASPEP_SendPacket (void *txBuffer, uint16_t txDataLength);
-bool ASPEP_getBuffer ( void **buffer);
+uint8_t *ASPEP_RxFrameProcess(uint16_t *packetLength);
+void ASPEP_SendPacket(void *txBuffer, uint16_t txDataLength);
+bool ASPEP_getBuffer(void **buffer);
 uint8_t ASPEP_GetStatus(uint8_t Flag, bool ClearFlag);
 void ASPEP_FreeBuffer(void);
 
-void ASPEP_RegisterTxComplete_cb( ASPEP_send_complete_cb_t ASPEP_send_complete_cb);
-void ASPEP_RegisterTransmitting_cb( ASPEP_after_sending_cb_t ASPEP_after_sending_cb);
-void ASPEP_RegisterNewPacket_cb( ASPEP_receive_new_packet_cb_t ASPEP_receive_new_packet_cb);
-void ASPEP_RegisterDelay_cb( ASPEP_delay_cb_t ASPEP_delay_cb);
+void ASPEP_RegisterTxComplete_cb(ASPEP_send_complete_cb_t ASPEP_send_complete_cb);
+void ASPEP_RegisterTransmitting_cb(ASPEP_after_sending_cb_t ASPEP_after_sending_cb);
+void ASPEP_RegisterNewPacket_cb(ASPEP_receive_new_packet_cb_t ASPEP_receive_new_packet_cb);
+void ASPEP_RegisterDelay_cb(ASPEP_delay_cb_t ASPEP_delay_cb);
 
 #ifdef __cplusplus
 }

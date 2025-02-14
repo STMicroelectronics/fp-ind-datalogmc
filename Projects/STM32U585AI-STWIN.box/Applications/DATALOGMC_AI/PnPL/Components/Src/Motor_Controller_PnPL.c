@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:dtmi:vespucci:steval_stwinbx1:fpIndDatalogMC_datalog2MC:other:motor_controller;1
+  * dtmi:dtmi:vespucci:steval_stwinbx1:FP_IND_DATALOGMC_DatalogMC:other:motor_controller;2
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -125,6 +125,23 @@ uint8_t Motor_Controller_PnPL_vtblGetStatus(IPnPLComponent_t *_this, char **seri
   int32_t temp_i = 0;
   motor_controller_get_motor_speed(&temp_i);
   json_object_dotset_number(JSON_Status, "motor_controller.motor_speed", temp_i);
+  char *temp_s = "";
+  motor_controller_get_control_stage(&temp_s);
+  json_object_dotset_string(JSON_Status, "motor_controller.control_stage", temp_s);
+  motor_controller_get_power_stage(&temp_s);
+  json_object_dotset_string(JSON_Status, "motor_controller.power_stage", temp_s);
+  motor_controller_get_motor_name(&temp_s);
+  json_object_dotset_string(JSON_Status, "motor_controller.motor_name", temp_s);
+  motor_controller_get_mcwb_sdk_version(&temp_s);
+  json_object_dotset_string(JSON_Status, "motor_controller.mcwb_sdk_version", temp_s);
+  motor_controller_get_pwm_frequency(&temp_i);
+  json_object_dotset_number(JSON_Status, "motor_controller.pwm_frequency", temp_i);
+  motor_controller_get_ramp_speed(&temp_i);
+  json_object_dotset_number(JSON_Status, "motor_controller.ramp_speed", temp_i);
+  motor_controller_get_max_speed(&temp_i);
+  json_object_dotset_number(JSON_Status, "motor_controller.max_speed", temp_i);
+  motor_controller_get_mcp_configured(&temp_b);
+  json_object_dotset_boolean(JSON_Status, "motor_controller.mcp_configured", temp_b);
   json_object_dotset_number(JSON_Status, "motor_controller.c_type", COMP_TYPE_OTHER);
 
   if (pretty == 1)
@@ -153,29 +170,48 @@ uint8_t Motor_Controller_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *ser
   JSON_Object *respJSONObject = json_value_get_object(respJSON);
 
   uint8_t ret = PNPL_NO_ERROR_CODE;
+  bool valid_property = false;
+  char *resp_msg;
   if (json_object_dothas_value(tempJSONObject, "motor_controller.motor_speed"))
   {
     int32_t motor_speed = (int32_t)json_object_dotget_number(tempJSONObject, "motor_controller.motor_speed");
-    ret = motor_controller_set_motor_speed(motor_speed);
+    valid_property = true;
+    ret = motor_controller_set_motor_speed(motor_speed, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_number(respJSONObject, "motor_controller.motor_speed.value", motor_speed);
+      json_object_dotset_number(respJSONObject, "PnPL_Response.value", motor_speed);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "motor_controller.motor_speed.value", "PNPL_SET_ERROR");
+      int32_t old_motor_speed;
+      motor_controller_get_motor_speed(&old_motor_speed);
+      json_object_dotset_number(respJSONObject, "PnPL_Response.value", old_motor_speed);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   json_value_free(tempJSON);
-  if (pretty == 1)
+  /* Check if received a valid request to modify an existing property */
+  if (valid_property)
   {
-    *response = json_serialize_to_string_pretty(respJSON);
-    *size = json_serialization_size_pretty(respJSON);
+    if (pretty == 1)
+    {
+      *response = json_serialize_to_string_pretty(respJSON);
+      *size = json_serialization_size_pretty(respJSON);
+    }
+    else
+    {
+      *response = json_serialize_to_string(respJSON);
+      *size = json_serialization_size(respJSON);
+    }
   }
   else
   {
-    *response = json_serialize_to_string(respJSON);
-    *size = json_serialization_size(respJSON);
+    /* Set property is not containing a valid property/parameter: PnPL_Error */
+    char *log_message = "Invalid property for motor_controller";
+    PnPLCreateLogMessage(response, size, log_message, PNPL_LOG_ERROR);
+    ret = PNPL_BASE_ERROR_CODE;
   }
   json_value_free(respJSON);
   return ret;
@@ -187,70 +223,38 @@ uint8_t Motor_Controller_PnPL_vtblExecuteFunction(IPnPLComponent_t *_this, char 
 {
   JSON_Value *tempJSON = json_parse_string(serializedJSON);
   JSON_Object *tempJSONObject = json_value_get_object(tempJSON);
-  JSON_Value *respJSON = json_value_init_object();
-  JSON_Object *respJSONObject = json_value_get_object(respJSON);
 
   uint8_t ret = PNPL_NO_ERROR_CODE;
+  bool valid_function = false;
   if (json_object_dothas_value(tempJSONObject, "motor_controller*start_motor"))
   {
+    valid_function = true;
     ret = motor_controller_start_motor();
-    if (ret == 0)
-    {
-      json_object_dotset_string(respJSONObject, "motor_controller*start_motor.response", 0);
-    }
-    else
-    {
-      json_object_dotset_string(respJSONObject, "motor_controller.start_motor.response", "PNPL_CMD_ERROR");
-    }
   }
   if (json_object_dothas_value(tempJSONObject, "motor_controller*stop_motor"))
   {
+    valid_function = true;
     ret = motor_controller_stop_motor();
-    if (ret == 0)
-    {
-      json_object_dotset_string(respJSONObject, "motor_controller*stop_motor.response", 0);
-    }
-    else
-    {
-      json_object_dotset_string(respJSONObject, "motor_controller.stop_motor.response", "PNPL_CMD_ERROR");
-    }
   }
   if (json_object_dothas_value(tempJSONObject, "motor_controller*motor_reset"))
   {
+    valid_function = true;
     ret = motor_controller_motor_reset();
-    if (ret == 0)
-    {
-      json_object_dotset_string(respJSONObject, "motor_controller*motor_reset.response", 0);
-    }
-    else
-    {
-      json_object_dotset_string(respJSONObject, "motor_controller.motor_reset.response", "PNPL_CMD_ERROR");
-    }
   }
   if (json_object_dothas_value(tempJSONObject, "motor_controller*ack_fault"))
   {
+    valid_function = true;
     ret = motor_controller_ack_fault();
-    if (ret == 0)
-    {
-      json_object_dotset_string(respJSONObject, "motor_controller*ack_fault.response", 0);
-    }
-    else
-    {
-      json_object_dotset_string(respJSONObject, "motor_controller.ack_fault.response", "PNPL_CMD_ERROR");
-    }
+  }
+  /* Check if received a valid function to modify an existing property */
+  if (valid_function == false)
+  {
+    char log_message[100];
+    (void) sprintf(log_message, "%s Invalid command", serializedJSON);
+    PnPLCreateLogMessage(response, size, log_message, PNPL_LOG_ERROR);
+    ret = PNPL_BASE_ERROR_CODE;
   }
   json_value_free(tempJSON);
-  if (pretty == 1)
-  {
-    *response = json_serialize_to_string_pretty(respJSON);
-    *size = json_serialization_size_pretty(respJSON);
-  }
-  else
-  {
-    *response = json_serialize_to_string(respJSON);
-    *size = json_serialization_size(respJSON);
-  }
-  json_value_free(respJSON);
   return ret;
 }
 

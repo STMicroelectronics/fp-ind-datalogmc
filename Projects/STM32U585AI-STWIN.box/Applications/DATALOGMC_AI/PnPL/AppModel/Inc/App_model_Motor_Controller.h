@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:dtmi:vespucci:steval_stwinbx1:fpIndDatalogMC_datalog2MC:other:motor_controller;1
+  * dtmi:dtmi:vespucci:steval_stwinbx1:FP_IND_DATALOGMC_DatalogMC:other:motor_controller;2
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -73,7 +73,15 @@ uint8_t motor_controller_comp_init(void);
 char *motor_controller_get_key(void);
 uint8_t motor_controller_get_motor_status(bool *value);
 uint8_t motor_controller_get_motor_speed(int32_t *value);
-uint8_t motor_controller_set_motor_speed(int32_t value);
+uint8_t motor_controller_get_control_stage(char **value);
+uint8_t motor_controller_get_power_stage(char **value);
+uint8_t motor_controller_get_motor_name(char **value);
+uint8_t motor_controller_get_mcwb_sdk_version(char **value);
+uint8_t motor_controller_get_pwm_frequency(int32_t *value);
+uint8_t motor_controller_get_ramp_speed(int32_t *value);
+uint8_t motor_controller_get_max_speed(int32_t *value);
+uint8_t motor_controller_get_mcp_configured(bool *value);
+uint8_t motor_controller_set_motor_speed(int32_t value, char **response_message);
 uint8_t motor_controller_start_motor(void);
 uint8_t motor_controller_stop_motor(void);
 uint8_t motor_controller_motor_reset(void);

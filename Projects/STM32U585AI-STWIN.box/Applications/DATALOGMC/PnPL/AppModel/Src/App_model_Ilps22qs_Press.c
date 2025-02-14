@@ -22,7 +22,7 @@
   * This file has been auto generated from the following DTDL Component:
   * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:ilps22qs_press;4
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -49,21 +49,28 @@ uint8_t ilps22qs_press_comp_init(void)
   SQInit(&querySM, SMGetSensorManager());
   uint16_t id = SQNextByNameAndType(&querySM, "ilps22qs", COM_TYPE_PRESS);
   ilps22qs_press_model.id = id;
+
   ilps22qs_press_model.sensor_status = SMSensorGetStatusPointer(id);
   ilps22qs_press_model.stream_params.stream_id = -1;
   ilps22qs_press_model.stream_params.usb_ep = -1;
 
   addSensorToAppModel(id, &ilps22qs_press_model);
 
-  ilps22qs_press_set_sensor_annotation("\0");
-  ilps22qs_press_set_odr(pnpl_ilps22qs_press_odr_hz200);
-  ilps22qs_press_set_fs(pnpl_ilps22qs_press_fs_hpa4060);
-  ilps22qs_press_set_enable(true);
+  ilps22qs_press_set_sensor_annotation("\0", NULL);
+  ilps22qs_press_set_odr(pnpl_ilps22qs_press_odr_hz200, NULL);
+  ilps22qs_press_set_fs(pnpl_ilps22qs_press_fs_hpa4060, NULL);
+  ilps22qs_press_set_enable(true, NULL);
 #if (HSD_USE_DUMMY_DATA == 1)
-  ilps22qs_press_set_samples_per_ts(0);
+  ilps22qs_press_set_samples_per_ts(0, NULL);
 #else
-  ilps22qs_press_set_samples_per_ts(200);
+  ilps22qs_press_set_samples_per_ts(200, NULL);
 #endif
+
+  int32_t value = 0;
+  ilps22qs_press_get_dim(&value);
+  float sensitivity = 0.0f;
+  ilps22qs_press_get_sensitivity(&sensitivity);
+
   __stream_control(true);
   /* USER Component initialization code */
   return PNPL_NO_ERROR_CODE;
@@ -106,13 +113,9 @@ uint8_t ilps22qs_press_get_odr(pnpl_ilps22qs_press_odr_t *enum_id)
   {
     *enum_id = pnpl_ilps22qs_press_odr_hz100;
   }
-  else if (odr < 199.0f)
-  {
-    *enum_id = pnpl_ilps22qs_press_odr_hz200;
-  }
   else
   {
-	  return 1;
+    *enum_id = pnpl_ilps22qs_press_odr_hz200;
   }
   return PNPL_NO_ERROR_CODE;
 }
@@ -130,7 +133,7 @@ uint8_t ilps22qs_press_get_fs(pnpl_ilps22qs_press_fs_t *enum_id)
   }
   else
   {
-   return 1;
+    return 1;
   }
   return PNPL_NO_ERROR_CODE;
 }
@@ -224,75 +227,99 @@ uint8_t ilps22qs_press_get_ep_id(int8_t *value)
 }
 
 
-uint8_t ilps22qs_press_set_odr(pnpl_ilps22qs_press_odr_t enum_id)
+uint8_t ilps22qs_press_set_odr(pnpl_ilps22qs_press_odr_t enum_id, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   float value;
   switch (enum_id)
   {
-	case pnpl_ilps22qs_press_odr_hz1:
-		value = 1.0f;
-		break;
-	case pnpl_ilps22qs_press_odr_hz4:
-		value = 4.0f;
-		break;
-	case pnpl_ilps22qs_press_odr_hz10:
-		value = 10.0f;
-		break;
-	case pnpl_ilps22qs_press_odr_hz25:
-		value = 25.0f;
-		break;
-	case pnpl_ilps22qs_press_odr_hz50:
-		value = 50.0f;
-		break;
-	case pnpl_ilps22qs_press_odr_hz75:
-		value = 75.0f;
-		break;
-	case pnpl_ilps22qs_press_odr_hz100:
-		value = 100.0f;
-		break;
-	case pnpl_ilps22qs_press_odr_hz200:
-		value = 200.0f;
-		break;
-	default:
-		return 1;
+    case pnpl_ilps22qs_press_odr_hz1:
+      value = 1.0f;
+      break;
+    case pnpl_ilps22qs_press_odr_hz4:
+      value = 4.0f;
+      break;
+    case pnpl_ilps22qs_press_odr_hz10:
+      value = 10.0f;
+      break;
+    case pnpl_ilps22qs_press_odr_hz25:
+      value = 25.0f;
+      break;
+    case pnpl_ilps22qs_press_odr_hz50:
+      value = 50.0f;
+      break;
+    case pnpl_ilps22qs_press_odr_hz75:
+      value = 75.0f;
+      break;
+    case pnpl_ilps22qs_press_odr_hz100:
+      value = 100.0f;
+      break;
+    case pnpl_ilps22qs_press_odr_hz200:
+      value = 200.0f;
+      break;
+    default:
+      if (response_message != NULL)
+      {
+        *response_message = "Error: Failed to set ODR";
+      }
+      return PNPL_BASE_ERROR_CODE;
   }
   ret = SMSensorSetODR(ilps22qs_press_model.id, value);
   if (ret == SYS_NO_ERROR_CODE)
   {
 #if (HSD_USE_DUMMY_DATA != 1)
-    ilps22qs_press_set_samples_per_ts((int32_t)value);
+    ilps22qs_press_set_samples_per_ts((int32_t)value, NULL);
 #endif
     __stream_control(true);
   }
   return ret;
 }
 
-uint8_t ilps22qs_press_set_fs(pnpl_ilps22qs_press_fs_t enum_id)
+uint8_t ilps22qs_press_set_fs(pnpl_ilps22qs_press_fs_t enum_id, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   float value;
   switch (enum_id)
   {
     case pnpl_ilps22qs_press_fs_hpa1260:
-  		value = 1260.0f;
-  		break;
-  	case pnpl_ilps22qs_press_fs_hpa4060:
-  		value = 4060.0f;
-  		break;
-	default:
-		return 1;
+      value = 1260.0f;
+      break;
+    case pnpl_ilps22qs_press_fs_hpa4060:
+      value = 4060.0f;
+      break;
+    default:
+      if (response_message != NULL)
+      {
+        *response_message = "Error: Failed to set FS";
+      }
+      return PNPL_BASE_ERROR_CODE;
   }
   ret = SMSensorSetFS(ilps22qs_press_model.id, value);
   if (ret == SYS_NO_ERROR_CODE)
   {
     /* USER Code */
   }
+
+  float sensitivity = 0.0f;
+  ilps22qs_press_get_sensitivity(&sensitivity);
+
   return ret;
 }
 
-uint8_t ilps22qs_press_set_enable(bool value)
+uint8_t ilps22qs_press_set_enable(bool value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   if (value)
   {
@@ -307,31 +334,54 @@ uint8_t ilps22qs_press_set_enable(bool value)
     /* USER Code */
     __stream_control(true);
   }
+  else
+  {
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Failed to enable the sensor";
+    }
+  }
   return ret;
 }
 
-uint8_t ilps22qs_press_set_samples_per_ts(int32_t value)
+uint8_t ilps22qs_press_set_samples_per_ts(int32_t value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   int32_t min_v = 0;
   int32_t max_v = 200;
   if (value >= min_v && value <= max_v)
   {
-	ilps22qs_press_model.stream_params.spts = value;
+    ilps22qs_press_model.stream_params.spts = value;
   }
   else if (value > max_v)
   {
-	  ilps22qs_press_model.stream_params.spts = max_v;
+    ilps22qs_press_model.stream_params.spts = max_v;
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Value setting above maximum threshold (1000)";
+    }
   }
   else
   {
-	  ilps22qs_press_model.stream_params.spts = min_v;
+    ilps22qs_press_model.stream_params.spts = min_v;
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Value setting below minimum threshold (0)";
+    }
   }
   return ret;
 }
 
-uint8_t ilps22qs_press_set_sensor_annotation(const char *value)
+uint8_t ilps22qs_press_set_sensor_annotation(const char *value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   strcpy(ilps22qs_press_model.annotation, value);
   return ret;

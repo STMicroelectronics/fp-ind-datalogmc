@@ -16,7 +16,7 @@
   * This software is licensed under terms that can be found in the LICENSE file in
   * the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  *                             
+  *
   *
   ******************************************************************************
   */
@@ -58,7 +58,7 @@ extern "C" {
 #define SYS_DBG_BLE                        SYS_DBG_ON                 ///< Datalog task debug control byte
 #define SYS_DBG_SYSTS                      SYS_DBG_ON                 ///< SysTimestamp debug control byte
 #define SYS_DBG_BCP                        SYS_DBG_ON                 ///< Battery Charger Protocol debug control byte
-#define SYS_DBG_MCPTASK					           SYS_DBG_ON       				  ///< Motor Control Protocol debug control byte
+#define SYS_DBG_MCPTASK                    SYS_DBG_ON                 ///< Motor Control Protocol debug control byte
 
 #include "mx.h"
 /* ODeV - hardware configuration for the debug services provided by the framework */

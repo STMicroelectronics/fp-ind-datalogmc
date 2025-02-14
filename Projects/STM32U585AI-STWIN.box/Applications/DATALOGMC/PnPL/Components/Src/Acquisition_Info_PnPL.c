@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:other:acquisition_info;1
+  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:other:acquisition_info;1
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -155,42 +155,67 @@ uint8_t Acquisition_Info_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *ser
   JSON_Object *respJSONObject = json_value_get_object(respJSON);
 
   uint8_t ret = PNPL_NO_ERROR_CODE;
+  bool valid_property = false;
+  char *resp_msg;
   if (json_object_dothas_value(tempJSONObject, "acquisition_info.name"))
   {
     const char *name = json_object_dotget_string(tempJSONObject, "acquisition_info.name");
-    ret = acquisition_info_set_name(name);
+    valid_property = true;
+    ret = acquisition_info_set_name(name, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_string(respJSONObject, "acquisition_info.name.value", name);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.value", name);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "acquisition_info.name.value", "PNPL_SET_ERROR");
+      char *old_name;
+      acquisition_info_get_name(&old_name);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_name);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   if (json_object_dothas_value(tempJSONObject, "acquisition_info.description"))
   {
     const char *description = json_object_dotget_string(tempJSONObject, "acquisition_info.description");
-    ret = acquisition_info_set_description(description);
+    valid_property = true;
+    ret = acquisition_info_set_description(description, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_string(respJSONObject, "acquisition_info.description.value", description);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.value", description);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "acquisition_info.description.value", "PNPL_SET_ERROR");
+      char *old_description;
+      acquisition_info_get_description(&old_description);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_description);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   json_value_free(tempJSON);
-  if (pretty == 1)
+  /* Check if received a valid request to modify an existing property */
+  if (valid_property)
   {
-    *response = json_serialize_to_string_pretty(respJSON);
-    *size = json_serialization_size_pretty(respJSON);
+    if (pretty == 1)
+    {
+      *response = json_serialize_to_string_pretty(respJSON);
+      *size = json_serialization_size_pretty(respJSON);
+    }
+    else
+    {
+      *response = json_serialize_to_string(respJSON);
+      *size = json_serialization_size(respJSON);
+    }
   }
   else
   {
-    *response = json_serialize_to_string(respJSON);
-    *size = json_serialization_size(respJSON);
+    /* Set property is not containing a valid property/parameter: PnPL_Error */
+    char *log_message = "Invalid property for acquisition_info";
+    PnPLCreateLogMessage(response, size, log_message, PNPL_LOG_ERROR);
+    ret = PNPL_BASE_ERROR_CODE;
   }
   json_value_free(respJSON);
   return ret;

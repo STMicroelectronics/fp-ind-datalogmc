@@ -21,7 +21,7 @@
   *
   ******************************************************************************
   */
-  
+
 #ifndef APPPOWERMODEHELPER_H_
 #define APPPOWERMODEHELPER_H_
 

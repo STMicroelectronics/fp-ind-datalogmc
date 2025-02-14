@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:dtmi:vespucci:steval_stwinbx1:fpIndDatalogMC_datalog2MC:actuators:slow_mc_telemetries;2
+  * dtmi:dtmi:vespucci:steval_stwinbx1:FP_IND_DATALOGMC_DatalogMC:actuators:slow_mc_telemetries;3
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -117,35 +117,39 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblGetStatus(IPnPLComponent_t *_this, char **s
   json_object_dotset_string(JSON_Status, "slow_mc_telemetries.data_type", temp_s);
   slow_mc_telemetries_get_st_ble_stream__id(&temp_i);
   json_object_dotset_number(JSON_Status, "slow_mc_telemetries.st_ble_stream.id", temp_i);
-  slow_mc_telemetries_get_st_ble_stream__temperature__enable(&temp_b);
+  slow_mc_telemetries_get_st_ble_stream__temperature_enable(&temp_b);
   json_object_dotset_boolean(JSON_Status, "slow_mc_telemetries.st_ble_stream.temperature.enable", temp_b);
-  slow_mc_telemetries_get_st_ble_stream__temperature__unit(&temp_s);
+  slow_mc_telemetries_get_st_ble_stream__temperature_unit(&temp_s);
   json_object_dotset_string(JSON_Status, "slow_mc_telemetries.st_ble_stream.temperature.unit", temp_s);
-  slow_mc_telemetries_get_st_ble_stream__temperature__format(&temp_s);
+  slow_mc_telemetries_get_st_ble_stream__temperature_format(&temp_s);
   json_object_dotset_string(JSON_Status, "slow_mc_telemetries.st_ble_stream.temperature.format", temp_s);
-  slow_mc_telemetries_get_st_ble_stream__ref_speed__enable(&temp_b);
+  slow_mc_telemetries_get_st_ble_stream__ref_speed_enable(&temp_b);
   json_object_dotset_boolean(JSON_Status, "slow_mc_telemetries.st_ble_stream.ref_speed.enable", temp_b);
-  slow_mc_telemetries_get_st_ble_stream__ref_speed__unit(&temp_s);
+  slow_mc_telemetries_get_st_ble_stream__ref_speed_unit(&temp_s);
   json_object_dotset_string(JSON_Status, "slow_mc_telemetries.st_ble_stream.ref_speed.unit", temp_s);
-  slow_mc_telemetries_get_st_ble_stream__ref_speed__format(&temp_s);
+  slow_mc_telemetries_get_st_ble_stream__ref_speed_format(&temp_s);
   json_object_dotset_string(JSON_Status, "slow_mc_telemetries.st_ble_stream.ref_speed.format", temp_s);
-  slow_mc_telemetries_get_st_ble_stream__speed__enable(&temp_b);
+  slow_mc_telemetries_get_st_ble_stream__speed_enable(&temp_b);
   json_object_dotset_boolean(JSON_Status, "slow_mc_telemetries.st_ble_stream.speed.enable", temp_b);
-  slow_mc_telemetries_get_st_ble_stream__speed__unit(&temp_s);
+  slow_mc_telemetries_get_st_ble_stream__speed_unit(&temp_s);
   json_object_dotset_string(JSON_Status, "slow_mc_telemetries.st_ble_stream.speed.unit", temp_s);
-  slow_mc_telemetries_get_st_ble_stream__speed__format(&temp_s);
+  slow_mc_telemetries_get_st_ble_stream__speed_format(&temp_s);
   json_object_dotset_string(JSON_Status, "slow_mc_telemetries.st_ble_stream.speed.format", temp_s);
-  slow_mc_telemetries_get_st_ble_stream__bus_voltage__enable(&temp_b);
+  slow_mc_telemetries_get_st_ble_stream__speed_max(&temp_i);
+  json_object_dotset_number(JSON_Status, "slow_mc_telemetries.st_ble_stream.speed.max", temp_i);
+  slow_mc_telemetries_get_st_ble_stream__speed_initial_value(&temp_i);
+  json_object_dotset_number(JSON_Status, "slow_mc_telemetries.st_ble_stream.speed.initial_value", temp_i);
+  slow_mc_telemetries_get_st_ble_stream__bus_voltage_enable(&temp_b);
   json_object_dotset_boolean(JSON_Status, "slow_mc_telemetries.st_ble_stream.bus_voltage.enable", temp_b);
-  slow_mc_telemetries_get_st_ble_stream__bus_voltage__unit(&temp_s);
+  slow_mc_telemetries_get_st_ble_stream__bus_voltage_unit(&temp_s);
   json_object_dotset_string(JSON_Status, "slow_mc_telemetries.st_ble_stream.bus_voltage.unit", temp_s);
-  slow_mc_telemetries_get_st_ble_stream__bus_voltage__format(&temp_s);
+  slow_mc_telemetries_get_st_ble_stream__bus_voltage_format(&temp_s);
   json_object_dotset_string(JSON_Status, "slow_mc_telemetries.st_ble_stream.bus_voltage.format", temp_s);
-  slow_mc_telemetries_get_st_ble_stream__fault__enable(&temp_b);
+  slow_mc_telemetries_get_st_ble_stream__fault_enable(&temp_b);
   json_object_dotset_boolean(JSON_Status, "slow_mc_telemetries.st_ble_stream.fault.enable", temp_b);
-  slow_mc_telemetries_get_st_ble_stream__fault__unit(&temp_s);
+  slow_mc_telemetries_get_st_ble_stream__fault_unit(&temp_s);
   json_object_dotset_string(JSON_Status, "slow_mc_telemetries.st_ble_stream.fault.unit", temp_s);
-  slow_mc_telemetries_get_st_ble_stream__fault__format(&temp_s);
+  slow_mc_telemetries_get_st_ble_stream__fault_format(&temp_s);
   json_object_dotset_string(JSON_Status, "slow_mc_telemetries.st_ble_stream.fault.format", temp_s);
   /* Next fields are not in DTDL model but added looking @ the component schema
   field (this is :sensors). ONLY for Sensors, Algorithms and Actuators*/
@@ -182,32 +186,46 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   JSON_Object *respJSONObject = json_value_get_object(respJSON);
 
   uint8_t ret = PNPL_NO_ERROR_CODE;
+  bool valid_property = false;
+  char *resp_msg;
   if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.enable"))
   {
     bool enable = json_object_dotget_boolean(tempJSONObject, "slow_mc_telemetries.enable");
-    ret = slow_mc_telemetries_set_enable(enable);
+    valid_property = true;
+    ret = slow_mc_telemetries_set_enable(enable, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_boolean(respJSONObject, "slow_mc_telemetries.enable.value", enable);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", enable);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "slow_mc_telemetries.enable.value", "PNPL_SET_ERROR");
+      bool old_enable;
+      slow_mc_telemetries_get_enable(&old_enable);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", old_enable);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream"))
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.id"))
     {
-      int32_t st_ble_stream = (int32_t)json_object_dotget_number(tempJSONObject, "slow_mc_telemetries.st_ble_stream.id");
-      ret = slow_mc_telemetries_set_st_ble_stream__id(st_ble_stream);
+      int32_t st_ble_stream__id = (int32_t)json_object_dotget_number(tempJSONObject, "slow_mc_telemetries.st_ble_stream.id");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__id(st_ble_stream__id, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_number(respJSONObject, "slow_mc_telemetries.st_ble_stream.id.value", st_ble_stream);
+        json_object_dotset_number(respJSONObject, "PnPL_Response.value", st_ble_stream__id);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.id.value", "PNPL_SET_ERROR");
+        int32_t old_st_ble_stream__id;
+        slow_mc_telemetries_get_st_ble_stream__id(&old_st_ble_stream__id);
+        json_object_dotset_number(respJSONObject, "PnPL_Response.value", old_st_ble_stream__id);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -215,16 +233,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.temperature.enable"))
     {
-      bool st_ble_stream = json_object_dotget_boolean(tempJSONObject, "slow_mc_telemetries.st_ble_stream.temperature.enable");
-      ret = slow_mc_telemetries_set_st_ble_stream__temperature__enable(st_ble_stream);
+      bool st_ble_stream__temperature_enable = json_object_dotget_boolean(tempJSONObject,
+                                                                          "slow_mc_telemetries.st_ble_stream.temperature.enable");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__temperature_enable(st_ble_stream__temperature_enable, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_boolean(respJSONObject, "slow_mc_telemetries.st_ble_stream.temperature.enable.value", st_ble_stream);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", st_ble_stream__temperature_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.temperature.enable.value",
-                                  "PNPL_SET_ERROR");
+        bool old_st_ble_stream__temperature_enable;
+        slow_mc_telemetries_get_st_ble_stream__temperature_enable(&old_st_ble_stream__temperature_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", old_st_ble_stream__temperature_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -232,16 +256,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.temperature.unit"))
     {
-      const char *st_ble_stream = json_object_dotget_string(tempJSONObject,
-                                                            "slow_mc_telemetries.st_ble_stream.temperature.unit");
-      ret = slow_mc_telemetries_set_st_ble_stream__temperature__unit(st_ble_stream);
+      const char *st_ble_stream__temperature_unit = json_object_dotget_string(tempJSONObject,
+                                                                              "slow_mc_telemetries.st_ble_stream.temperature.unit");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__temperature_unit(st_ble_stream__temperature_unit, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.temperature.unit.value", st_ble_stream);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", st_ble_stream__temperature_unit);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.temperature.unit.value", "PNPL_SET_ERROR");
+        char *old_st_ble_stream__temperature_unit;
+        slow_mc_telemetries_get_st_ble_stream__temperature_unit(&old_st_ble_stream__temperature_unit);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_st_ble_stream__temperature_unit);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -249,17 +279,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.temperature.format"))
     {
-      const char *st_ble_stream = json_object_dotget_string(tempJSONObject,
-                                                            "slow_mc_telemetries.st_ble_stream.temperature.format");
-      ret = slow_mc_telemetries_set_st_ble_stream__temperature__format(st_ble_stream);
+      const char *st_ble_stream__temperature_format = json_object_dotget_string(tempJSONObject,
+                                                                                "slow_mc_telemetries.st_ble_stream.temperature.format");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__temperature_format(st_ble_stream__temperature_format, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.temperature.format.value", st_ble_stream);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", st_ble_stream__temperature_format);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.temperature.format.value",
-                                  "PNPL_SET_ERROR");
+        char *old_st_ble_stream__temperature_format;
+        slow_mc_telemetries_get_st_ble_stream__temperature_format(&old_st_ble_stream__temperature_format);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_st_ble_stream__temperature_format);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -267,15 +302,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.ref_speed.enable"))
     {
-      bool st_ble_stream = json_object_dotget_boolean(tempJSONObject, "slow_mc_telemetries.st_ble_stream.ref_speed.enable");
-      ret = slow_mc_telemetries_set_st_ble_stream__ref_speed__enable(st_ble_stream);
+      bool st_ble_stream__ref_speed_enable = json_object_dotget_boolean(tempJSONObject,
+                                                                        "slow_mc_telemetries.st_ble_stream.ref_speed.enable");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__ref_speed_enable(st_ble_stream__ref_speed_enable, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_boolean(respJSONObject, "slow_mc_telemetries.st_ble_stream.ref_speed.enable.value", st_ble_stream);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", st_ble_stream__ref_speed_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.ref_speed.enable.value", "PNPL_SET_ERROR");
+        bool old_st_ble_stream__ref_speed_enable;
+        slow_mc_telemetries_get_st_ble_stream__ref_speed_enable(&old_st_ble_stream__ref_speed_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", old_st_ble_stream__ref_speed_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -283,16 +325,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.ref_speed.unit"))
     {
-      const char *st_ble_stream = json_object_dotget_string(tempJSONObject,
-                                                            "slow_mc_telemetries.st_ble_stream.ref_speed.unit");
-      ret = slow_mc_telemetries_set_st_ble_stream__ref_speed__unit(st_ble_stream);
+      const char *st_ble_stream__ref_speed_unit = json_object_dotget_string(tempJSONObject,
+                                                                            "slow_mc_telemetries.st_ble_stream.ref_speed.unit");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__ref_speed_unit(st_ble_stream__ref_speed_unit, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.ref_speed.unit.value", st_ble_stream);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", st_ble_stream__ref_speed_unit);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.ref_speed.unit.value", "PNPL_SET_ERROR");
+        char *old_st_ble_stream__ref_speed_unit;
+        slow_mc_telemetries_get_st_ble_stream__ref_speed_unit(&old_st_ble_stream__ref_speed_unit);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_st_ble_stream__ref_speed_unit);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -300,16 +348,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.ref_speed.format"))
     {
-      const char *st_ble_stream = json_object_dotget_string(tempJSONObject,
-                                                            "slow_mc_telemetries.st_ble_stream.ref_speed.format");
-      ret = slow_mc_telemetries_set_st_ble_stream__ref_speed__format(st_ble_stream);
+      const char *st_ble_stream__ref_speed_format = json_object_dotget_string(tempJSONObject,
+                                                                              "slow_mc_telemetries.st_ble_stream.ref_speed.format");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__ref_speed_format(st_ble_stream__ref_speed_format, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.ref_speed.format.value", st_ble_stream);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", st_ble_stream__ref_speed_format);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.ref_speed.format.value", "PNPL_SET_ERROR");
+        char *old_st_ble_stream__ref_speed_format;
+        slow_mc_telemetries_get_st_ble_stream__ref_speed_format(&old_st_ble_stream__ref_speed_format);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_st_ble_stream__ref_speed_format);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -317,15 +371,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.speed.enable"))
     {
-      bool st_ble_stream = json_object_dotget_boolean(tempJSONObject, "slow_mc_telemetries.st_ble_stream.speed.enable");
-      ret = slow_mc_telemetries_set_st_ble_stream__speed__enable(st_ble_stream);
+      bool st_ble_stream__speed_enable = json_object_dotget_boolean(tempJSONObject,
+                                                                    "slow_mc_telemetries.st_ble_stream.speed.enable");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__speed_enable(st_ble_stream__speed_enable, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_boolean(respJSONObject, "slow_mc_telemetries.st_ble_stream.speed.enable.value", st_ble_stream);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", st_ble_stream__speed_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.speed.enable.value", "PNPL_SET_ERROR");
+        bool old_st_ble_stream__speed_enable;
+        slow_mc_telemetries_get_st_ble_stream__speed_enable(&old_st_ble_stream__speed_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", old_st_ble_stream__speed_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -333,15 +394,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.speed.unit"))
     {
-      const char *st_ble_stream = json_object_dotget_string(tempJSONObject, "slow_mc_telemetries.st_ble_stream.speed.unit");
-      ret = slow_mc_telemetries_set_st_ble_stream__speed__unit(st_ble_stream);
+      const char *st_ble_stream__speed_unit = json_object_dotget_string(tempJSONObject,
+                                                                        "slow_mc_telemetries.st_ble_stream.speed.unit");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__speed_unit(st_ble_stream__speed_unit, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.speed.unit.value", st_ble_stream);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", st_ble_stream__speed_unit);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.speed.unit.value", "PNPL_SET_ERROR");
+        char *old_st_ble_stream__speed_unit;
+        slow_mc_telemetries_get_st_ble_stream__speed_unit(&old_st_ble_stream__speed_unit);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_st_ble_stream__speed_unit);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -349,15 +417,68 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.speed.format"))
     {
-      const char *st_ble_stream = json_object_dotget_string(tempJSONObject, "slow_mc_telemetries.st_ble_stream.speed.format");
-      ret = slow_mc_telemetries_set_st_ble_stream__speed__format(st_ble_stream);
+      const char *st_ble_stream__speed_format = json_object_dotget_string(tempJSONObject,
+                                                                          "slow_mc_telemetries.st_ble_stream.speed.format");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__speed_format(st_ble_stream__speed_format, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.speed.format.value", st_ble_stream);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", st_ble_stream__speed_format);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.speed.format.value", "PNPL_SET_ERROR");
+        char *old_st_ble_stream__speed_format;
+        slow_mc_telemetries_get_st_ble_stream__speed_format(&old_st_ble_stream__speed_format);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_st_ble_stream__speed_format);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
+      }
+    }
+  }
+  if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream"))
+  {
+    if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.speed.max"))
+    {
+      int32_t st_ble_stream__speed_max = (int32_t)json_object_dotget_number(tempJSONObject,
+                                                                            "slow_mc_telemetries.st_ble_stream.speed.max");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__speed_max(st_ble_stream__speed_max, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
+      if (ret == PNPL_NO_ERROR_CODE)
+      {
+        json_object_dotset_number(respJSONObject, "PnPL_Response.value", st_ble_stream__speed_max);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
+      }
+      else
+      {
+        int32_t old_st_ble_stream__speed_max;
+        slow_mc_telemetries_get_st_ble_stream__speed_max(&old_st_ble_stream__speed_max);
+        json_object_dotset_number(respJSONObject, "PnPL_Response.value", old_st_ble_stream__speed_max);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
+      }
+    }
+  }
+  if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream"))
+  {
+    if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.speed.initial_value"))
+    {
+      int32_t st_ble_stream__speed_initial_value = (int32_t)json_object_dotget_number(tempJSONObject,
+                                                                                      "slow_mc_telemetries.st_ble_stream.speed.initial_value");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__speed_initial_value(st_ble_stream__speed_initial_value, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
+      if (ret == PNPL_NO_ERROR_CODE)
+      {
+        json_object_dotset_number(respJSONObject, "PnPL_Response.value", st_ble_stream__speed_initial_value);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
+      }
+      else
+      {
+        int32_t old_st_ble_stream__speed_initial_value;
+        slow_mc_telemetries_get_st_ble_stream__speed_initial_value(&old_st_ble_stream__speed_initial_value);
+        json_object_dotset_number(respJSONObject, "PnPL_Response.value", old_st_ble_stream__speed_initial_value);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -365,16 +486,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.bus_voltage.enable"))
     {
-      bool st_ble_stream = json_object_dotget_boolean(tempJSONObject, "slow_mc_telemetries.st_ble_stream.bus_voltage.enable");
-      ret = slow_mc_telemetries_set_st_ble_stream__bus_voltage__enable(st_ble_stream);
+      bool st_ble_stream__bus_voltage_enable = json_object_dotget_boolean(tempJSONObject,
+                                                                          "slow_mc_telemetries.st_ble_stream.bus_voltage.enable");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__bus_voltage_enable(st_ble_stream__bus_voltage_enable, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_boolean(respJSONObject, "slow_mc_telemetries.st_ble_stream.bus_voltage.enable.value", st_ble_stream);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", st_ble_stream__bus_voltage_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.bus_voltage.enable.value",
-                                  "PNPL_SET_ERROR");
+        bool old_st_ble_stream__bus_voltage_enable;
+        slow_mc_telemetries_get_st_ble_stream__bus_voltage_enable(&old_st_ble_stream__bus_voltage_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", old_st_ble_stream__bus_voltage_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -382,16 +509,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.bus_voltage.unit"))
     {
-      const char *st_ble_stream = json_object_dotget_string(tempJSONObject,
-                                                            "slow_mc_telemetries.st_ble_stream.bus_voltage.unit");
-      ret = slow_mc_telemetries_set_st_ble_stream__bus_voltage__unit(st_ble_stream);
+      const char *st_ble_stream__bus_voltage_unit = json_object_dotget_string(tempJSONObject,
+                                                                              "slow_mc_telemetries.st_ble_stream.bus_voltage.unit");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__bus_voltage_unit(st_ble_stream__bus_voltage_unit, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.bus_voltage.unit.value", st_ble_stream);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", st_ble_stream__bus_voltage_unit);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.bus_voltage.unit.value", "PNPL_SET_ERROR");
+        char *old_st_ble_stream__bus_voltage_unit;
+        slow_mc_telemetries_get_st_ble_stream__bus_voltage_unit(&old_st_ble_stream__bus_voltage_unit);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_st_ble_stream__bus_voltage_unit);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -399,17 +532,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.bus_voltage.format"))
     {
-      const char *st_ble_stream = json_object_dotget_string(tempJSONObject,
-                                                            "slow_mc_telemetries.st_ble_stream.bus_voltage.format");
-      ret = slow_mc_telemetries_set_st_ble_stream__bus_voltage__format(st_ble_stream);
+      const char *st_ble_stream__bus_voltage_format = json_object_dotget_string(tempJSONObject,
+                                                                                "slow_mc_telemetries.st_ble_stream.bus_voltage.format");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__bus_voltage_format(st_ble_stream__bus_voltage_format, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.bus_voltage.format.value", st_ble_stream);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", st_ble_stream__bus_voltage_format);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.bus_voltage.format.value",
-                                  "PNPL_SET_ERROR");
+        char *old_st_ble_stream__bus_voltage_format;
+        slow_mc_telemetries_get_st_ble_stream__bus_voltage_format(&old_st_ble_stream__bus_voltage_format);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_st_ble_stream__bus_voltage_format);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -417,15 +555,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.fault.enable"))
     {
-      bool st_ble_stream = json_object_dotget_boolean(tempJSONObject, "slow_mc_telemetries.st_ble_stream.fault.enable");
-      ret = slow_mc_telemetries_set_st_ble_stream__fault__enable(st_ble_stream);
+      bool st_ble_stream__fault_enable = json_object_dotget_boolean(tempJSONObject,
+                                                                    "slow_mc_telemetries.st_ble_stream.fault.enable");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__fault_enable(st_ble_stream__fault_enable, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_boolean(respJSONObject, "slow_mc_telemetries.st_ble_stream.fault.enable.value", st_ble_stream);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", st_ble_stream__fault_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.fault.enable.value", "PNPL_SET_ERROR");
+        bool old_st_ble_stream__fault_enable;
+        slow_mc_telemetries_get_st_ble_stream__fault_enable(&old_st_ble_stream__fault_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", old_st_ble_stream__fault_enable);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -433,15 +578,22 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.fault.unit"))
     {
-      const char *st_ble_stream = json_object_dotget_string(tempJSONObject, "slow_mc_telemetries.st_ble_stream.fault.unit");
-      ret = slow_mc_telemetries_set_st_ble_stream__fault__unit(st_ble_stream);
+      const char *st_ble_stream__fault_unit = json_object_dotget_string(tempJSONObject,
+                                                                        "slow_mc_telemetries.st_ble_stream.fault.unit");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__fault_unit(st_ble_stream__fault_unit, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.fault.unit.value", st_ble_stream);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", st_ble_stream__fault_unit);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.fault.unit.value", "PNPL_SET_ERROR");
+        char *old_st_ble_stream__fault_unit;
+        slow_mc_telemetries_get_st_ble_stream__fault_unit(&old_st_ble_stream__fault_unit);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_st_ble_stream__fault_unit);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
@@ -449,28 +601,46 @@ uint8_t Slow_Mc_Telemetries_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *
   {
     if (json_object_dothas_value(tempJSONObject, "slow_mc_telemetries.st_ble_stream.fault.format"))
     {
-      const char *st_ble_stream = json_object_dotget_string(tempJSONObject, "slow_mc_telemetries.st_ble_stream.fault.format");
-      ret = slow_mc_telemetries_set_st_ble_stream__fault__format(st_ble_stream);
+      const char *st_ble_stream__fault_format = json_object_dotget_string(tempJSONObject,
+                                                                          "slow_mc_telemetries.st_ble_stream.fault.format");
+      valid_property = true;
+      ret = slow_mc_telemetries_set_st_ble_stream__fault_format(st_ble_stream__fault_format, &resp_msg);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
       if (ret == PNPL_NO_ERROR_CODE)
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.fault.format.value", st_ble_stream);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", st_ble_stream__fault_format);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
       }
       else
       {
-        json_object_dotset_string(respJSONObject, "slow_mc_telemetries.st_ble_stream.fault.format.value", "PNPL_SET_ERROR");
+        char *old_st_ble_stream__fault_format;
+        slow_mc_telemetries_get_st_ble_stream__fault_format(&old_st_ble_stream__fault_format);
+        json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_st_ble_stream__fault_format);
+        json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
       }
     }
   }
   json_value_free(tempJSON);
-  if (pretty == 1)
+  /* Check if received a valid request to modify an existing property */
+  if (valid_property)
   {
-    *response = json_serialize_to_string_pretty(respJSON);
-    *size = json_serialization_size_pretty(respJSON);
+    if (pretty == 1)
+    {
+      *response = json_serialize_to_string_pretty(respJSON);
+      *size = json_serialization_size_pretty(respJSON);
+    }
+    else
+    {
+      *response = json_serialize_to_string(respJSON);
+      *size = json_serialization_size(respJSON);
+    }
   }
   else
   {
-    *response = json_serialize_to_string(respJSON);
-    *size = json_serialization_size(respJSON);
+    /* Set property is not containing a valid property/parameter: PnPL_Error */
+    char *log_message = "Invalid property for slow_mc_telemetries";
+    PnPLCreateLogMessage(response, size, log_message, PNPL_LOG_ERROR);
+    ret = PNPL_BASE_ERROR_CODE;
   }
   json_value_free(respJSON);
   return ret;

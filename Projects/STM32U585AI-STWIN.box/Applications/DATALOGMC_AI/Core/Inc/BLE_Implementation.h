@@ -39,11 +39,10 @@ extern "C" {
 /* Exported Defines --------------------------------------------------------*/
 
 /* Firmware Package Name */
-#define BLE_FW_PACKAGENAME          "DMCv110"
+#define BLE_FW_PACKAGENAME          "DMCv200"
 
 /* Max Stream ID dedicated to custom data, utility stream (like advertise option byte) could be added after this */
 #define MAX_CUSTOM_DATA_STREAM_ID          (SM_MAX_SENSORS)
-
 
 
 /* Exported Variables ------------------------------------------------------- */

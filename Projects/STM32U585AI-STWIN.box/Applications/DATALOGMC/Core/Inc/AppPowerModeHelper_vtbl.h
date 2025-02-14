@@ -16,7 +16,7 @@
   *
   ******************************************************************************
   */
-  
+
 #ifndef APPPOWERMODEHELPER_VTBL_H_
 #define APPPOWERMODEHELPER_VTBL_H_
 

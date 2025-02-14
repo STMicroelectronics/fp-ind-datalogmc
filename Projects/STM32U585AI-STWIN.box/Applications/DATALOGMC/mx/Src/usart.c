@@ -124,11 +124,13 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
 
   GPIO_InitTypeDef GPIO_InitStruct =
   {
-      0 };
+    0
+  };
   RCC_PeriphCLKInitTypeDef PeriphClkInit =
   {
-      0 };
-  if(uartHandle->Instance == USART2)
+    0
+  };
+  if (uartHandle->Instance == USART2)
   {
     /* USER CODE BEGIN USART2_MspInit 0 */
 
@@ -138,7 +140,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
      */
     PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
     PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-    if(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
     {
       Error_Handler();
     }
@@ -163,7 +165,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
 
     /* USER CODE END USART2_MspInit 1 */
   }
-  else if(uartHandle->Instance == USART3)
+  else if (uartHandle->Instance == USART3)
   {
     /* USER CODE BEGIN USART3_MspInit 0 */
 
@@ -173,7 +175,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
      */
     PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART3;
     PeriphClkInit.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
-    if(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
     {
       Error_Handler();
     }
@@ -213,24 +215,24 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
     handle_GPDMA1_Channel15.Init.DestInc = DMA_DINC_INCREMENTED;
     handle_GPDMA1_Channel15.Init.SrcDataWidth = DMA_SRC_DATAWIDTH_BYTE;
     handle_GPDMA1_Channel15.Init.DestDataWidth =
-    DMA_DEST_DATAWIDTH_BYTE;
+      DMA_DEST_DATAWIDTH_BYTE;
     handle_GPDMA1_Channel15.Init.Priority = DMA_LOW_PRIORITY_LOW_WEIGHT;
     handle_GPDMA1_Channel15.Init.SrcBurstLength = 1;
     handle_GPDMA1_Channel15.Init.DestBurstLength = 1;
     handle_GPDMA1_Channel15.Init.TransferAllocatedPort =
-    DMA_SRC_ALLOCATED_PORT0 | DMA_DEST_ALLOCATED_PORT0;
+      DMA_SRC_ALLOCATED_PORT0 | DMA_DEST_ALLOCATED_PORT0;
     handle_GPDMA1_Channel15.Init.TransferEventMode =
-    DMA_TCEM_BLOCK_TRANSFER;
+      DMA_TCEM_BLOCK_TRANSFER;
     handle_GPDMA1_Channel15.Init.Mode = DMA_NORMAL;
-    if(HAL_DMA_Init(&handle_GPDMA1_Channel15) != HAL_OK)
+    if (HAL_DMA_Init(&handle_GPDMA1_Channel15) != HAL_OK)
     {
       Error_Handler();
     }
 
     __HAL_LINKDMA(uartHandle, hdmarx, handle_GPDMA1_Channel15);
 
-    if(HAL_DMA_ConfigChannelAttributes(&handle_GPDMA1_Channel15,
-    DMA_CHANNEL_NPRIV) != HAL_OK)
+    if (HAL_DMA_ConfigChannelAttributes(&handle_GPDMA1_Channel15,
+                                        DMA_CHANNEL_NPRIV) != HAL_OK)
     {
       Error_Handler();
     }
@@ -244,24 +246,24 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
     handle_GPDMA1_Channel14.Init.DestInc = DMA_DINC_FIXED;
     handle_GPDMA1_Channel14.Init.SrcDataWidth = DMA_SRC_DATAWIDTH_BYTE;
     handle_GPDMA1_Channel14.Init.DestDataWidth =
-    DMA_DEST_DATAWIDTH_BYTE;
+      DMA_DEST_DATAWIDTH_BYTE;
     handle_GPDMA1_Channel14.Init.Priority = DMA_LOW_PRIORITY_LOW_WEIGHT;
     handle_GPDMA1_Channel14.Init.SrcBurstLength = 1;
     handle_GPDMA1_Channel14.Init.DestBurstLength = 1;
     handle_GPDMA1_Channel14.Init.TransferAllocatedPort =
-    DMA_SRC_ALLOCATED_PORT0 | DMA_DEST_ALLOCATED_PORT0;
+      DMA_SRC_ALLOCATED_PORT0 | DMA_DEST_ALLOCATED_PORT0;
     handle_GPDMA1_Channel14.Init.TransferEventMode =
-    DMA_TCEM_BLOCK_TRANSFER;
+      DMA_TCEM_BLOCK_TRANSFER;
     handle_GPDMA1_Channel14.Init.Mode = DMA_NORMAL;
-    if(HAL_DMA_Init(&handle_GPDMA1_Channel14) != HAL_OK)
+    if (HAL_DMA_Init(&handle_GPDMA1_Channel14) != HAL_OK)
     {
       Error_Handler();
     }
 
     __HAL_LINKDMA(uartHandle, hdmatx, handle_GPDMA1_Channel14);
 
-    if(HAL_DMA_ConfigChannelAttributes(&handle_GPDMA1_Channel14,
-    DMA_CHANNEL_NPRIV) != HAL_OK)
+    if (HAL_DMA_ConfigChannelAttributes(&handle_GPDMA1_Channel14,
+                                        DMA_CHANNEL_NPRIV) != HAL_OK)
     {
       Error_Handler();
     }
@@ -278,14 +280,14 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
   }
 }
 
-void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
+void HAL_UART_MspDeInit(UART_HandleTypeDef *uartHandle)
 {
 
-  if(uartHandle->Instance==USART2)
+  if (uartHandle->Instance == USART2)
   {
-  /* USER CODE BEGIN USART2_MspDeInit 0 */
+    /* USER CODE BEGIN USART2_MspDeInit 0 */
 
-  /* USER CODE END USART2_MspDeInit 0 */
+    /* USER CODE END USART2_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_USART2_CLK_DISABLE();
 
@@ -293,18 +295,18 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     PD6     ------> USART2_RX
     PD4     ------> USART2_RTS
     PD5     ------> USART2_TX
-    */
-    HAL_GPIO_DeInit(GPIOD, GPIO_PIN_6|GPIO_PIN_4|GPIO_PIN_5);
+      */
+    HAL_GPIO_DeInit(GPIOD, GPIO_PIN_6 | GPIO_PIN_4 | GPIO_PIN_5);
 
-  /* USER CODE BEGIN USART2_MspDeInit 1 */
+    /* USER CODE BEGIN USART2_MspDeInit 1 */
 
-  /* USER CODE END USART2_MspDeInit 1 */
+    /* USER CODE END USART2_MspDeInit 1 */
   }
-  else if(uartHandle->Instance==USART3)
+  else if (uartHandle->Instance == USART3)
   {
-  /* USER CODE BEGIN USART3_MspDeInit 0 */
+    /* USER CODE BEGIN USART3_MspDeInit 0 */
 
-  /* USER CODE END USART3_MspDeInit 0 */
+    /* USER CODE END USART3_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_USART3_CLK_DISABLE();
 
@@ -313,14 +315,14 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     PA5     ------> USART3_RX
     PD12     ------> USART3_RTS
     PD11     ------> USART3_CTS
-    */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_7|GPIO_PIN_5);
+      */
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_7 | GPIO_PIN_5);
 
-    HAL_GPIO_DeInit(GPIOD, GPIO_PIN_12|GPIO_PIN_11);
+    HAL_GPIO_DeInit(GPIOD, GPIO_PIN_12 | GPIO_PIN_11);
 
-  /* USER CODE BEGIN USART3_MspDeInit 1 */
+    /* USER CODE BEGIN USART3_MspDeInit 1 */
 
-  /* USER CODE END USART3_MspDeInit 1 */
+    /* USER CODE END USART3_MspDeInit 1 */
   }
 }
 

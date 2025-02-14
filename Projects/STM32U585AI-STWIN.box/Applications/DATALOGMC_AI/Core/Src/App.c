@@ -16,7 +16,7 @@
   * This software is licensed under terms that can be found in the LICENSE file in
   * the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  *                             
+  *
   *
   ******************************************************************************
   */
@@ -97,8 +97,8 @@ static AManagedTaskEx *sSTTS22HObj = NULL;
 static AManagedTaskEx *sDatalogAppObj = NULL;
 
 /**
- * Motor Control Protocol scheduler task
- */
+  * Motor Control Protocol scheduler task
+  */
 static AManagedTaskEx *sMCPObj = NULL;
 
 /**
@@ -107,8 +107,8 @@ static AManagedTaskEx *sMCPObj = NULL;
 static AManagedTaskEx *sDataAggregationProcessTaskObj = NULL;
 
 /**
- *  Flags for external Add-on
- */
+  *  Flags for external Add-on
+  */
 static boolean_t sExtIis3dwb = FALSE;
 static boolean_t sExtStts22h = FALSE;
 
@@ -142,10 +142,10 @@ sys_error_code_t SysLoadApplicationContext(ApplicationContext *pAppContext)
   sI2C2BusObj = I2CBusTaskAlloc(&MX_I2C2InitParams);
   sSPI2BusObj = SPIBusTaskAlloc(&MX_SPI2InitParams);
 
-  if(sExtIis3dwb)
+  if (sExtIis3dwb)
   {
     /* Use the external IIS3DWB */
-  sIIS3DWBObj = IIS3DWBTaskAlloc(&MX_GPIO_INT1_EXTERNAL_DWBInitParams, &MX_GPIO_CS_EXTERNALInitParams);
+    sIIS3DWBObj = IIS3DWBTaskAlloc(&MX_GPIO_INT1_EXTERNAL_DWBInitParams, &MX_GPIO_CS_EXTERNALInitParams);
   }
   else
   {
@@ -153,7 +153,7 @@ sys_error_code_t SysLoadApplicationContext(ApplicationContext *pAppContext)
     sIIS3DWBObj = IIS3DWBTaskAlloc(&MX_GPIO_INT1_DWBInitParams, &MX_GPIO_CS_DWBInitParams);
   }
 
-  if(sExtStts22h)
+  if (sExtStts22h)
   {
     /* Use the external STTS22H on I2C3 */
     sSTTS22HObj = STTS22HTaskAlloc(NULL, NULL, stts22h_address);
@@ -206,7 +206,7 @@ sys_error_code_t SysOnStartApplication(ApplicationContext *pAppContext)
   //SensorManagerStateMachineRemap(spAppPMState2SMPMStateMap);
 
   /* Connect the sensor task to the bus. */
-  if(sI2C3BusObj)
+  if (sI2C3BusObj)
   {
     /* Use I2C3 for External STTS22H */
     I2CBusTaskConnectDevice((I2CBusTask *) sI2C3BusObj, (I2CBusIF *)STTS22HTaskGetSensorIF((STTS22HTask *) sSTTS22HObj));
@@ -217,7 +217,7 @@ sys_error_code_t SysOnStartApplication(ApplicationContext *pAppContext)
     I2CBusTaskConnectDevice((I2CBusTask *) sI2C2BusObj, (I2CBusIF *)STTS22HTaskGetSensorIF((STTS22HTask *) sSTTS22HObj));
   }
 
-  if(sIIS3DWBObj)
+  if (sIIS3DWBObj)
   {
     SPIBusTaskConnectDevice((SPIBusTask *) sSPI2BusObj, (SPIBusIF *)IIS3DWBTaskGetSensorIF((IIS3DWBTask *) sIIS3DWBObj));
   }
@@ -227,16 +227,17 @@ sys_error_code_t SysOnStartApplication(ApplicationContext *pAppContext)
 
   /* Connect MCP events to DatalogApp Task */
   IEventListener *DatalogActuatorListener = DatalogAppTask_GetActuatorEventListenerIF((DatalogAppTask *) sDatalogAppObj);
-  IEventSrcAddEventListener(MCPTask_GetEventSrcIF((MCPTask_t *) sMCPObj), DatalogActuatorListener);
+  IEventSrcAddEventListener(MCPTask_GetSlowTelemetriesEventSrcIF((MCPTask_t *) sMCPObj), DatalogActuatorListener);
+  IEventSrcAddEventListener(MCPTask_GetAsyncTelemetriesEventSrcIF((MCPTask_t *) sMCPObj), DatalogActuatorListener);
 
   /* Get Data Aggregation and process Event listener interface */
-  IEventListener *DAPSensorEvtLstener = DataAggregationProcessTask_GetSensorEventListenerIF((DataAggregationProcessTask_t*) sDataAggregationProcessTaskObj);
-  IEventListener *DAPActuatorEvtLstener = DataAggregationProcessTask_GetActuatorEventListenerIF((DataAggregationProcessTask_t*) sDataAggregationProcessTaskObj);
+  IEventListener *DAPSensorEvtLstener = DataAggregationProcessTask_GetSensorEventListenerIF((DataAggregationProcessTask_t *) sDataAggregationProcessTaskObj);
+  IEventListener *DAPActuatorEvtLstener = DataAggregationProcessTask_GetActuatorEventListenerIF((DataAggregationProcessTask_t *) sDataAggregationProcessTaskObj);
 
   /* Connect Data Aggregation and process Event listener interface to data sources */
-  IEventSrcAddEventListener(MCPTask_GetEventSrcIF((MCPTask_t *) sMCPObj), DAPActuatorEvtLstener);
+  IEventSrcAddEventListener(MCPTask_GetAsyncTelemetriesEventSrcIF((MCPTask_t *) sMCPObj), DAPActuatorEvtLstener);
 
-  if(sIIS3DWBObj)
+  if (sIIS3DWBObj)
   {
     IEventSrcAddEventListener(IIS3DWBTaskGetEventSrcIF((IIS3DWBTask *) sIIS3DWBObj), DatalogAppListener);
     IEventSrcAddEventListener(IIS3DWBTaskGetEventSrcIF((IIS3DWBTask *) sIIS3DWBObj), DAPSensorEvtLstener);
@@ -245,10 +246,10 @@ sys_error_code_t SysOnStartApplication(ApplicationContext *pAppContext)
   IEventSrcAddEventListener(STTS22HTaskGetTempEventSrcIF((STTS22HTask *) sSTTS22HObj), DatalogAppListener);
 
   /* Connect NEAIDPU to DatalogAppListener*/
-  IEventListener *p_classifierEvtListener = DatalogAppTask_GetAIClassifierEventListenerIF((DatalogAppTask*) sDatalogAppObj);
-  IDPU2_t *p_classifierDPU = DataAggregationProcessTask_GetClassifierDPU((DataAggregationProcessTask_t*) sDataAggregationProcessTaskObj);
+  IEventListener *p_classifierEvtListener = DatalogAppTask_GetAIClassifierEventListenerIF((DatalogAppTask *) sDatalogAppObj);
+  IDPU2_t *p_classifierDPU = DataAggregationProcessTask_GetClassifierDPU((DataAggregationProcessTask_t *) sDataAggregationProcessTaskObj);
   IEventSrc *p_evt_src;
-  p_evt_src = ADPU2_GetEventSrcIF((ADPU2_t*) p_classifierDPU);
+  p_evt_src = ADPU2_GetEventSrcIF((ADPU2_t *) p_classifierDPU);
   IEventSrcAddEventListener(p_evt_src, p_classifierEvtListener);
 
   /* Init&Add PnPL Components */

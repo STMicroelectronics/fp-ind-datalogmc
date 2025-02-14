@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:dtmi:vespucci:steval_stwinbx1:fpIndDatalogMC_datalog2MC:actuators:fast_mc_telemetries;1
+  * dtmi:dtmi:vespucci:steval_stwinbx1:FP_IND_DATALOGMC_DatalogMC:actuators:fast_mc_telemetries;2
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -90,29 +90,32 @@ uint8_t fast_mc_telemetries_get_v_a__enabled(bool *value);
 uint8_t fast_mc_telemetries_get_v_a__unit(char **value);
 uint8_t fast_mc_telemetries_get_v_b__enabled(bool *value);
 uint8_t fast_mc_telemetries_get_v_b__unit(char **value);
+uint8_t fast_mc_telemetries_get_sensitivity__voltage(float *value);
+uint8_t fast_mc_telemetries_get_sensitivity__current(float *value);
+uint8_t fast_mc_telemetries_get_sensitivity__frequency(float *value);
 uint8_t fast_mc_telemetries_get_stream_id(int8_t *value);
 uint8_t fast_mc_telemetries_get_ep_id(int8_t *value);
-uint8_t fast_mc_telemetries_set_enable(bool value);
-uint8_t fast_mc_telemetries_set_i_q__enabled(bool value);
-uint8_t fast_mc_telemetries_set_i_q__unit(const char *value);
-uint8_t fast_mc_telemetries_set_i_d__enabled(bool value);
-uint8_t fast_mc_telemetries_set_i_d__unit(const char *value);
-uint8_t fast_mc_telemetries_set_i_q_ref__enabled(bool value);
-uint8_t fast_mc_telemetries_set_i_q_ref__unit(const char *value);
-uint8_t fast_mc_telemetries_set_i_d_ref__enabled(bool value);
-uint8_t fast_mc_telemetries_set_i_d_ref__unit(const char *value);
-uint8_t fast_mc_telemetries_set_v_q__enabled(bool value);
-uint8_t fast_mc_telemetries_set_v_q__unit(const char *value);
-uint8_t fast_mc_telemetries_set_v_d__enabled(bool value);
-uint8_t fast_mc_telemetries_set_v_d__unit(const char *value);
-uint8_t fast_mc_telemetries_set_i_a__enabled(bool value);
-uint8_t fast_mc_telemetries_set_i_a__unit(const char *value);
-uint8_t fast_mc_telemetries_set_i_b__enabled(bool value);
-uint8_t fast_mc_telemetries_set_i_b__unit(const char *value);
-uint8_t fast_mc_telemetries_set_v_a__enabled(bool value);
-uint8_t fast_mc_telemetries_set_v_a__unit(const char *value);
-uint8_t fast_mc_telemetries_set_v_b__enabled(bool value);
-uint8_t fast_mc_telemetries_set_v_b__unit(const char *value);
+uint8_t fast_mc_telemetries_set_enable(bool value, char **response_message);
+uint8_t fast_mc_telemetries_set_i_q__enabled(bool value, char **response_message);
+uint8_t fast_mc_telemetries_set_i_q__unit(const char *value, char **response_message);
+uint8_t fast_mc_telemetries_set_i_d__enabled(bool value, char **response_message);
+uint8_t fast_mc_telemetries_set_i_d__unit(const char *value, char **response_message);
+uint8_t fast_mc_telemetries_set_i_q_ref__enabled(bool value, char **response_message);
+uint8_t fast_mc_telemetries_set_i_q_ref__unit(const char *value, char **response_message);
+uint8_t fast_mc_telemetries_set_i_d_ref__enabled(bool value, char **response_message);
+uint8_t fast_mc_telemetries_set_i_d_ref__unit(const char *value, char **response_message);
+uint8_t fast_mc_telemetries_set_v_q__enabled(bool value, char **response_message);
+uint8_t fast_mc_telemetries_set_v_q__unit(const char *value, char **response_message);
+uint8_t fast_mc_telemetries_set_v_d__enabled(bool value, char **response_message);
+uint8_t fast_mc_telemetries_set_v_d__unit(const char *value, char **response_message);
+uint8_t fast_mc_telemetries_set_i_a__enabled(bool value, char **response_message);
+uint8_t fast_mc_telemetries_set_i_a__unit(const char *value, char **response_message);
+uint8_t fast_mc_telemetries_set_i_b__enabled(bool value, char **response_message);
+uint8_t fast_mc_telemetries_set_i_b__unit(const char *value, char **response_message);
+uint8_t fast_mc_telemetries_set_v_a__enabled(bool value, char **response_message);
+uint8_t fast_mc_telemetries_set_v_a__unit(const char *value, char **response_message);
+uint8_t fast_mc_telemetries_set_v_b__enabled(bool value, char **response_message);
+uint8_t fast_mc_telemetries_set_v_b__unit(const char *value, char **response_message);
 
 
 #ifdef __cplusplus

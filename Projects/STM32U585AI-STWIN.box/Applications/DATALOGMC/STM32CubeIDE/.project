@@ -1158,6 +1158,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/hci_tl_interface.h</locationURI>
 		</link>
 		<link>
+			<name>User/Core/Inc/stateMachine.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/stateMachine.h</locationURI>
+		</link>
+		<link>
 			<name>User/Core/Inc/stm32u5xx_hal_conf.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/stm32u5xx_hal_conf.h</locationURI>
@@ -1263,6 +1268,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/main.c</locationURI>
 		</link>
 		<link>
+			<name>User/Core/Src/stateMachine.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/stateMachine.c</locationURI>
+		</link>
+		<link>
 			<name>User/Core/Src/stm32u5xx_hal_timebase_tim.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/stm32u5xx_hal_timebase_tim.c</locationURI>
@@ -1346,6 +1356,11 @@
 			<name>User/FileX/Target/fx_user.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/FileX/Target/fx_user.h</locationURI>
+		</link>
+		<link>
+			<name>User/Mcp/Inc/mc_configuration_registers.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/mcp/Inc/mc_configuration_registers.h</locationURI>
 		</link>
 		<link>
 			<name>User/Mcp/Inc/mcp.h</name>
@@ -5191,6 +5206,16 @@
 			<name>Middlewares/ST/usbx/common/core/src/ux_utility_memory_allocate_mulv_safe.c</name>
 			<type>1</type>
 			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/ST/usbx/common/core/src/ux_utility_memory_allocate_mulv_safe.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/ST/usbx/common/core/src/ux_utility_memory_byte_pool_create.c</name>
+			<type>1</type>
+			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/ST/usbx/common/core/src/ux_utility_memory_byte_pool_create.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/ST/usbx/common/core/src/ux_utility_memory_byte_pool_search.c</name>
+			<type>1</type>
+			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/ST/usbx/common/core/src/ux_utility_memory_byte_pool_search.c</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/ST/usbx/common/core/src/ux_utility_memory_compare.c</name>

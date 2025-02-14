@@ -184,10 +184,10 @@ int32_t HCI_TL_SPI_Receive(uint8_t *buffer, uint16_t size)
   }
 
   /**
-   * To be aligned to the SPI protocol.
-   * Can bring to a delay inside the frame, due to the BlueNRG-2 that needs
-   * to check if the header is received or not.
-   */
+    * To be aligned to the SPI protocol.
+    * Can bring to a delay inside the frame, due to the BlueNRG-2 that needs
+    * to check if the header is received or not.
+    */
   uint32_t tickstart = HAL_GetTick();
   while ((HAL_GetTick() - tickstart) < TIMEOUT_IRQ_HIGH)
   {
@@ -282,10 +282,10 @@ int32_t HCI_TL_SPI_Send(uint8_t *buffer, uint16_t size)
   } while (result < 0);
 
   /**
-   * To be aligned to the SPI protocol.
-   * Can bring to a delay inside the frame, due to the BlueNRG-2 that needs
-   * to check if the header is received or not.
-   */
+    * To be aligned to the SPI protocol.
+    * Can bring to a delay inside the frame, due to the BlueNRG-2 that needs
+    * to check if the header is received or not.
+    */
   tickstart = HAL_GetTick();
   while ((HAL_GetTick() - tickstart) < TIMEOUT_IRQ_HIGH)
   {
@@ -339,5 +339,4 @@ void hci_tl_lowlevel_init(void)
 #endif /* HCI_TL */
 
 }
-
 

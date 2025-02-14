@@ -22,7 +22,7 @@
   * This file has been auto generated from the following DTDL Component:
   * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:imp23absu_mic;5
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -55,12 +55,12 @@ uint8_t imp23absu_mic_comp_init(void)
 
   addSensorToAppModel(id, &imp23absu_mic_model);
 
-  imp23absu_mic_set_sensor_annotation("\0");
-  imp23absu_mic_set_volume(100);
+  imp23absu_mic_set_sensor_annotation("\0", NULL);
+  imp23absu_mic_set_volume(100, NULL);
 #if (HSD_USE_DUMMY_DATA == 1)
-  imp23absu_mic_set_samples_per_ts(0);
+  imp23absu_mic_set_samples_per_ts(0, NULL);
 #else
-  imp23absu_mic_set_samples_per_ts(1000);
+  imp23absu_mic_set_samples_per_ts(1000, NULL);
 #endif
   __stream_control(true);
   /* USER Component initialization code */
@@ -92,20 +92,16 @@ uint8_t imp23absu_mic_get_odr(pnpl_imp23absu_mic_odr_t *enum_id)
   {
     *enum_id = pnpl_imp23absu_mic_odr_hz96000;
   }
-  else if (odr <= 192000)
-  {
-    *enum_id = pnpl_imp23absu_mic_odr_hz192000;
-  }
   else
   {
-	  return 1;
+    *enum_id = pnpl_imp23absu_mic_odr_hz192000;
   }
   return PNPL_NO_ERROR_CODE;
 }
 
-uint8_t imp23absu_mic_get_aop(int32_t *value)
+uint8_t imp23absu_mic_get_aop(pnpl_imp23absu_mic_aop_t *enum_id)
 {
-  *value = 130;
+  *enum_id = pnpl_imp23absu_mic_aop_dbspl130;
   return PNPL_NO_ERROR_CODE;
 }
 
@@ -125,13 +121,13 @@ uint8_t imp23absu_mic_get_volume(int32_t *value)
 uint8_t imp23absu_mic_get_resolution(pnpl_imp23absu_mic_resolution_t *enum_id)
 {
   uint8_t resolution = imp23absu_mic_model.sensor_status->type.audio.resolution;
-  if(resolution == 16)
+  if (resolution == 16)
   {
-	  *enum_id = pnpl_imp23absu_mic_resolution_bit16;
+    *enum_id = pnpl_imp23absu_mic_resolution_bit16;
   }
   else
   {
-	  return 1;
+    return 1;
   }
   return PNPL_NO_ERROR_CODE;
 }
@@ -210,42 +206,55 @@ uint8_t imp23absu_mic_get_ep_id(int8_t *value)
 }
 
 
-uint8_t imp23absu_mic_set_odr(pnpl_imp23absu_mic_odr_t enum_id)
+uint8_t imp23absu_mic_set_odr(pnpl_imp23absu_mic_odr_t enum_id, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   uint32_t value;
   switch (enum_id)
   {
-	case pnpl_imp23absu_mic_odr_hz16000:
-		value = 16000;
-		break;
-	case pnpl_imp23absu_mic_odr_hz32000:
-		value = 32000;
-		break;
-	case pnpl_imp23absu_mic_odr_hz48000:
-		value = 48000;
-		break;
-	case pnpl_imp23absu_mic_odr_hz96000:
-		value = 96000;
-		break;
-	case pnpl_imp23absu_mic_odr_hz192000:
-		value = 192000;
-	default:
-		return 1;
+    case pnpl_imp23absu_mic_odr_hz16000:
+      value = 16000;
+      break;
+    case pnpl_imp23absu_mic_odr_hz32000:
+      value = 32000;
+      break;
+    case pnpl_imp23absu_mic_odr_hz48000:
+      value = 48000;
+      break;
+    case pnpl_imp23absu_mic_odr_hz96000:
+      value = 96000;
+      break;
+    case pnpl_imp23absu_mic_odr_hz192000:
+      value = 192000;
+      break;
+    default:
+      if (response_message != NULL)
+      {
+        *response_message = "Error: Failed to set ODR";
+      }
+      return PNPL_BASE_ERROR_CODE;
   }
   ret = SMSensorSetFrequency(imp23absu_mic_model.id, value);
   if (ret == SYS_NO_ERROR_CODE)
   {
 #if (HSD_USE_DUMMY_DATA != 1)
-    imp23absu_mic_set_samples_per_ts(value);
+    imp23absu_mic_set_samples_per_ts(value, NULL);
 #endif
     __stream_control(true);
   }
   return ret;
 }
 
-uint8_t imp23absu_mic_set_enable(bool value)
+uint8_t imp23absu_mic_set_enable(bool value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   if (value)
   {
@@ -260,43 +269,72 @@ uint8_t imp23absu_mic_set_enable(bool value)
     /* USER Code */
     __stream_control(true);
   }
-  return ret;
-}
-
-uint8_t imp23absu_mic_set_volume(int32_t value)
-{
-  uint8_t ret = PNPL_NO_ERROR_CODE;
-  ret = SMSensorSetVolume(imp23absu_mic_model.id, value);
-  if (ret == SYS_NO_ERROR_CODE)
+  else
   {
-    /* USER Code */
-    __stream_control(true);
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Failed to enable the sensor";
+    }
   }
   return ret;
 }
 
-uint8_t imp23absu_mic_set_samples_per_ts(int32_t value)
+uint8_t imp23absu_mic_set_volume(int32_t value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
+  uint8_t ret = PNPL_NO_ERROR_CODE;
+  ret = SMSensorSetVolume(imp23absu_mic_model.id, value);
+  if (ret != SYS_NO_ERROR_CODE)
+  {
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Failed to set Volume";
+    }
+  }
+  return ret;
+}
+
+uint8_t imp23absu_mic_set_samples_per_ts(int32_t value, char **response_message)
+{
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   int32_t min_v = 0;
   int32_t max_v = 1000;
   if (value >= min_v && value <= max_v)
   {
-	imp23absu_mic_model.stream_params.spts = value;
+    imp23absu_mic_model.stream_params.spts = value;
   }
   else if (value > max_v)
   {
-	  imp23absu_mic_model.stream_params.spts = max_v;
+    imp23absu_mic_model.stream_params.spts = max_v;
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Value setting above maximum threshold (1000)";
+    }
   }
   else
   {
-	  imp23absu_mic_model.stream_params.spts = min_v;
+    imp23absu_mic_model.stream_params.spts = min_v;
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Value setting below minimum threshold (0)";
+    }
   }
   return ret;
 }
 
-uint8_t imp23absu_mic_set_sensor_annotation(const char *value)
+uint8_t imp23absu_mic_set_sensor_annotation(const char *value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   strcpy(imp23absu_mic_model.annotation, value);
   return ret;

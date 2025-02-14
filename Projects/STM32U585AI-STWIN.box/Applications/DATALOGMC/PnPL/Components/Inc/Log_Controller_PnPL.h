@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:other:log_controller;2
+  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:other:log_controller;2
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -31,7 +31,6 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef _PNPL_LOG_CONTROLLER_H_
 #define _PNPL_LOG_CONTROLLER_H_
-
 
 
 #ifdef __cplusplus

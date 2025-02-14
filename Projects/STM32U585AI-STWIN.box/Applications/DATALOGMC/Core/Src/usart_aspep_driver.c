@@ -27,12 +27,8 @@
 #include "stm32u5xx_ll_gpio.h"
 
 
-
-void UASPEP_DMACONFIG_TX (UASPEP_Handle_t *pHandle);
-void UASPEP_DMACONFIG_RX (UASPEP_Handle_t *pHandle);
-
-
-
+void UASPEP_DMACONFIG_TX(UASPEP_Handle_t *pHandle);
+void UASPEP_DMACONFIG_RX(UASPEP_Handle_t *pHandle);
 
 
 /**
@@ -74,7 +70,7 @@ void UASPEP_DMACONFIG_TX(UASPEP_Handle_t *pHandle)
     /* Write the USART_TDR register address in the DMA control register to configure it as
      * the destination of the transfer */
     //cstat !MISRAC2012-Rule-11.4
-    LL_DMA_SetDestAddress ( pHandle->txDMA, pHandle->txChannel , ( uint32_t ) &pHandle->USARTx->TDR );
+    LL_DMA_SetDestAddress(pHandle->txDMA, pHandle->txChannel, (uint32_t) &pHandle->USARTx->TDR);
     /* Clear UART ISR */
     LL_USART_ClearFlag_TC(pHandle->USARTx);
 
@@ -108,7 +104,7 @@ void UASPEP_DMACONFIG_RX(UASPEP_Handle_t *pHandle)
     /* Write the USART_RDR register address in the DMA control register to configure it as
      * the source of the transfer */
     //cstat !MISRAC2012-Rule-11.4
-     LL_DMA_SetSrcAddress( pHandle->rxDMA, pHandle->rxChannel , ( uint32_t ) &pHandle->USARTx->RDR );
+    LL_DMA_SetSrcAddress(pHandle->rxDMA, pHandle->rxChannel, (uint32_t) &pHandle->USARTx->RDR);
 
     /* Clear UART ISR */
     LL_USART_ClearFlag_TC(pHandle->USARTx);
@@ -125,9 +121,9 @@ bool UASPEP_SEND_PACKET(void *pHWHandle, void *data, uint16_t length)
   bool result;
   if (0U == LL_DMA_IsEnabledChannel(pHandle->txDMA, pHandle->txChannel))
   {
-    LL_DMA_SetSrcAddress( pHandle->txDMA, pHandle->txChannel, (uint32_t) data );
-    LL_DMA_SetBlkDataLength( pHandle->txDMA, pHandle->txChannel, length );
-    LL_DMA_EnableChannel( pHandle->txDMA, pHandle->txChannel );
+    LL_DMA_SetSrcAddress(pHandle->txDMA, pHandle->txChannel, (uint32_t) data);
+    LL_DMA_SetBlkDataLength(pHandle->txDMA, pHandle->txChannel, length);
+    LL_DMA_EnableChannel(pHandle->txDMA, pHandle->txChannel);
     result = true;
   }
   else
@@ -137,12 +133,12 @@ bool UASPEP_SEND_PACKET(void *pHWHandle, void *data, uint16_t length)
   return (result);
 }
 
-void UASPEP_RECEIVE_BUFFER(void *pHWHandle, void* buffer, uint16_t length)
+void UASPEP_RECEIVE_BUFFER(void *pHWHandle, void *buffer, uint16_t length)
 {
   UASPEP_Handle_t *pHandle = (UASPEP_Handle_t *)pHWHandle; //cstat !MISRAC2012-Rule-11.5
   LL_DMA_DisableChannel(pHandle->rxDMA, pHandle->rxChannel);
-  LL_DMA_SetDestAddress( pHandle->rxDMA, pHandle->rxChannel, (uint32_t) buffer );
-  LL_DMA_SetBlkDataLength(  pHandle->rxDMA, pHandle->rxChannel, length );
+  LL_DMA_SetDestAddress(pHandle->rxDMA, pHandle->rxChannel, (uint32_t) buffer);
+  LL_DMA_SetBlkDataLength(pHandle->rxDMA, pHandle->rxChannel, length);
 
   LL_DMA_EnableChannel(pHandle->rxDMA, pHandle->rxChannel);
 }

@@ -58,6 +58,10 @@
 
 #define SYS_DEBUGF(level, message)                SYS_DEBUGF3(SYS_DBG_IIS3DWB, level, message)
 
+#ifndef IIS3DWB_TASK_CFG_I2C_ADDRESS
+#define IIS3DWB_TASK_CFG_I2C_ADDRESS              IIS3DWB_I2C_ADD_H
+#endif
+
 #ifndef HSD_USE_DUMMY_DATA
 #define HSD_USE_DUMMY_DATA 0
 #endif
@@ -422,7 +426,7 @@ sys_error_code_t IIS3DWBTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_func
   }
   else
   {
-    p_obj->p_sensor_bus_if = I2CBusIFAlloc(IIS3DWB_ID, IIS3DWB_I2C_ADD_H, 0);
+    p_obj->p_sensor_bus_if = I2CBusIFAlloc(IIS3DWB_ID, IIS3DWB_TASK_CFG_I2C_ADDRESS, 0);
     if (p_obj->p_sensor_bus_if == NULL)
     {
       res = SYS_TASK_HEAP_OUT_OF_MEMORY_ERROR_CODE;
@@ -1254,11 +1258,6 @@ static sys_error_code_t IIS3DWBTaskSensorInit(IIS3DWBTask *_this)
     {
       iis3dwb_wtm_level = IIS3DWB_MAX_WTM_LEVEL;
     }
-    else if (iis3dwb_wtm_level < IIS3DWB_MIN_WTM_LEVEL)
-    {
-      iis3dwb_wtm_level = IIS3DWB_MIN_WTM_LEVEL;
-    }
-
     _this->samples_per_it = iis3dwb_wtm_level;
   }
 
@@ -1321,29 +1320,32 @@ static sys_error_code_t IIS3DWBTaskSensorReadData(IIS3DWBTask *_this)
 
   if (((reg[1]) & 0x80) && (fifo_level >= samples_per_it))
   {
-    iis3dwb_read_reg(p_sensor_drv, IIS3DWB_FIFO_DATA_OUT_TAG, (uint8_t *) _this->p_sensor_data_buff, samples_per_it * 7);
+    res = iis3dwb_read_reg(p_sensor_drv, IIS3DWB_FIFO_DATA_OUT_TAG, (uint8_t *) _this->p_sensor_data_buff, samples_per_it * 7);
 
+    if (!SYS_IS_ERROR_CODE(res))
+    {
 #if (HSD_USE_DUMMY_DATA == 1)
-    int16_t *p16 = (int16_t *)_this->p_sensor_data_buff;
+      int16_t *p16 = (int16_t *)_this->p_sensor_data_buff;
 
-    for (i = 0; i < samples_per_it; i++)
-    {
-      *p16++ = dummyDataCounter++;
-      *p16++ = dummyDataCounter++;
-      *p16++ = dummyDataCounter++;
-    }
+      for (i = 0; i < samples_per_it; i++)
+      {
+        *p16++ = dummyDataCounter++;
+        *p16++ = dummyDataCounter++;
+        *p16++ = dummyDataCounter++;
+      }
 #else
-    /* Arrange Data */
-    int16_t *p16_src = (int16_t *) _this->p_sensor_data_buff;
-    int16_t *p16_dest = (int16_t *) _this->p_sensor_data_buff;
-    for (i = 0; i < samples_per_it; i++)
-    {
-      p16_src = (int16_t *) & ((uint8_t *)(p16_src))[1];
-      *p16_dest++ = *p16_src++;
-      *p16_dest++ = *p16_src++;
-      *p16_dest++ = *p16_src++;
-    }
+      /* Arrange Data */
+      int16_t *p16_src = (int16_t *) _this->p_sensor_data_buff;
+      int16_t *p16_dest = (int16_t *) _this->p_sensor_data_buff;
+      for (i = 0; i < samples_per_it; i++)
+      {
+        p16_src = (int16_t *) & ((uint8_t *)(p16_src))[1];
+        *p16_dest++ = *p16_src++;
+        *p16_dest++ = *p16_src++;
+        *p16_dest++ = *p16_src++;
+      }
 #endif /* HSD_USE_DUMMY_DATA */
+    }
   }
   else
   {
@@ -1351,15 +1353,19 @@ static sys_error_code_t IIS3DWBTaskSensorReadData(IIS3DWBTask *_this)
   }
 #else
   iis3dwb_read_reg(p_sensor_drv, IIS3DWB_OUTX_L_A, (uint8_t *) _this->p_sensor_data_buff, samples_per_it * 6);
-#if (HSD_USE_DUMMY_DATA == 1)
-  int16_t *p16 = (int16_t *)_this->p_sensor_data_buff;
-  for (i = 0; i < samples_per_it ; i++)
+
+  if (!SYS_IS_ERROR_CODE(res))
   {
-    *p16++ = dummyDataCounter++;
-    *p16++ = dummyDataCounter++;
-    *p16++ = dummyDataCounter++;
-  }
+#if (HSD_USE_DUMMY_DATA == 1)
+    int16_t *p16 = (int16_t *)_this->p_sensor_data_buff;
+    for (i = 0; i < samples_per_it ; i++)
+    {
+      *p16++ = dummyDataCounter++;
+      *p16++ = dummyDataCounter++;
+      *p16++ = dummyDataCounter++;
+    }
 #endif /* HSD_USE_DUMMY_DATA */
+  }
 #endif /* IIS3DWB_FIFO_ENABLED */
 
   return res;

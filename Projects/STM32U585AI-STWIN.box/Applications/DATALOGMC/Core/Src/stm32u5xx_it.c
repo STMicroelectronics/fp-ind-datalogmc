@@ -12,7 +12,7 @@
   * This software is licensed under terms that can be found in the LICENSE file in
   * the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  *                             
+  *
   *
   ******************************************************************************
   */
@@ -455,7 +455,6 @@ void GPDMA1_Channel14_IRQHandler(void)
 }
 
 
-
 void SPI2_IRQHandler(void)
 {
   HAL_SPI_IRQHandler(&hspi2);
@@ -492,7 +491,6 @@ void I2C3_ER_IRQHandler(void)
 {
   HAL_I2C_ER_IRQHandler(&hi2c3);
 }
-
 
 
 /**

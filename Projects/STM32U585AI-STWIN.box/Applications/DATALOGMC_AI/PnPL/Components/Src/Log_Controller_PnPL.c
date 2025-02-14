@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:other:log_controller;2
+  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:other:log_controller;2
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -87,7 +87,7 @@ char *Log_Controller_PnPL_vtblGetKey(IPnPLComponent_t *_this)
 
 uint8_t Log_Controller_PnPL_vtblGetNCommands(IPnPLComponent_t *_this)
 {
-  return 6;
+  return 5;
 }
 
 char *Log_Controller_PnPL_vtblGetCommandKey(IPnPLComponent_t *_this, uint8_t id)
@@ -108,9 +108,6 @@ char *Log_Controller_PnPL_vtblGetCommandKey(IPnPLComponent_t *_this, uint8_t id)
       break;
     case 4:
       return "log_controller*switch_bank";
-      break;
-    case 5:
-      return "log_controller*set_dfu_mode";
       break;
   }
   return "";
@@ -167,96 +164,45 @@ uint8_t Log_Controller_PnPL_vtblExecuteFunction(IPnPLComponent_t *_this, char *s
 {
   JSON_Value *tempJSON = json_parse_string(serializedJSON);
   JSON_Object *tempJSONObject = json_value_get_object(tempJSON);
-  JSON_Value *respJSON = json_value_init_object();
-  JSON_Object *respJSONObject = json_value_get_object(respJSON);
 
   uint8_t ret = PNPL_NO_ERROR_CODE;
+  bool valid_function = false;
   if (json_object_dothas_value(tempJSONObject, "log_controller*save_config"))
   {
+    valid_function = true;
     ret = log_controller_save_config();
-    if (ret == 0)
-    {
-      json_object_dotset_string(respJSONObject, "log_controller*save_config.response", 0);
-    }
-    else
-    {
-      json_object_dotset_string(respJSONObject, "log_controller.save_config.response", "PNPL_CMD_ERROR");
-    }
   }
   if (json_object_dothas_value(tempJSONObject, "log_controller*start_log.interface"))
   {
+    valid_function = true;
     int32_t interface = (int32_t)json_object_dotget_number(tempJSONObject, "log_controller*start_log.interface");
     ret = log_controller_start_log(interface);
-    if (ret == 0)
-    {
-      json_object_dotset_string(respJSONObject, "log_controller*start_log.interface.response", 0);
-    }
-    else
-    {
-      json_object_dotset_string(respJSONObject, "log_controller.start_log.interface", "PNPL_CMD_ERROR");
-    }
   }
   if (json_object_dothas_value(tempJSONObject, "log_controller*stop_log"))
   {
+    valid_function = true;
     ret = log_controller_stop_log();
-    if (ret == 0)
-    {
-      json_object_dotset_string(respJSONObject, "log_controller*stop_log.response", 0);
-    }
-    else
-    {
-      json_object_dotset_string(respJSONObject, "log_controller.stop_log.response", "PNPL_CMD_ERROR");
-    }
   }
   if (json_object_dothas_value(tempJSONObject, "log_controller*set_time.datetime"))
   {
+    valid_function = true;
     const char *datetime = json_object_dotget_string(tempJSONObject, "log_controller*set_time.datetime");
     ret = log_controller_set_time(datetime);
-    if (ret == 0)
-    {
-      json_object_dotset_string(respJSONObject, "log_controller*set_time.datetime.response", 0);
-    }
-    else
-    {
-      json_object_dotset_string(respJSONObject, "log_controller.set_time.datetime", "PNPL_CMD_ERROR");
-    }
   }
   if (json_object_dothas_value(tempJSONObject, "log_controller*switch_bank"))
   {
+    valid_function = true;
     ret = log_controller_switch_bank();
-    if (ret == 0)
-    {
-      json_object_dotset_string(respJSONObject, "log_controller*switch_bank.response", 0);
-    }
-    else
-    {
-      json_object_dotset_string(respJSONObject, "log_controller.switch_bank.response", "PNPL_CMD_ERROR");
-    }
   }
-  if (json_object_dothas_value(tempJSONObject, "log_controller*set_dfu_mode"))
+  /* Check if received a valid function to modify an existing property */
+  if (valid_function == false)
   {
-    ret = log_controller_set_dfu_mode();
-    if (ret == 0)
-    {
-      json_object_dotset_string(respJSONObject, "log_controller*set_dfu_mode.response", 0);
-    }
-    else
-    {
-      json_object_dotset_string(respJSONObject, "log_controller.set_dfu_mode.response", "PNPL_CMD_ERROR");
-    }
+    char log_message[100];
+    (void) sprintf(log_message, "%s Invalid command", serializedJSON);
+    PnPLCreateLogMessage(response, size, log_message, PNPL_LOG_ERROR);
+    ret = PNPL_BASE_ERROR_CODE;
   }
   json_value_free(tempJSON);
-  if (pretty == 1)
-  {
-    *response = json_serialize_to_string_pretty(respJSON);
-    *size = json_serialization_size_pretty(respJSON);
-  }
-  else
-  {
-    *response = json_serialize_to_string(respJSON);
-    *size = json_serialization_size(respJSON);
-  }
-  json_value_free(respJSON);
   return ret;
 }
 

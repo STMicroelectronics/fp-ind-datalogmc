@@ -103,8 +103,8 @@ extern "C" {
 #define N_MAX_EP 5
 #define FAST_TELEMETRY_APP_MODEL_STREAM_ID    3u
 
-#define FW_VERSION_MAJOR    "1"
-#define FW_VERSION_MINOR    "1"
+#define FW_VERSION_MAJOR    "2"
+#define FW_VERSION_MINOR    "0"
 #define FW_VERSION_PATCH    "0"
 
 typedef struct _StreamParams_t
@@ -177,8 +177,8 @@ typedef struct _StBleStreamObjectModel_t
 typedef struct _StBleStreamModel_t
 {
   /* Component that enable the data stream via BLE */
- int32_t st_ble_stream_id;
- StBleStreamObjectModel_t st_ble_stream_objects[ST_BLE_STREAM_OBJECT_NUM];
+  int32_t st_ble_stream_id;
+  StBleStreamObjectModel_t st_ble_stream_objects[ST_BLE_STREAM_OBJECT_NUM];
 } StBleStreamModel_t;
 
 typedef struct _AppModel_t

@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file    register_interface.h
   * @author  SRA
-  * @brief   
+  * @brief
   ******************************************************************************
   * @attention
   *
@@ -16,7 +16,7 @@
   ******************************************************************************
   */
 
-/* Define to prevent recursive inclusion -------------------------------------*/  
+/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef REGISTER_INTERFACE_H
 #define REGISTER_INTERFACE_H
 
@@ -39,14 +39,14 @@ extern "C" {
    |15|14|13|12|11|10|09|08|07|06|05|04|03|02|01|00|
 
    Type definition :
-   0	Data Segment End
-   1	8-bit data
-   2	16-bit data
-   3	32-bit data
-   4	Character string
-   5	Raw Structure
-   6	Flag
-   7	Data Segment Begin
+   0  Data Segment End
+   1  8-bit data
+   2  16-bit data
+   3  32-bit data
+   4  Character string
+   5  Raw Structure
+   6  Flag
+   7  Data Segment Begin
 */
 
 #define ELT_IDENTIFIER_POS 6
@@ -55,7 +55,7 @@ extern "C" {
 #define MOTOR_MASK 0x7
 #define REG_MASK 0xFFF8
 
-#define MOTOR_ID_ONE	 (0x01)
+#define MOTOR_ID_ONE   (0x01)
 #define MOTOR_ID_GLOBAL  (0x00)
 
 #define TYPE_DATA_8BIT    (1 << TYPE_POS)
@@ -208,8 +208,8 @@ extern "C" {
 #define  MC_REG_MOTOR_POWER              (((109 << ELT_IDENTIFIER_POS) | TYPE_DATA_32BIT) |MOTOR_ID_ONE)
 
 #define  MC_REG_FW_NAME                  (((0U << ELT_IDENTIFIER_POS) | TYPE_DATA_STRING) | MOTOR_ID_GLOBAL)
-#define  MC_REG_CTRL_STAGE_NAME          (((1U << ELT_IDENTIFIER_POS) | TYPE_DATA_STRING) | MOTOR_ID_ONE)
-#define  MC_REG_PWR_STAGE_NAME           (((2U << ELT_IDENTIFIER_POS) | TYPE_DATA_STRING) | MOTOR_ID_GLOBAL)
+#define  MC_REG_CTRL_STAGE_NAME          (((1U << ELT_IDENTIFIER_POS) | TYPE_DATA_STRING) | MOTOR_ID_GLOBAL)
+#define  MC_REG_PWR_STAGE_NAME           (((2U << ELT_IDENTIFIER_POS) | TYPE_DATA_STRING) | MOTOR_ID_ONE)
 #define  MC_REG_MOTOR_NAME               (((3U << ELT_IDENTIFIER_POS) | TYPE_DATA_STRING) | MOTOR_ID_ONE)
 
 #define  MC_REG_GLOBAL_CONFIG            (((0U << ELT_IDENTIFIER_POS) | TYPE_DATA_RAW) | MOTOR_ID_GLOBAL)
@@ -235,10 +235,10 @@ extern "C" {
 #define  MC_REG_GLOBAL_CFG            (((0  << ELT_IDENTIFIER_POS) | TYPE_DATA_RAW ) | MOTOR_ID_ONE)
 #define  MC_REG_MOTOR_CFG             (((1  << ELT_IDENTIFIER_POS) | TYPE_DATA_RAW ) | MOTOR_ID_ONE)
 
-uint8_t RI_SetRegCommandParser (MCP_Handle_t * pHandle);
-uint8_t RI_GetRegCommandParser (MCP_Handle_t * pHandle);
-uint8_t RI_GetPtrReg (uint16_t dataID, void ** dataPtr);
-uint8_t RI_GetIDSize (uint16_t ID);
+uint8_t RI_SetRegCommandParser(MCP_Handle_t *pHandle);
+uint8_t RI_GetRegCommandParser(MCP_Handle_t *pHandle);
+uint8_t RI_GetPtrReg(uint16_t dataID, void **dataPtr);
+uint8_t RI_GetIDSize(uint16_t ID);
 
 #ifdef __cplusplus
 }

@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:imp23absu_mic;5
+  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:imp23absu_mic;6
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -106,12 +106,13 @@ uint8_t Imp23absu_Mic_PnPL_vtblGetStatus(IPnPLComponent_t *_this, char **seriali
   pnpl_imp23absu_mic_odr_t temp_odr_e = (pnpl_imp23absu_mic_odr_t)0;
   imp23absu_mic_get_odr(&temp_odr_e);
   json_object_dotset_number(JSON_Status, "imp23absu_mic.odr", temp_odr_e);
-  int32_t temp_i = 0;
-  imp23absu_mic_get_aop(&temp_i);
-  json_object_dotset_number(JSON_Status, "imp23absu_mic.aop", temp_i);
+  pnpl_imp23absu_mic_aop_t temp_aop_e = (pnpl_imp23absu_mic_aop_t)0;
+  imp23absu_mic_get_aop(&temp_aop_e);
+  json_object_dotset_number(JSON_Status, "imp23absu_mic.aop", temp_aop_e);
   bool temp_b = 0;
   imp23absu_mic_get_enable(&temp_b);
   json_object_dotset_boolean(JSON_Status, "imp23absu_mic.enable", temp_b);
+  int32_t temp_i = 0;
   imp23absu_mic_get_volume(&temp_i);
   json_object_dotset_number(JSON_Status, "imp23absu_mic.volume", temp_i);
   pnpl_imp23absu_mic_resolution_t temp_resolution_e = (pnpl_imp23absu_mic_resolution_t)0;
@@ -172,81 +173,124 @@ uint8_t Imp23absu_Mic_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *serial
   JSON_Object *respJSONObject = json_value_get_object(respJSON);
 
   uint8_t ret = PNPL_NO_ERROR_CODE;
+  bool valid_property = false;
+  char *resp_msg;
   if (json_object_dothas_value(tempJSONObject, "imp23absu_mic.odr"))
   {
     int32_t odr = (int32_t)json_object_dotget_number(tempJSONObject, "imp23absu_mic.odr");
-    ret = imp23absu_mic_set_odr((pnpl_imp23absu_mic_odr_t)odr);
+    valid_property = true;
+    ret = imp23absu_mic_set_odr((pnpl_imp23absu_mic_odr_t)odr, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_number(respJSONObject, "imp23absu_mic.odr.value", odr);
+      json_object_dotset_number(respJSONObject, "PnPL_Response.value", odr);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "imp23absu_mic.odr.value", "PNPL_SET_ERROR");
+      pnpl_imp23absu_mic_odr_t old_odr;
+      imp23absu_mic_get_odr(&old_odr);
+      json_object_dotset_number(respJSONObject, "PnPL_Response.value", old_odr);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   if (json_object_dothas_value(tempJSONObject, "imp23absu_mic.enable"))
   {
     bool enable = json_object_dotget_boolean(tempJSONObject, "imp23absu_mic.enable");
-    ret = imp23absu_mic_set_enable(enable);
+    valid_property = true;
+    ret = imp23absu_mic_set_enable(enable, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_boolean(respJSONObject, "imp23absu_mic.enable.value", enable);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", enable);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "imp23absu_mic.enable.value", "PNPL_SET_ERROR");
+      bool old_enable;
+      imp23absu_mic_get_enable(&old_enable);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", old_enable);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   if (json_object_dothas_value(tempJSONObject, "imp23absu_mic.volume"))
   {
     int32_t volume = (int32_t)json_object_dotget_number(tempJSONObject, "imp23absu_mic.volume");
-    ret = imp23absu_mic_set_volume(volume);
+    valid_property = true;
+    ret = imp23absu_mic_set_volume(volume, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_number(respJSONObject, "imp23absu_mic.volume.value", volume);
+      json_object_dotset_number(respJSONObject, "PnPL_Response.value", volume);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "imp23absu_mic.volume.value", "PNPL_SET_ERROR");
+      int32_t old_volume;
+      imp23absu_mic_get_volume(&old_volume);
+      json_object_dotset_number(respJSONObject, "PnPL_Response.value", old_volume);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   if (json_object_dothas_value(tempJSONObject, "imp23absu_mic.samples_per_ts"))
   {
     int32_t samples_per_ts = (int32_t)json_object_dotget_number(tempJSONObject, "imp23absu_mic.samples_per_ts");
-    ret = imp23absu_mic_set_samples_per_ts(samples_per_ts);
+    valid_property = true;
+    ret = imp23absu_mic_set_samples_per_ts(samples_per_ts, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_number(respJSONObject, "imp23absu_mic.samples_per_ts.value", samples_per_ts);
+      json_object_dotset_number(respJSONObject, "PnPL_Response.value", samples_per_ts);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "imp23absu_mic.samples_per_ts.value", "PNPL_SET_ERROR");
+      int32_t old_samples_per_ts;
+      imp23absu_mic_get_samples_per_ts(&old_samples_per_ts);
+      json_object_dotset_number(respJSONObject, "PnPL_Response.value", old_samples_per_ts);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   if (json_object_dothas_value(tempJSONObject, "imp23absu_mic.sensor_annotation"))
   {
     const char *sensor_annotation = json_object_dotget_string(tempJSONObject, "imp23absu_mic.sensor_annotation");
-    ret = imp23absu_mic_set_sensor_annotation(sensor_annotation);
+    valid_property = true;
+    ret = imp23absu_mic_set_sensor_annotation(sensor_annotation, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_string(respJSONObject, "imp23absu_mic.sensor_annotation.value", sensor_annotation);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.value", sensor_annotation);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "imp23absu_mic.sensor_annotation.value", "PNPL_SET_ERROR");
+      char *old_sensor_annotation;
+      imp23absu_mic_get_sensor_annotation(&old_sensor_annotation);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_sensor_annotation);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   json_value_free(tempJSON);
-  if (pretty == 1)
+  /* Check if received a valid request to modify an existing property */
+  if (valid_property)
   {
-    *response = json_serialize_to_string_pretty(respJSON);
-    *size = json_serialization_size_pretty(respJSON);
+    if (pretty == 1)
+    {
+      *response = json_serialize_to_string_pretty(respJSON);
+      *size = json_serialization_size_pretty(respJSON);
+    }
+    else
+    {
+      *response = json_serialize_to_string(respJSON);
+      *size = json_serialization_size(respJSON);
+    }
   }
   else
   {
-    *response = json_serialize_to_string(respJSON);
-    *size = json_serialization_size(respJSON);
+    /* Set property is not containing a valid property/parameter: PnPL_Error */
+    char *log_message = "Invalid property for imp23absu_mic";
+    PnPLCreateLogMessage(response, size, log_message, PNPL_LOG_ERROR);
+    ret = PNPL_BASE_ERROR_CODE;
   }
   json_value_free(respJSON);
   return ret;

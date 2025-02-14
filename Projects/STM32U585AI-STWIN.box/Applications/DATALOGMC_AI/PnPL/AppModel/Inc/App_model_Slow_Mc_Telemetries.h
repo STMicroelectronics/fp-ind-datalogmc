@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:dtmi:vespucci:steval_stwinbx1:fpIndDatalogMC_datalog2MC:actuators:slow_mc_telemetries;2
+  * dtmi:dtmi:vespucci:steval_stwinbx1:FP_IND_DATALOGMC_DatalogMC:actuators:slow_mc_telemetries;3
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -70,40 +70,44 @@ uint8_t slow_mc_telemetries_get_sd_dps(int32_t *value);
 uint8_t slow_mc_telemetries_get_enable(bool *value);
 uint8_t slow_mc_telemetries_get_data_type(char **value);
 uint8_t slow_mc_telemetries_get_st_ble_stream__id(int32_t *value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__temperature__enable(bool *value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__temperature__unit(char **value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__temperature__format(char **value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__ref_speed__enable(bool *value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__ref_speed__unit(char **value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__ref_speed__format(char **value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__speed__enable(bool *value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__speed__unit(char **value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__speed__format(char **value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__bus_voltage__enable(bool *value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__bus_voltage__unit(char **value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__bus_voltage__format(char **value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__fault__enable(bool *value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__fault__unit(char **value);
-uint8_t slow_mc_telemetries_get_st_ble_stream__fault__format(char **value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__temperature_enable(bool *value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__temperature_unit(char **value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__temperature_format(char **value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__ref_speed_enable(bool *value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__ref_speed_unit(char **value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__ref_speed_format(char **value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__speed_enable(bool *value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__speed_unit(char **value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__speed_format(char **value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__speed_max(int32_t *value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__speed_initial_value(int32_t *value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__bus_voltage_enable(bool *value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__bus_voltage_unit(char **value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__bus_voltage_format(char **value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__fault_enable(bool *value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__fault_unit(char **value);
+uint8_t slow_mc_telemetries_get_st_ble_stream__fault_format(char **value);
 uint8_t slow_mc_telemetries_get_stream_id(int8_t *value);
 uint8_t slow_mc_telemetries_get_ep_id(int8_t *value);
-uint8_t slow_mc_telemetries_set_enable(bool value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__id(int32_t value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__temperature__enable(bool value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__temperature__unit(const char *value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__temperature__format(const char *value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__ref_speed__enable(bool value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__ref_speed__unit(const char *value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__ref_speed__format(const char *value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__speed__enable(bool value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__speed__unit(const char *value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__speed__format(const char *value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__bus_voltage__enable(bool value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__bus_voltage__unit(const char *value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__bus_voltage__format(const char *value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__fault__enable(bool value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__fault__unit(const char *value);
-uint8_t slow_mc_telemetries_set_st_ble_stream__fault__format(const char *value);
+uint8_t slow_mc_telemetries_set_enable(bool value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__id(int32_t value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__temperature_enable(bool value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__temperature_unit(const char *value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__temperature_format(const char *value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__ref_speed_enable(bool value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__ref_speed_unit(const char *value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__ref_speed_format(const char *value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__speed_enable(bool value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__speed_unit(const char *value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__speed_format(const char *value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__speed_max(int32_t value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__speed_initial_value(int32_t value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__bus_voltage_enable(bool value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__bus_voltage_unit(const char *value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__bus_voltage_format(const char *value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__fault_enable(bool value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__fault_unit(const char *value, char **response_message);
+uint8_t slow_mc_telemetries_set_st_ble_stream__fault_format(const char *value, char **response_message);
 
 
 #ifdef __cplusplus

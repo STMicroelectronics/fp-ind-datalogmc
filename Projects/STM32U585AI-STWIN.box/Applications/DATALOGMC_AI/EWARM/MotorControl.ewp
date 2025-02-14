@@ -710,7 +710,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>160</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -2752,9 +2752,6 @@
                         <name>$PROJ_DIR$\..\Core\Inc\mc_tasks.h</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\Core\Inc\mcp_config.h</name>
-                    </file>
-                    <file>
                         <name>$PROJ_DIR$\..\Core\Inc\MCPTask.h</name>
                     </file>
                     <file>
@@ -2768,6 +2765,9 @@
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\Core\Inc\SensorManager_conf.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Core\Inc\stateMachine.h</name>
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\Core\Inc\stm32u5xx_hal_conf.h</name>
@@ -2869,6 +2869,9 @@
                         <name>$PROJ_DIR$\..\Core\Src\OTA.c</name>
                     </file>
                     <file>
+                        <name>$PROJ_DIR$\..\Core\Src\stateMachine.c</name>
+                    </file>
+                    <file>
                         <name>$PROJ_DIR$\..\Core\Src\stm32u5xx_hal_timebase_tim.c</name>
                     </file>
                     <file>
@@ -2937,6 +2940,9 @@
                 </group>
                 <group>
                     <name>Inc</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\mcp\Inc\mc_configuration_registers.h</name>
+                    </file>
                     <file>
                         <name>$PROJ_DIR$\..\mcp\Inc\mcp.h</name>
                     </file>
@@ -5241,6 +5247,12 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\..\Middlewares\ST\usbx\common\core\src\ux_utility_memory_allocate_mulv_safe.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\..\Middlewares\ST\usbx\common\core\src\ux_utility_memory_byte_pool_create.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\..\Middlewares\ST\usbx\common\core\src\ux_utility_memory_byte_pool_search.c</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\..\Middlewares\ST\usbx\common\core\src\ux_utility_memory_compare.c</name>

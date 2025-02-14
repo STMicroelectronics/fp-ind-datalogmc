@@ -22,7 +22,7 @@
   * This file has been auto generated from the following DTDL Component:
   * dtmi:vespucci:other:firmware_info;3
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -146,29 +146,48 @@ uint8_t Firmware_Info_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *serial
   JSON_Object *respJSONObject = json_value_get_object(respJSON);
 
   uint8_t ret = PNPL_NO_ERROR_CODE;
+  bool valid_property = false;
+  char *resp_msg;
   if (json_object_dothas_value(tempJSONObject, "firmware_info.alias"))
   {
     const char *alias = json_object_dotget_string(tempJSONObject, "firmware_info.alias");
-    ret = firmware_info_set_alias(alias);
+    valid_property = true;
+    ret = firmware_info_set_alias(alias, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_string(respJSONObject, "firmware_info.alias.value", alias);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.value", alias);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "firmware_info.alias.value", "PNPL_SET_ERROR");
+      char *old_alias;
+      firmware_info_get_alias(&old_alias);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_alias);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   json_value_free(tempJSON);
-  if (pretty == 1)
+  /* Check if received a valid request to modify an existing property */
+  if (valid_property)
   {
-    *response = json_serialize_to_string_pretty(respJSON);
-    *size = json_serialization_size_pretty(respJSON);
+    if (pretty == 1)
+    {
+      *response = json_serialize_to_string_pretty(respJSON);
+      *size = json_serialization_size_pretty(respJSON);
+    }
+    else
+    {
+      *response = json_serialize_to_string(respJSON);
+      *size = json_serialization_size(respJSON);
+    }
   }
   else
   {
-    *response = json_serialize_to_string(respJSON);
-    *size = json_serialization_size(respJSON);
+    /* Set property is not containing a valid property/parameter: PnPL_Error */
+    char *log_message = "Invalid property for firmware_info";
+    PnPLCreateLogMessage(response, size, log_message, PNPL_LOG_ERROR);
+    ret = PNPL_BASE_ERROR_CODE;
   }
   json_value_free(respJSON);
   return ret;

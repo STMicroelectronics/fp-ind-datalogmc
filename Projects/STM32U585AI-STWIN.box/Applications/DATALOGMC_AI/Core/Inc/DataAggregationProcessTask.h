@@ -1,25 +1,25 @@
 /**
- ********************************************************************************
- * @file    DataAggregationProcessTask.h
- * @author  STMicroelectronics - AIS - MCD Team
- * @version 1.0.0
- * @date    2023-07-06
- *
- * @brief
- *
- * <ADD_FILE_DESCRIPTION>
- *
- ********************************************************************************
- * @attention
- *
- * Copyright (c) 2023 STMicroelectronics
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file in
- * the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- ********************************************************************************
- */
+  ********************************************************************************
+  * @file    DataAggregationProcessTask.h
+  * @author  STMicroelectronics - AIS - MCD Team
+  * @version 1.0.0
+  * @date    2023-07-06
+  *
+  * @brief
+  *
+  * <ADD_FILE_DESCRIPTION>
+  *
+  ********************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2023 STMicroelectronics
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file in
+  * the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  ********************************************************************************
+  */
 
 #ifndef ELOOM_AMANAGED_TASK_EX_DATAAGGREGATIONPROCESSTASK_H_
 #define ELOOM_AMANAGED_TASK_EX_DATAAGGREGATIONPROCESSTASK_H_
@@ -53,8 +53,8 @@ extern "C" {
 /*#define SYS_DATAAGGREGATIONPROCESSTASK_UNKNOWN_ERROR_CODE  SYS_DATAAGGREGATIONPROCESSTASK_BASE_ERROR_CODEE + 1*/
 
 /**
- *  DataSource_t internal structure.
- */
+  *  DataSource_t internal structure.
+  */
 typedef struct _DataSource
 {
   /* pointer to data buffer */
@@ -64,24 +64,25 @@ typedef struct _DataSource
   uint32_t len;
 
   /* Data buffer byte index.
-   * Used as position during data copy 
+   * Used as position during data copy
    */
   uint32_t data_idx;
-}DataSource_t;
+} DataSource_t;
 
 
 /**
- * Create  type name for _DataAggregationProcessTask.
- */
+  * Create  type name for _DataAggregationProcessTask.
+  */
 typedef struct _DataAggregationProcessTask DataAggregationProcessTask_t;
 
 /**
- *  DataAggregationProcessTask_t internal structure.
- */
-struct _DataAggregationProcessTask {
+  *  DataAggregationProcessTask_t internal structure.
+  */
+struct _DataAggregationProcessTask
+{
   /**
-   * Base class object.
-   */
+    * Base class object.
+    */
   AManagedTaskEx super;
 
   /* Incoming message queue */
@@ -96,28 +97,28 @@ struct _DataAggregationProcessTask {
   bool DPUprocessOnDoing;
 
   /**
-   * Digital processing Unit specialized for Neai nCC classification algorithm.
-   */
+    * Digital processing Unit specialized for Neai nCC classification algorithm.
+    */
   IDPU2_t *p_AImotorCtrlDPU;
 
   /**
-   * pointer to Neai DPU input buffer
-   */
+    * pointer to Neai DPU input buffer
+    */
   void *p_neai_dpu_in_buff;
 
   /**
-   * pointer to Neai DPU output buffer
-   */
+    * pointer to Neai DPU output buffer
+    */
   void *p_neai_dpu_out_buff;
 
   /**
-   * Data builder object to connect the DPU to teh sensor.
-   */
+    * Data builder object to connect the DPU to the sensor.
+    */
   DefDataBuilder_t neai_data_builder;
 
   /**
-   * EMData aggregated data
-   */
+    * EMData aggregated data
+    */
   EMData_t aggregated_EMData;
 
 
@@ -153,11 +154,11 @@ struct _DataAggregationProcessTask {
 /**************************/
 
 /**
- * Allocate an instance of DataAggregationProcessTask_t in the framework heap.
- *
- * @return a pointer to the generic object ::AManagedTaskEx if success,
- *         or NULL if out of memory error occurs.
- */
+  * Allocate an instance of DataAggregationProcessTask_t in the framework heap.
+  *
+  * @return a pointer to the generic object ::AManagedTaskEx if success,
+  *         or NULL if out of memory error occurs.
+  */
 AManagedTaskEx *DataAggregationProcessTask_Alloc();
 
 IEventListener *DataAggregationProcessTask_GetSensorEventListenerIF(DataAggregationProcessTask_t *_this);

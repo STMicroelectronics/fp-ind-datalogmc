@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file    mcp.h
   * @author  SRA
-  * @brief   
+  * @brief
   ******************************************************************************
   * @attention
   *
@@ -16,7 +16,7 @@
   ******************************************************************************
   */
 
-/* Define to prevent recursive inclusion -------------------------------------*/  
+/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef motor_control_protocol
 #define motor_control_protocol
 
@@ -35,7 +35,7 @@ typedef struct _MCP_Handle_t MCP_Handle_t;
 /* Exported variables --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-/* Action suppoted by the Motor control protocol*/
+/* Action supported by the Motor control protocol*/
 #define MOTOR_MASK     0x7
 #define CMD_MASK       0xFFF8
 
@@ -81,12 +81,13 @@ typedef struct _MCP_Handle_t MCP_Handle_t;
 #define EVENT_DISCONNECTED 3
 #define EVENT_ASYNC        4
 
-typedef void (* MCP_DeliverPacket ) (uint8_t CallbackID, uint8_t MCPResponse, uint8_t * rxData, uint16_t * rxLength);
-typedef void (* MCP_Connected ) (bool Connected);
-typedef void (* MCP_DeliverAsync) (uint8_t * rxAsync, uint32_t rxLength);
+typedef void (* MCP_DeliverPacket)(uint8_t CallbackID, uint8_t MCPResponse, uint8_t *rxData, uint16_t *rxLength);
+typedef void (* MCP_Connected)(bool Connected);
+typedef void (* MCP_DeliverAsync)(uint8_t *rxAsync, uint32_t rxLength);
 
 
-typedef enum {
+typedef enum
+{
   SetRampCmd = SET_DATA_ELEMENT,
   StartMotorCmd = START_MOTOR,
   StopMotorCmd = STOP_MOTOR,
@@ -97,11 +98,9 @@ typedef enum {
 /* Public Function declaration */
 
 void MCP_Init(MCP_Handle_t **pHandle);
-void MCP_EventProcess(MCP_Handle_t *pSupHandle);
-void MCP_ReceivedPacket(MCP_Handle_t * pHandle);
 void MCP_ReceiveAndEventProcess(MCP_Handle_t *pSupHandle);
-bool MCP_GetRegister(MCP_Handle_t *pSupHandle, uint16_t NumberReg, uint16_t * RegID);
-bool MCP_SetRegister(MCP_Handle_t *pSupHandle, uint16_t NumberReg, uint16_t * RegID, uint8_t * RegValue);
+bool MCP_GetRegister(MCP_Handle_t *pSupHandle, uint16_t NumberReg, uint16_t *RegID);
+bool MCP_SetRegister(MCP_Handle_t *pSupHandle, uint16_t NumberReg, uint16_t *RegID, uint8_t *RegValue);
 bool MCP_StopMotorRequest(MCP_Handle_t *pSupHandle);
 bool MCP_SendAckFault(MCP_Handle_t *pSupHandle);
 bool MCP_StartMotorRequest(MCP_Handle_t *pSupHandle);
@@ -109,12 +108,12 @@ void MCP_DisconnectionRequest(MCP_Handle_t *pSupHandle);
 void MCP_ConnectionRequest(void);
 bool MCP_ResetMotor(MCP_Handle_t *pSupHandle);
 
-void MCP_SetAsyncs(MCP_Handle_t *p_MCP_Handle, uint16_t * RegisterID, uint8_t * RegisterValBuff, uint8_t HFNum);
-void MCP_DisableAsyncs(MCP_Handle_t *p_MCP_Handle, uint8_t * RegisterValBuff);
+void MCP_SetAsyncs(MCP_Handle_t *p_MCP_Handle, uint16_t *RegisterID, uint8_t *RegisterValBuff, uint8_t HFNum);
+void MCP_DisableAsyncs(MCP_Handle_t *p_MCP_Handle, uint8_t *RegisterValBuff);
 
 /**
- * Added API to register application layer callback
- */
+  * Added API to register application layer callback
+  */
 bool MCP_RegisterTransportLayer(MCP_Handle_t *pHandle, void *p_transport_layer);
 void MCP_RegisterDeliveredSyncPacketCb(MCP_Handle_t *pHandle, MCP_DeliverPacket mcp_delivered_sync_packet_cb);
 void MCP_RegisterConnectCompletedCb(MCP_Handle_t *pHandle, MCP_Connected mcp_connect_completed_cb);

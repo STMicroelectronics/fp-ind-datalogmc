@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:iis3dwb_acc;4
+  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:iis3dwb_acc;5
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -49,19 +49,28 @@ uint8_t iis3dwb_acc_comp_init(void)
   SQInit(&querySM, SMGetSensorManager());
   uint16_t id = SQNextByNameAndType(&querySM, "iis3dwb", COM_TYPE_ACC);
   iis3dwb_acc_model.id = id;
+
   iis3dwb_acc_model.sensor_status = SMSensorGetStatusPointer(id);
   iis3dwb_acc_model.stream_params.stream_id = -1;
   iis3dwb_acc_model.stream_params.usb_ep = -1;
 
   addSensorToAppModel(id, &iis3dwb_acc_model);
 
-  iis3dwb_acc_set_sensor_annotation("\0");
+  iis3dwb_acc_set_sensor_annotation("\0", NULL);
+  iis3dwb_acc_set_fs(pnpl_iis3dwb_acc_fs_g16, NULL);
 #if (HSD_USE_DUMMY_DATA == 1)
-  iis3dwb_acc_set_samples_per_ts(0);
+  iis3dwb_acc_set_samples_per_ts(0, NULL);
 #else
-  iis3dwb_acc_set_samples_per_ts(1000);
+  iis3dwb_acc_set_samples_per_ts(1000, NULL);
 #endif
+
+  int32_t value = 0;
+  iis3dwb_acc_get_dim(&value);
+  float sensitivity = 0.0f;
+  iis3dwb_acc_get_sensitivity(&sensitivity);
+
   __stream_control(true);
+
   /* USER Component initialization code */
   return PNPL_NO_ERROR_CODE;
 }
@@ -75,13 +84,13 @@ char *iis3dwb_acc_get_key(void)
 uint8_t iis3dwb_acc_get_odr(pnpl_iis3dwb_acc_odr_t *enum_id)
 {
   float odr = iis3dwb_acc_model.sensor_status->type.mems.odr;
-  if(odr > 26666.0f && odr < 26668.0f)
+  if (odr > 26666.0f && odr < 26668.0f)
   {
-	  *enum_id = pnpl_iis3dwb_acc_odr_hz26667;
+    *enum_id = pnpl_iis3dwb_acc_odr_hz26667;
   }
   else
   {
-	  return 1;
+    return 1;
   }
   return PNPL_NO_ERROR_CODE;
 }
@@ -91,23 +100,19 @@ uint8_t iis3dwb_acc_get_fs(pnpl_iis3dwb_acc_fs_t *enum_id)
   float fs = iis3dwb_acc_model.sensor_status->type.mems.fs;
   if (fs < 3.0f)
   {
-	*enum_id = pnpl_iis3dwb_acc_fs_g2;
+    *enum_id = pnpl_iis3dwb_acc_fs_g2;
   }
   else if (fs < 5.0f)
   {
-	*enum_id = pnpl_iis3dwb_acc_fs_g4;
+    *enum_id = pnpl_iis3dwb_acc_fs_g4;
   }
   else if (fs < 9.0f)
   {
-	*enum_id = pnpl_iis3dwb_acc_fs_g8;
-  }
-  else if (fs < 15.0f)
-  {
-	*enum_id = pnpl_iis3dwb_acc_fs_g16;
+    *enum_id = pnpl_iis3dwb_acc_fs_g8;
   }
   else
   {
-	  return 1;
+    *enum_id = pnpl_iis3dwb_acc_fs_g16;
   }
   return PNPL_NO_ERROR_CODE;
 }
@@ -142,6 +147,7 @@ uint8_t iis3dwb_acc_get_ioffset(float *value)
 uint8_t iis3dwb_acc_get_measodr(float *value)
 {
   *value = iis3dwb_acc_model.sensor_status->type.mems.measured_odr;
+  /* USER Code */
   return PNPL_NO_ERROR_CODE;
 }
 
@@ -162,6 +168,7 @@ uint8_t iis3dwb_acc_get_sd_dps(int32_t *value)
 uint8_t iis3dwb_acc_get_sensitivity(float *value)
 {
   *value = iis3dwb_acc_model.sensor_status->type.mems.sensitivity;
+  /* USER Code */
   return PNPL_NO_ERROR_CODE;
 }
 
@@ -199,37 +206,54 @@ uint8_t iis3dwb_acc_get_ep_id(int8_t *value)
 }
 
 
-uint8_t iis3dwb_acc_set_fs(pnpl_iis3dwb_acc_fs_t enum_id)
+uint8_t iis3dwb_acc_set_fs(pnpl_iis3dwb_acc_fs_t enum_id, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
+  uint8_t ret = PNPL_NO_ERROR_CODE;
   float value;
   switch (enum_id)
   {
-	case pnpl_iis3dwb_acc_fs_g2:
-		value = 2.0f;
-		break;
-	case pnpl_iis3dwb_acc_fs_g4:
-		value = 4.0f;
-		break;
-	case pnpl_iis3dwb_acc_fs_g8:
-		value = 8.0f;
-		break;
-	case pnpl_iis3dwb_acc_fs_g16:
-		value = 16.0f;
-		break;
-	default:
-		return 1;
+    case pnpl_iis3dwb_acc_fs_g2:
+      value = 2.0f;
+      break;
+    case pnpl_iis3dwb_acc_fs_g4:
+      value = 4.0f;
+      break;
+    case pnpl_iis3dwb_acc_fs_g8:
+      value = 8.0f;
+      break;
+    case pnpl_iis3dwb_acc_fs_g16:
+      value = 16.0f;
+      break;
+    default:
+      if (response_message != NULL)
+      {
+        *response_message = "Error: Failed to set FS";
+      }
+      return PNPL_BASE_ERROR_CODE;
   }
-  sys_error_code_t ret = SMSensorSetFS(iis3dwb_acc_model.id, value);
+  ret = SMSensorSetFS(iis3dwb_acc_model.id, value);
   if (ret == SYS_NO_ERROR_CODE)
   {
     /* USER Code */
   }
+
+  float sensitivity = 0.0f;
+  iis3dwb_acc_get_sensitivity(&sensitivity);
+
   return ret;
 }
 
-uint8_t iis3dwb_acc_set_enable(bool value)
+uint8_t iis3dwb_acc_set_enable(bool value, char **response_message)
 {
-  sys_error_code_t ret = 1;
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
+  uint8_t ret = PNPL_NO_ERROR_CODE;
   if (value)
   {
     ret = SMSensorEnable(iis3dwb_acc_model.id);
@@ -243,33 +267,59 @@ uint8_t iis3dwb_acc_set_enable(bool value)
     /* USER Code */
     __stream_control(true);
   }
+  else
+  {
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Failed to enable the sensor";
+    }
+  }
   return ret;
 }
 
-uint8_t iis3dwb_acc_set_samples_per_ts(int32_t value)
+uint8_t iis3dwb_acc_set_samples_per_ts(int32_t value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
+  uint8_t ret = PNPL_NO_ERROR_CODE;
   int32_t min_v = 0;
   int32_t max_v = 1000;
   if (value >= min_v && value <= max_v)
   {
-	iis3dwb_acc_model.stream_params.spts = value;
+    iis3dwb_acc_model.stream_params.spts = value;
   }
   else if (value > max_v)
   {
-	  iis3dwb_acc_model.stream_params.spts = max_v;
+    iis3dwb_acc_model.stream_params.spts = max_v;
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Value setting above maximum threshold (1000)";
+    }
   }
   else
   {
-	  iis3dwb_acc_model.stream_params.spts = min_v;
+    iis3dwb_acc_model.stream_params.spts = min_v;
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Value setting below minimum threshold (0)";
+    }
   }
-  return PNPL_NO_ERROR_CODE;
+  return ret;
 }
 
-uint8_t iis3dwb_acc_set_sensor_annotation(const char *value)
+uint8_t iis3dwb_acc_set_sensor_annotation(const char *value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
+  uint8_t ret = PNPL_NO_ERROR_CODE;
   strcpy(iis3dwb_acc_model.annotation, value);
-  return PNPL_NO_ERROR_CODE;
+  return ret;
 }
+
 
 
 

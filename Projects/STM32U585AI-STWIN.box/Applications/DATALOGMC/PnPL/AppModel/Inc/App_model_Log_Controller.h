@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:other:log_controller;2
+  * dtmi:vespucci:other:log_controller;3
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -62,20 +62,22 @@ extern "C" {
 
 /* USER includes -------------------------------------------------------------*/
 
-  typedef struct _LogControllerModel_t
-  {
-    char *comp_name;
-    /* LogController Component Model USER code */
-    bool status;
-    bool sd_mounted;
-    int8_t interface;
-  } LogControllerModel_t;;
+typedef struct _LogControllerModel_t
+{
+  char *comp_name;
+  /* LogController Component Model USER code */
+  bool status;
+  bool sd_mounted;
+  bool sd_failed;
+  int8_t interface;
+} LogControllerModel_t;
 
 /* Log Controller PnPL Component ---------------------------------------------- */
 uint8_t log_controller_comp_init(void);
 char *log_controller_get_key(void);
 uint8_t log_controller_get_log_status(bool *value);
 uint8_t log_controller_get_sd_mounted(bool *value);
+uint8_t log_controller_get_sd_failed(bool *value);
 uint8_t log_controller_get_controller_type(int32_t *value);
 uint8_t log_controller_save_config(void);
 uint8_t log_controller_start_log(int32_t interface);
@@ -83,6 +85,7 @@ uint8_t log_controller_stop_log(void);
 uint8_t log_controller_set_time(const char *datetime);
 uint8_t log_controller_switch_bank(void);
 uint8_t log_controller_set_dfu_mode(void);
+uint8_t log_controller_enable_all(bool status);
 
 
 #ifdef __cplusplus

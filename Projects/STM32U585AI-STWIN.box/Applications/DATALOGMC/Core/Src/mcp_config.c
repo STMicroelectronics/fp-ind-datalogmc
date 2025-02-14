@@ -97,7 +97,6 @@
 //};
 
 
-
 //MCP_Handle_t MCP_Over_UartB =
 //{
 //  .pTransportLayer = (MCTL_Handle_t *) &aspepOverUartB,
@@ -105,7 +104,6 @@
 //  .fConnected = &APPLI_Connected_cb,
 //  .fDeliverAsync = &APPLI_Async_cb,
 //};
-
 
 
 //MCPA_Handle_t MCPA_UART_B =

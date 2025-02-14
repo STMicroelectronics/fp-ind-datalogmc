@@ -12,7 +12,7 @@
   * This software is licensed under terms that can be found in the LICENSE file in
   * the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  *                             
+  *
   *
   ******************************************************************************
   */
@@ -60,7 +60,8 @@ sys_error_code_t DatalogAppTask_ActuatorListenerOnNewDataReady_vtbl(IEventListen
 sys_error_code_t DatalogAppTask_AIClassifierListenerOnStatusChange_vtbl(IListener *_this);
 void DatalogAppTask_AIClassifierListenerSetOwner_vtbl(IEventListener *_this, void *p_owner);
 void *DatalogAppTask_AIClassifierListenerGetOwner_vtbl(IEventListener *_this);
-sys_error_code_t DatalogAppTask_AIClassifierListenerOnNewDataReady_vtbl(IEventListener *_this, const DataEvent_t *p_evt);
+sys_error_code_t DatalogAppTask_AIClassifierListenerOnNewDataReady_vtbl(IEventListener *_this,
+                                                                        const DataEvent_t *p_evt);
 
 // ICommandParse_t virtual functions
 sys_error_code_t DatalogAppTask_vtblICommandParse_t_parse_cmd(ICommandParse_t *_this, char *commandString,
@@ -68,7 +69,8 @@ sys_error_code_t DatalogAppTask_vtblICommandParse_t_parse_cmd(ICommandParse_t *_
 sys_error_code_t DatalogAppTask_vtblICommandParse_t_serialize_response(ICommandParse_t *_this, char **response_name,
                                                                        char **buff, uint32_t *size,
                                                                        uint8_t pretty);
-sys_error_code_t DatalogAppTask_vtblICommandParse_t_send_ctrl_msg(ICommandParse_t *_this,  uint32_t *msg, uint32_t length);
+sys_error_code_t DatalogAppTask_vtblICommandParse_t_send_ctrl_msg(ICommandParse_t *_this,  uint32_t *msg,
+                                                                  uint32_t length);
 
 
 // IMLCController_t virtual functions

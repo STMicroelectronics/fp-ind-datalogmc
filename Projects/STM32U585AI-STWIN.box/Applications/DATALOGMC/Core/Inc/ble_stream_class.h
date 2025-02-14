@@ -12,11 +12,11 @@
   * This software is licensed under terms that can be found in the LICENSE file in
   * the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  *                             
+  *
   *
   ******************************************************************************
   */
-  
+
 #ifndef BLE_STREAM_CLASS_H_
 #define BLE_STREAM_CLASS_H_
 
@@ -58,8 +58,8 @@ struct _ble_stream_class_t
   IStream_t super;
 
   /**
-   * Identification for this specific communication interface
-   */
+    * Identification for this specific communication interface
+    */
   uint8_t comm_interface_id;
 
   ICommandParse_t *cmd_parser;
@@ -122,8 +122,9 @@ extern ble_stream_SendCommand_t ble_stream_SendCommandCallback;
   * or SYS_OUT_OF_MEMORY_ERROR_CODE otherwise.
   */
 IStream_t *ble_stream_class_alloc(void);
-int8_t datalog_class_control(void *_this, uint8_t isHostToDevice, uint8_t cmd, uint16_t wValue, uint16_t wIndex, uint8_t *pbuf, uint16_t length);
-sys_error_code_t ble_stream_msg(streamMsg_t* msg);
+int8_t datalog_class_control(void *_this, uint8_t isHostToDevice, uint8_t cmd, uint16_t wValue, uint16_t wIndex,
+                             uint8_t *pbuf, uint16_t length);
+sys_error_code_t ble_stream_msg(streamMsg_t *msg);
 sys_error_code_t ble_sendMSG_wait(void);
 void WriteRequestCommandLikeFunction(uint8_t *received_msg, uint8_t msg_length);
 

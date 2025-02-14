@@ -168,12 +168,12 @@ extern DCACHE_HandleTypeDef hdcache1;
 
 /* Define how to notify about Read completion operation */
 #define FX_STM32_SD_READ_CPLT_NOTIFY(__media_ptr__)         do {                                                                                             \
-																extern TX_SEMAPHORE transfer_semaphore;                                                     \
-																if(tx_semaphore_get(&transfer_semaphore, FX_STM32_SD_DEFAULT_TIMEOUT) != TX_SUCCESS)                    \
-																{                                                                                           \
-																	return FX_IO_ERROR;                                                                 \
-																}                                                                                           \
-      	  	  	  	  	  	  	  	  	  	  	  	  	  	  } while(0)
+                                                                                                extern TX_SEMAPHORE transfer_semaphore;                                                     \
+                                                                                                if(tx_semaphore_get(&transfer_semaphore, FX_STM32_SD_DEFAULT_TIMEOUT) != TX_SUCCESS)                    \
+                                                                                                {                                                                                           \
+                                                                                                     return FX_IO_ERROR;                                                                 \
+                                                                                                }                                                                                           \
+                                                                                                                      } while(0)
 
 /* USER CODE END FX_STM32_SD_READ_CPLT_NOTIFY */
 
@@ -181,12 +181,12 @@ extern DCACHE_HandleTypeDef hdcache1;
 
 /* Define how to notify about write completion operation */
 #define FX_STM32_SD_WRITE_CPLT_NOTIFY(__media_ptr__)         do {                                                                                             \
-        														extern TX_SEMAPHORE transfer_semaphore;                                                     \
-        														if(tx_semaphore_get(&transfer_semaphore, FX_STM32_SD_DEFAULT_TIMEOUT) != TX_SUCCESS)                    \
-																{                                                                                           \
-        															return FX_IO_ERROR;                                                                 \
-																}                                                                                           \
-														  	  } while(0)
+                                                                                              extern TX_SEMAPHORE transfer_semaphore;                                                     \
+                                                                                              if(tx_semaphore_get(&transfer_semaphore, FX_STM32_SD_DEFAULT_TIMEOUT) != TX_SUCCESS)                    \
+                                                                                                  {                                                                                           \
+                                                                                                 return FX_IO_ERROR;                                                                 \
+                                                                                                  }                                                                                           \
+                                                                                                 } while(0)
 
 /* USER CODE END FX_STM32_SD_WRITE_CPLT_NOTIFY */
 

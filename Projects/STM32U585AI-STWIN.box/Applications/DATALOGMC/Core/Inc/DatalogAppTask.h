@@ -12,7 +12,7 @@
   * This software is licensed under terms that can be found in the LICENSE file in
   * the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  *                             
+  *
   *
   ******************************************************************************
   */
@@ -80,6 +80,7 @@ uint8_t DatalogAppTask_switch_bank(void);
 uint8_t DatalogAppTask_set_time(const char *datetime);
 uint8_t DatalogAppTask_set_dfu_mode(void);
 
+void DatalogApp_Task_command_response(char *response_msg, uint32_t size);
 
 // Inline functions definition
 // ***************************

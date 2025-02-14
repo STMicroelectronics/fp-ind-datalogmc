@@ -56,7 +56,11 @@
 #define IIS2DH_TASK_CFG_MAX_INSTANCES_COUNT      1
 #endif
 
-#define SYS_DEBUGF(level, message)                SYS_DEBUGF3(SYS_DBG_IIS2DH, level, message)
+#define SYS_DEBUGF(level, message)               SYS_DEBUGF3(SYS_DBG_IIS2DH, level, message)
+
+#ifndef IIS2DH_TASK_CFG_I2C_ADDRESS
+#define IIS2DH_TASK_CFG_I2C_ADDRESS              IIS2DH_I2C_ADD_H
+#endif
 
 #ifndef HSD_USE_DUMMY_DATA
 #define HSD_USE_DUMMY_DATA 0
@@ -416,7 +420,7 @@ sys_error_code_t IIS2DHTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_funct
   }
   else
   {
-    p_obj->p_sensor_bus_if = I2CBusIFAlloc(IIS2DH_ID, IIS2DH_I2C_ADD_H, 0);
+    p_obj->p_sensor_bus_if = I2CBusIFAlloc(IIS2DH_ID, IIS2DH_TASK_CFG_I2C_ADDRESS, 0);
     if (p_obj->p_sensor_bus_if == NULL)
     {
       res = SYS_TASK_HEAP_OUT_OF_MEMORY_ERROR_CODE;
@@ -740,7 +744,7 @@ sys_error_code_t IIS2DHTask_vtblSensorSetODR(ISensorMems_t *_this, float odr)
   }
   else
   {
-    if (odr > 1.0f)
+    if (odr > 0.0f)
     {
       /* ODR = 0 sends only message to switch off the sensor.
        * Do not update the model in case of odr = 0 */
@@ -1355,7 +1359,7 @@ static sys_error_code_t IIS2DHTaskSensorReadData(IIS2DHTask *_this)
 
   if (_this->fifo_level >= samples_per_it)
   {
-    iis2dh_read_reg(p_sensor_drv, IIS2DH_OUT_X_L, (uint8_t *) _this->p_sensor_data_buff,
+     res = iis2dh_read_reg(p_sensor_drv, IIS2DH_OUT_X_L, (uint8_t *) _this->p_sensor_data_buff,
                     ((uint16_t) samples_per_it * 6u));
   }
   else
@@ -1364,22 +1368,25 @@ static sys_error_code_t IIS2DHTaskSensorReadData(IIS2DHTask *_this)
   }
 
 #else
-  iis2dh_read_reg(p_sensor_drv, IIS2DH_OUT_X_L, (uint8_t *) _this->p_sensor_data_buff, samples_per_it * 6);
+  res = iis2dh_read_reg(p_sensor_drv, IIS2DH_OUT_X_L, (uint8_t *) _this->p_sensor_data_buff, samples_per_it * 6);
   _this->fifo_level = 1;
 #endif /* IIS2DH_FIFO_ENABLED */
 
-#if (HSD_USE_DUMMY_DATA == 1)
-  uint16_t i = 0;
-  int16_t *p16 = (int16_t *)_this->p_sensor_data_buff;
-
-  if (_this->fifo_level >= samples_per_it)
+  if (!SYS_IS_ERROR_CODE(res))
   {
-    for (i = 0; i < samples_per_it * 3 ; i++)
+#if (HSD_USE_DUMMY_DATA == 1)
+    uint16_t i = 0;
+    int16_t *p16 = (int16_t *)_this->p_sensor_data_buff;
+
+    if (_this->fifo_level >= samples_per_it)
     {
-      *p16++ = dummyDataCounter++;
+      for (i = 0; i < samples_per_it * 3 ; i++)
+      {
+        *p16++ = dummyDataCounter++;
+      }
     }
-  }
 #endif
+  }
 
   return res;
 }

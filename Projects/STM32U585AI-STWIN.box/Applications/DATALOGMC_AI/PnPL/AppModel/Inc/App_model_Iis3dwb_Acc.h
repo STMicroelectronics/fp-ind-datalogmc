@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:iis3dwb_acc;4
+  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:iis3dwb_acc;5
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -82,10 +82,10 @@ uint8_t iis3dwb_acc_get_sensor_annotation(char **value);
 uint8_t iis3dwb_acc_get_sensor_category(int32_t *value);
 uint8_t iis3dwb_acc_get_stream_id(int8_t *value);
 uint8_t iis3dwb_acc_get_ep_id(int8_t *value);
-uint8_t iis3dwb_acc_set_fs(pnpl_iis3dwb_acc_fs_t enum_id);
-uint8_t iis3dwb_acc_set_enable(bool value);
-uint8_t iis3dwb_acc_set_samples_per_ts(int32_t value);
-uint8_t iis3dwb_acc_set_sensor_annotation(const char *value);
+uint8_t iis3dwb_acc_set_fs(pnpl_iis3dwb_acc_fs_t enum_id, char **response_message);
+uint8_t iis3dwb_acc_set_enable(bool value, char **response_message);
+uint8_t iis3dwb_acc_set_samples_per_ts(int32_t value, char **response_message);
+uint8_t iis3dwb_acc_set_sensor_annotation(const char *value, char **response_message);
 
 
 #ifdef __cplusplus

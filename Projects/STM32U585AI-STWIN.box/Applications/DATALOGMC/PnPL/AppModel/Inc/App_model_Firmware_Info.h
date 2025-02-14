@@ -22,7 +22,7 @@
   * This file has been auto generated from the following DTDL Component:
   * dtmi:vespucci:other:firmware_info;3
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -82,7 +82,7 @@ uint8_t firmware_info_get_part_number(char **value);
 uint8_t firmware_info_get_device_url(char **value);
 uint8_t firmware_info_get_fw_url(char **value);
 uint8_t firmware_info_get_mac_address(char **value);
-uint8_t firmware_info_set_alias(const char *value);
+uint8_t firmware_info_set_alias(const char *value, char **response_message);
 
 
 #ifdef __cplusplus

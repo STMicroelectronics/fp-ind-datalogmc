@@ -58,6 +58,10 @@
 
 #define SYS_DEBUGF(level, message)                 SYS_DEBUGF3(SYS_DBG_LIS2DU12, level, message)
 
+#ifndef LIS2DU12_TASK_CFG_I2C_ADDRESS
+#define LIS2DU12_TASK_CFG_I2C_ADDRESS              LIS2DU12_I2C_ADD_H
+#endif
+
 #ifndef HSD_USE_DUMMY_DATA
 #define HSD_USE_DUMMY_DATA 0
 #endif
@@ -418,7 +422,7 @@ sys_error_code_t LIS2DU12Task_vtblOnCreateTask(AManagedTask *_this, tx_entry_fun
   }
   else
   {
-    p_obj->p_sensor_bus_if = I2CBusIFAlloc(LIS2DU12_ID, LIS2DU12_I2C_ADD_H, 0);
+    p_obj->p_sensor_bus_if = I2CBusIFAlloc(LIS2DU12_ID, LIS2DU12_TASK_CFG_I2C_ADDRESS, 0);
     if (p_obj->p_sensor_bus_if == NULL)
     {
       res = SYS_TASK_HEAP_OUT_OF_MEMORY_ERROR_CODE;
@@ -1191,7 +1195,7 @@ static sys_error_code_t LIS2DU12TaskSensorInit(LIS2DU12Task *_this)
 //  uint8_t reg0;
 
   /* FIFO INT setup */
-  lis2du12_pin_int2_route_t int2_route =
+  lis2du12_pin_int_route_t int2_route =
   {
     0
   };
@@ -1222,10 +1226,6 @@ static sys_error_code_t LIS2DU12TaskSensorInit(LIS2DU12Task *_this)
     if (lis2du12_wtm_level > LIS2DU12_MAX_WTM_LEVEL)
     {
       lis2du12_wtm_level = LIS2DU12_MAX_WTM_LEVEL;
-    }
-    else if (lis2du12_wtm_level < LIS2DU12_MIN_WTM_LEVEL)
-    {
-      lis2du12_wtm_level = LIS2DU12_MIN_WTM_LEVEL;
     }
 
     _this->samples_per_it = lis2du12_wtm_level;
@@ -1290,7 +1290,7 @@ static sys_error_code_t LIS2DU12TaskSensorInit(LIS2DU12Task *_this)
 
   if (_this->sensor_status.type.mems.odr < 2.0f)
   {
-    mode.odr = LIS2DU12_1Hz5_ULP;
+    mode.odr = LIS2DU12_1Hz6_ULP;
   }
   else if (_this->sensor_status.type.mems.odr < 4.0f)
   {
@@ -1367,32 +1367,34 @@ static sys_error_code_t LIS2DU12TaskSensorReadData(LIS2DU12Task *_this)
   lis2du12_fifo_level_get(p_sensor_drv, &fifo_md, (uint8_t *) &_this->fifo_level);
   if (_this->fifo_level >= samples_per_it)
   {
-    lis2du12_read_reg(p_sensor_drv, LIS2DU12_OUTX_L, (uint8_t *) _this->p_sensor_data_buff,
-                      ((uint16_t)samples_per_it * 6u));
+    res = lis2du12_read_reg(p_sensor_drv, LIS2DU12_OUTX_L, (uint8_t *) _this->p_sensor_data_buff,
+                            ((uint16_t)samples_per_it * 6u));
   }
   else
   {
     _this->fifo_level = 0;
   }
 #else
-  lis2du12_read_reg(p_sensor_drv, LIS2DU12_OUTX_L, (uint8_t *) _this->p_sensor_data_buff,
-                    ((uint16_t) samples_per_it * 6u));
+  res = lis2du12_read_reg(p_sensor_drv, LIS2DU12_OUTX_L, (uint8_t *) _this->p_sensor_data_buff,
+                          ((uint16_t) samples_per_it * 6u));
   _this->fifo_level = 1;
 #endif /* LIS2DU12_FIFO_ENABLED */
 
-#if (HSD_USE_DUMMY_DATA == 1)
-  uint16_t i = 0;
-  int16_t *p16 = (int16_t *)_this->p_sensor_data_buff;
-
-  if (_this->fifo_level >= samples_per_it)
+  if (!SYS_IS_ERROR_CODE(res))
   {
-    for (i = 0; i < samples_per_it * 3 ; i++)
-    {
-      *p16++ = dummyDataCounter++;
-    }
-  }
-#endif
+#if (HSD_USE_DUMMY_DATA == 1)
+    uint16_t i = 0;
+    int16_t *p16 = (int16_t *)_this->p_sensor_data_buff;
 
+    if (_this->fifo_level >= samples_per_it)
+    {
+      for (i = 0; i < samples_per_it * 3 ; i++)
+      {
+        *p16++ = dummyDataCounter++;
+      }
+    }
+#endif
+  }
   return res;
 }
 
@@ -1556,7 +1558,6 @@ static sys_error_code_t LIS2DU12TaskSensorSetFifoWM(LIS2DU12Task *_this, SMMessa
     {
       lis2du12_wtm_level = LIS2DU12_MAX_WTM_LEVEL;
     }
-
     _this->samples_per_it = lis2du12_wtm_level;
 
     lis2du12_fifo_md_t fifo_md = { LIS2DU12_BYPASS, LIS2DU12_8_BIT };

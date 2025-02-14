@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:other:tags_info;2
+  * dtmi:vespucci:other:tags_info;3
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -61,8 +61,6 @@ extern "C" {
 #endif
 
 /* USER includes -------------------------------------------------------------*/
-#define HSD_SW_TAG_CLASS_NUM 5U
-#define HSD_HW_TAG_CLASS_NUM 5U
 
 typedef struct _TagsInfoModel_t
 {
@@ -89,22 +87,99 @@ uint8_t tags_info_get_sw_tag3__status(bool *value);
 uint8_t tags_info_get_sw_tag4__label(char **value);
 uint8_t tags_info_get_sw_tag4__enabled(bool *value);
 uint8_t tags_info_get_sw_tag4__status(bool *value);
-uint8_t tags_info_set_sw_tag0__label(const char *value);
-uint8_t tags_info_set_sw_tag0__enabled(bool value);
-uint8_t tags_info_set_sw_tag0__status(bool value);
-uint8_t tags_info_set_sw_tag1__label(const char *value);
-uint8_t tags_info_set_sw_tag1__enabled(bool value);
-uint8_t tags_info_set_sw_tag1__status(bool value);
-uint8_t tags_info_set_sw_tag2__label(const char *value);
-uint8_t tags_info_set_sw_tag2__enabled(bool value);
-uint8_t tags_info_set_sw_tag2__status(bool value);
-uint8_t tags_info_set_sw_tag3__label(const char *value);
-uint8_t tags_info_set_sw_tag3__enabled(bool value);
-uint8_t tags_info_set_sw_tag3__status(bool value);
-uint8_t tags_info_set_sw_tag4__label(const char *value);
-uint8_t tags_info_set_sw_tag4__enabled(bool value);
-uint8_t tags_info_set_sw_tag4__status(bool value);
-
+uint8_t tags_info_get_sw_tag5__label(char **value);
+uint8_t tags_info_get_sw_tag5__enabled(bool *value);
+uint8_t tags_info_get_sw_tag5__status(bool *value);
+uint8_t tags_info_get_sw_tag6__label(char **value);
+uint8_t tags_info_get_sw_tag6__enabled(bool *value);
+uint8_t tags_info_get_sw_tag6__status(bool *value);
+uint8_t tags_info_get_sw_tag7__label(char **value);
+uint8_t tags_info_get_sw_tag7__enabled(bool *value);
+uint8_t tags_info_get_sw_tag7__status(bool *value);
+uint8_t tags_info_get_sw_tag8__label(char **value);
+uint8_t tags_info_get_sw_tag8__enabled(bool *value);
+uint8_t tags_info_get_sw_tag8__status(bool *value);
+uint8_t tags_info_get_sw_tag9__label(char **value);
+uint8_t tags_info_get_sw_tag9__enabled(bool *value);
+uint8_t tags_info_get_sw_tag9__status(bool *value);
+uint8_t tags_info_get_sw_tag10__label(char **value);
+uint8_t tags_info_get_sw_tag10__enabled(bool *value);
+uint8_t tags_info_get_sw_tag10__status(bool *value);
+uint8_t tags_info_get_sw_tag11__label(char **value);
+uint8_t tags_info_get_sw_tag11__enabled(bool *value);
+uint8_t tags_info_get_sw_tag11__status(bool *value);
+uint8_t tags_info_get_sw_tag12__label(char **value);
+uint8_t tags_info_get_sw_tag12__enabled(bool *value);
+uint8_t tags_info_get_sw_tag12__status(bool *value);
+uint8_t tags_info_get_sw_tag13__label(char **value);
+uint8_t tags_info_get_sw_tag13__enabled(bool *value);
+uint8_t tags_info_get_sw_tag13__status(bool *value);
+uint8_t tags_info_get_sw_tag14__label(char **value);
+uint8_t tags_info_get_sw_tag14__enabled(bool *value);
+uint8_t tags_info_get_sw_tag14__status(bool *value);
+uint8_t tags_info_get_sw_tag15__label(char **value);
+uint8_t tags_info_get_sw_tag15__enabled(bool *value);
+uint8_t tags_info_get_sw_tag15__status(bool *value);
+uint8_t tags_info_get_hw_tag0__label(char **value);
+uint8_t tags_info_get_hw_tag0__enabled(bool *value);
+uint8_t tags_info_get_hw_tag0__status(bool *value);
+uint8_t tags_info_get_hw_tag1__label(char **value);
+uint8_t tags_info_get_hw_tag1__enabled(bool *value);
+uint8_t tags_info_get_hw_tag1__status(bool *value);
+uint8_t tags_info_set_sw_tag0__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag0__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag0__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag1__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag1__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag1__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag2__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag2__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag2__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag3__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag3__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag3__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag4__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag4__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag4__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag5__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag5__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag5__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag6__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag6__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag6__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag7__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag7__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag7__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag8__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag8__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag8__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag9__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag9__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag9__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag10__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag10__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag10__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag11__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag11__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag11__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag12__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag12__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag12__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag13__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag13__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag13__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag14__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag14__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag14__status(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag15__label(const char *value, char **response_message);
+uint8_t tags_info_set_sw_tag15__enabled(bool value, char **response_message);
+uint8_t tags_info_set_sw_tag15__status(bool value, char **response_message);
+uint8_t tags_info_set_hw_tag0__label(const char *value, char **response_message);
+uint8_t tags_info_set_hw_tag0__enabled(bool value, char **response_message);
+uint8_t tags_info_set_hw_tag0__status(bool value, char **response_message);
+uint8_t tags_info_set_hw_tag1__label(const char *value, char **response_message);
+uint8_t tags_info_set_hw_tag1__enabled(bool value, char **response_message);
+uint8_t tags_info_set_hw_tag1__status(bool value, char **response_message);
 
 
 #ifdef __cplusplus

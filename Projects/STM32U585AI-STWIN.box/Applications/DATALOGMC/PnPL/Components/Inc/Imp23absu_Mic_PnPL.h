@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:imp23absu_mic;5
+  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:imp23absu_mic;6
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -40,6 +40,10 @@ typedef enum
   pnpl_imp23absu_mic_odr_hz96000 = 3,
   pnpl_imp23absu_mic_odr_hz192000 = 4,
 } pnpl_imp23absu_mic_odr_t;
+typedef enum
+{
+  pnpl_imp23absu_mic_aop_dbspl130 = 0,
+} pnpl_imp23absu_mic_aop_t;
 typedef enum
 {
   pnpl_imp23absu_mic_resolution_bit16 = 0,

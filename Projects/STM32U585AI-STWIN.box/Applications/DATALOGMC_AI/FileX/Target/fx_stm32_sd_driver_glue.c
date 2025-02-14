@@ -12,11 +12,11 @@
   * This software is licensed under terms that can be found in the LICENSE file in
   * the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  *                             
+  *
   *
   ******************************************************************************
   */
-  
+
 #include "fx_stm32_sd_driver.h"
 
 /* USER CODE BEGIN  0 */
@@ -26,7 +26,7 @@ TX_SEMAPHORE transfer_semaphore;
 
 /**
   * @brief Initializes the SD IP instance
-* @param UINT instance SD instance to initialize
+  * @param UINT instance SD instance to initialize
   * @retval 0 on success error value otherwise
   */
 INT fx_stm32_sd_init(UINT instance)
@@ -38,7 +38,7 @@ INT fx_stm32_sd_init(UINT instance)
 
   /* Check if SD card is present */
   SD_DetectInit();
-  if(!SD_IsDetected())
+  if (!SD_IsDetected())
   {
     return -1;
   }
@@ -51,7 +51,7 @@ INT fx_stm32_sd_init(UINT instance)
 
   /* USER CODE BEGIN POST_FX_SD_INIT */
 #if (FX_STM32_SD_INIT == 1)
-  if(HAL_SD_ConfigWideBusOperation(&hsd1, SDMMC_BUS_WIDE_4B) != HAL_OK)
+  if (HAL_SD_ConfigWideBusOperation(&hsd1, SDMMC_BUS_WIDE_4B) != HAL_OK)
   {
     ret = -1;
   }
@@ -68,7 +68,7 @@ INT fx_stm32_sd_init(UINT instance)
 
 /**
   * @brief Deinitializes the SD IP instance
-* @param UINT instance SD instance to deinitialize
+  * @param UINT instance SD instance to deinitialize
   * @retval 0 on success error value otherwise
   */
 INT fx_stm32_sd_deinit(UINT instance)
@@ -79,7 +79,7 @@ INT fx_stm32_sd_deinit(UINT instance)
   UNUSED(instance);
   /* USER CODE END PRE_FX_SD_DEINIT */
 
-  if(HAL_SD_DeInit(&hsd1) != HAL_OK)
+  if (HAL_SD_DeInit(&hsd1) != HAL_OK)
   {
     ret = 1;
   }
@@ -93,7 +93,7 @@ INT fx_stm32_sd_deinit(UINT instance)
 
 /**
   * @brief Check the SD IP status.
-* @param UINT instance SD instance to check
+  * @param UINT instance SD instance to check
   * @retval 0 when ready 1 when busy
   */
 INT fx_stm32_sd_get_status(UINT instance)
@@ -104,7 +104,7 @@ INT fx_stm32_sd_get_status(UINT instance)
   UNUSED(instance);
   /* USER CODE END PRE_GET_STATUS */
 
-  if(HAL_SD_GetCardState(&hsd1) != HAL_SD_CARD_TRANSFER)
+  if (HAL_SD_GetCardState(&hsd1) != HAL_SD_CARD_TRANSFER)
   {
     ret = 1;
   }
@@ -118,10 +118,10 @@ INT fx_stm32_sd_get_status(UINT instance)
 
 /**
   * @brief Read Data from the SD device into a buffer.
-* @param UINT instance SD IP instance to read from.
-* @param UINT *buffer buffer into which the data is to be read.
-* @param UINT start_block the first block to start reading from.
-* @param UINT total_blocks total number of blocks to read.
+  * @param UINT instance SD IP instance to read from.
+  * @param UINT *buffer buffer into which the data is to be read.
+  * @param UINT start_block the first block to start reading from.
+  * @param UINT total_blocks total number of blocks to read.
   * @retval 0 on success error code otherwise
   */
 INT fx_stm32_sd_read_blocks(UINT instance, UINT *buffer, UINT start_block, UINT total_blocks)
@@ -132,7 +132,7 @@ INT fx_stm32_sd_read_blocks(UINT instance, UINT *buffer, UINT start_block, UINT 
   UNUSED(instance);
   /* USER CODE END PRE_READ_BLOCKS */
 
-  if(HAL_SD_ReadBlocks_DMA(&hsd1, (uint8_t *)buffer, start_block, total_blocks) != HAL_OK)
+  if (HAL_SD_ReadBlocks_DMA(&hsd1, (uint8_t *)buffer, start_block, total_blocks) != HAL_OK)
   {
     ret = 1;
   }
@@ -145,10 +145,10 @@ INT fx_stm32_sd_read_blocks(UINT instance, UINT *buffer, UINT start_block, UINT 
 }
 /**
   * @brief Write data buffer into the SD device.
-* @param UINT instance SD IP instance to write into.
-* @param UINT *buffer buffer to write into the SD device.
-* @param UINT start_block the first block to start writing into.
-* @param UINT total_blocks total number of blocks to write.
+  * @param UINT instance SD IP instance to write into.
+  * @param UINT *buffer buffer to write into the SD device.
+  * @param UINT start_block the first block to start writing into.
+  * @param UINT total_blocks total number of blocks to write.
   * @retval 0 on success error code otherwise
   */
 
@@ -160,7 +160,7 @@ INT fx_stm32_sd_write_blocks(UINT instance, UINT *buffer, UINT start_block, UINT
   UNUSED(instance);
   /* USER CODE END PRE_WRITE_BLOCKS */
 
-  if(HAL_SD_WriteBlocks_DMA(&hsd1, (uint8_t *)buffer, start_block, total_blocks) != HAL_OK)
+  if (HAL_SD_WriteBlocks_DMA(&hsd1, (uint8_t *)buffer, start_block, total_blocks) != HAL_OK)
   {
     ret = 1;
   }
@@ -170,7 +170,7 @@ INT fx_stm32_sd_write_blocks(UINT instance, UINT *buffer, UINT start_block, UINT
   /* USER CODE END POST_WRITE_BLOCKS */
 
   return ret;
-  }
+}
 
 /* USER CODE BEGIN  1 */
 
@@ -201,7 +201,7 @@ bool SD_IsDetected(void)
   bool res = false;
 
   /* Check SD card detect pin */
-  if(HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin) == GPIO_PIN_RESET)
+  if (HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin) == GPIO_PIN_RESET)
   {
     res = true;
   }

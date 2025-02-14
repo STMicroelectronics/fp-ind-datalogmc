@@ -12,11 +12,11 @@
   * This software is licensed under terms that can be found in the LICENSE file in
   * the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  *                             
+  *
   *
   ******************************************************************************
   */
-  
+
 #ifndef BLE_STREAM_VTBL_CLASS_H_
 #define BLE_STREAM_VTBL_CLASS_H_
 
@@ -34,7 +34,7 @@ sys_error_code_t ble_stream_vtblStream_start(IStream_t *_this, void *param);
 sys_error_code_t ble_stream_vtblStream_stop(IStream_t *_this);
 sys_error_code_t ble_stream_vtblStream_post_data(IStream_t *_this, uint8_t id_stream, uint8_t *buf, uint32_t size);
 sys_error_code_t ble_stream_vtblStream_alloc_resource(IStream_t *_this, uint8_t id_stream, uint32_t size,
-                                                     const char *stream_name);
+                                                      const char *stream_name);
 sys_error_code_t ble_stream_vtblStream_set_mode(IStream_t *_this, IStreamMode_t mode);
 sys_error_code_t ble_stream_vtblStream_dealloc(IStream_t *_this, uint8_t id_stream);
 

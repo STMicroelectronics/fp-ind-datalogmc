@@ -90,6 +90,11 @@ struct _PnPLCommand_t
   //???
 
   /**
+   * Command interface id.
+   */
+  uint8_t comm_interface_id;
+
+  /**
    * Command response.
    */
   char* response;

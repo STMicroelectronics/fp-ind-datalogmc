@@ -42,7 +42,7 @@
 #define AI_MOTOR_CLASSIFIER_DPS  (STREAM_TIMESTAMP_DIM + AI_MOTOR_CLASSIFIER_DIMENSION)
 
 static char ai_motor_classifier_enum_string[] = "[{\"value\":0,\"label\":\"normal\"},"
-                                                 "{\"value\":1,\"label\":\"fault\"}]";
+                                                "{\"value\":1,\"label\":\"fault\"}]";
 
 /* AI Motor Classifier PnPL Component ----------------------------------------*/
 static AlgorithmModel_t ai_motor_classifier_model;
@@ -72,7 +72,7 @@ uint8_t ai_motor_classifier_comp_init(void)
   /* USER Component initialization code */
   return PNPL_NO_ERROR_CODE;
 }
-char* ai_motor_classifier_get_key(void)
+char *ai_motor_classifier_get_key(void)
 {
   return "ai_motor_classifier";
 }
@@ -215,7 +215,4 @@ uint8_t ai_motor_classifier_set_st_ble_stream__class_neai__labels(const char *va
   /* USER Code */
   return PNPL_NO_ERROR_CODE;
 }
-
-
-
 

@@ -33,7 +33,6 @@
 #define _PNPL_AI_MOTOR_CLASSIFIER_H_
 
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

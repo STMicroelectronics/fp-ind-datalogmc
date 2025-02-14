@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:other:tags_info;2
+  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:other:tags_info;1
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -31,7 +31,6 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef _PNPL_TAGS_INFO_H_
 #define _PNPL_TAGS_INFO_H_
-
 
 
 #ifdef __cplusplus

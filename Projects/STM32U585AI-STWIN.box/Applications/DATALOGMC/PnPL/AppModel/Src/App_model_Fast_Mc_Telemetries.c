@@ -61,28 +61,27 @@ static ActuatorModel_t fast_mc_telemetries_model;
 
 extern AppModel_t app_model;
 
-
 uint8_t fast_mc_telemetries_comp_init(void)
 {
-  fast_mc_telemetries_model.comp_name               = fast_mc_telemetries_get_key();
-  fast_mc_telemetries_model.stream_params.usb_dps    = STREAM_TIMESTAMP_DIM;
-  fast_mc_telemetries_model.stream_params.spts       = FAST_TELEMETRY_APP_MODEL_SPTS;
-  fast_mc_telemetries_model.stream_params.stream_id  = FAST_TELEMETRY_APP_MODEL_STREAM_ID;
-  fast_mc_telemetries_model.stream_params.usb_ep     = FAST_TELEMETRY_APP_MODEL_USB_EP;
+  fast_mc_telemetries_model.comp_name = fast_mc_telemetries_get_key();
+  fast_mc_telemetries_model.stream_params.usb_dps = STREAM_TIMESTAMP_DIM;
+  fast_mc_telemetries_model.stream_params.spts = FAST_TELEMETRY_APP_MODEL_SPTS;
+  fast_mc_telemetries_model.stream_params.stream_id = FAST_TELEMETRY_APP_MODEL_STREAM_ID;
+  fast_mc_telemetries_model.stream_params.usb_ep = FAST_TELEMETRY_APP_MODEL_USB_EP;
   fast_mc_telemetries_model.actuatorStatus.is_active = true;
 
   /* USER Component initialization code */
 
   /* Enable fast telemetries*/
-  fast_mc_telemetries_set_i_q__enabled(true);
-  fast_mc_telemetries_set_i_d__enabled(true);
-  fast_mc_telemetries_set_i_q_ref__enabled(true);
-  fast_mc_telemetries_set_i_d_ref__enabled(true);
+  fast_mc_telemetries_set_i_q__enabled(true, NULL);
+  fast_mc_telemetries_set_i_d__enabled(true, NULL);
+  fast_mc_telemetries_set_i_q_ref__enabled(true, NULL);
+  fast_mc_telemetries_set_i_d_ref__enabled(true, NULL);
 
   app_model.ac_models[FAST_TELEMETRY_APP_MODEL_IDX] = &fast_mc_telemetries_model;
   return 0;
 }
-char* fast_mc_telemetries_get_key(void)
+char *fast_mc_telemetries_get_key(void)
 {
   return "fast_mc_telemetries";
 }
@@ -118,7 +117,7 @@ uint8_t fast_mc_telemetries_get_dim(int32_t *value)
    * @fast_mc_telemetries_model.stream_params.usb_dps/2
    * sample in the buffers
    **/
-  *value = (fast_mc_telemetries_model.stream_params.usb_dps-STREAM_TIMESTAMP_DIM )/2;
+  *value = (fast_mc_telemetries_model.stream_params.usb_dps - STREAM_TIMESTAMP_DIM) / 2;
   return 0;
 }
 uint8_t fast_mc_telemetries_get_i_q__enabled(bool *value)
@@ -222,6 +221,21 @@ uint8_t fast_mc_telemetries_get_v_b__unit(char **value)
   /* USER Code */
   return 0;
 }
+uint8_t fast_mc_telemetries_get_sensitivity__voltage(float *value)
+{
+  *value = MCPTask_GetVoltageScaler();
+  return PNPL_NO_ERROR_CODE ;
+}
+uint8_t fast_mc_telemetries_get_sensitivity__current(float *value)
+{
+  *value = MCPTask_GetCurrentScaler();
+  return PNPL_NO_ERROR_CODE ;
+}
+uint8_t fast_mc_telemetries_get_sensitivity__frequency(float *value)
+{
+  *value = MCPTask_GetFrequencyScaler();
+  return PNPL_NO_ERROR_CODE ;
+}
 uint8_t fast_mc_telemetries_get_stream_id(int8_t *value)
 {
   *value = fast_mc_telemetries_model.stream_params.stream_id;
@@ -232,132 +246,207 @@ uint8_t fast_mc_telemetries_get_ep_id(int8_t *value)
   *value = fast_mc_telemetries_model.stream_params.usb_ep;
   return 0;
 }
-uint8_t fast_mc_telemetries_set_enable(bool value)
+uint8_t fast_mc_telemetries_set_enable(bool value, char **response_message)
 {
-  fast_mc_telemetries_model.actuatorStatus.is_active = value;
-  if(!value)
+  if (response_message != NULL)
   {
-    fast_mc_telemetries_set_i_d_ref__enabled(fast_mc_telemetries_model.actuatorStatus.is_active);
-    fast_mc_telemetries_set_i_q_ref__enabled(fast_mc_telemetries_model.actuatorStatus.is_active);
-    fast_mc_telemetries_set_i_d__enabled(fast_mc_telemetries_model.actuatorStatus.is_active);
-    fast_mc_telemetries_set_i_q__enabled(fast_mc_telemetries_model.actuatorStatus.is_active);
-    fast_mc_telemetries_set_v_q__enabled(fast_mc_telemetries_model.actuatorStatus.is_active);
-    fast_mc_telemetries_set_v_d__enabled(fast_mc_telemetries_model.actuatorStatus.is_active);
-    fast_mc_telemetries_set_i_a__enabled(fast_mc_telemetries_model.actuatorStatus.is_active);
-    fast_mc_telemetries_set_i_b__enabled(fast_mc_telemetries_model.actuatorStatus.is_active);
-    fast_mc_telemetries_set_v_a__enabled(fast_mc_telemetries_model.actuatorStatus.is_active);
-    fast_mc_telemetries_set_v_b__enabled(fast_mc_telemetries_model.actuatorStatus.is_active);
+    *response_message = "";
+  }
+  fast_mc_telemetries_model.actuatorStatus.is_active = value;
+  if (!value)
+  {
+    fast_mc_telemetries_set_i_d_ref__enabled(fast_mc_telemetries_model.actuatorStatus.is_active, NULL);
+    fast_mc_telemetries_set_i_q_ref__enabled(fast_mc_telemetries_model.actuatorStatus.is_active, NULL);
+    fast_mc_telemetries_set_i_d__enabled(fast_mc_telemetries_model.actuatorStatus.is_active, NULL);
+    fast_mc_telemetries_set_i_q__enabled(fast_mc_telemetries_model.actuatorStatus.is_active, NULL);
+    fast_mc_telemetries_set_v_q__enabled(fast_mc_telemetries_model.actuatorStatus.is_active, NULL);
+    fast_mc_telemetries_set_v_d__enabled(fast_mc_telemetries_model.actuatorStatus.is_active, NULL);
+    fast_mc_telemetries_set_i_a__enabled(fast_mc_telemetries_model.actuatorStatus.is_active, NULL);
+    fast_mc_telemetries_set_i_b__enabled(fast_mc_telemetries_model.actuatorStatus.is_active, NULL);
+    fast_mc_telemetries_set_v_a__enabled(fast_mc_telemetries_model.actuatorStatus.is_active, NULL);
+    fast_mc_telemetries_set_v_b__enabled(fast_mc_telemetries_model.actuatorStatus.is_active, NULL);
   }
   else
   {
     /* Get num of enabled fast telemetries */
-    if(0 == MCPTask_GetNumOfEnabledFastTelemetry())
+    if (0 == MCPTask_GetNumOfEnabledFastTelemetry())
     {
       /* Enable the first one in the list */
-      fast_mc_telemetries_set_i_q__enabled(true);
+      fast_mc_telemetries_set_i_q__enabled(true, NULL);
     }
   }
 
   return 0;
 }
-uint8_t fast_mc_telemetries_set_i_q__enabled(bool value)
+uint8_t fast_mc_telemetries_set_i_q__enabled(bool value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   update_fast_telemetry_state(MC_REG_I_Q_MEAS_IDX, value);
   return 0;
 }
-uint8_t fast_mc_telemetries_set_i_q__unit(const char *value)
+uint8_t fast_mc_telemetries_set_i_q__unit(const char *value, char **response_message)
 {
-  /* USER Code */
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   return 0;
 }
-uint8_t fast_mc_telemetries_set_i_d__enabled(bool value)
+uint8_t fast_mc_telemetries_set_i_d__enabled(bool value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   update_fast_telemetry_state(MC_REG_I_D_MEAS_IDX, value);
   return 0;
 }
-uint8_t fast_mc_telemetries_set_i_d__unit(const char *value)
+uint8_t fast_mc_telemetries_set_i_d__unit(const char *value, char **response_message)
 {
-  /* USER Code */
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   return 0;
 }
-uint8_t fast_mc_telemetries_set_i_q_ref__enabled(bool value)
+uint8_t fast_mc_telemetries_set_i_q_ref__enabled(bool value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   update_fast_telemetry_state(MC_REG_I_Q_REF_IDX, value);
   return 0;
 }
-uint8_t fast_mc_telemetries_set_i_q_ref__unit(const char *value)
+uint8_t fast_mc_telemetries_set_i_q_ref__unit(const char *value, char **response_message)
 {
-  /* USER Code */
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   return 0;
 }
-uint8_t fast_mc_telemetries_set_i_d_ref__enabled(bool value)
+uint8_t fast_mc_telemetries_set_i_d_ref__enabled(bool value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   update_fast_telemetry_state(MC_REG_I_D_REF_IDX, value);
   return 0;
 }
-uint8_t fast_mc_telemetries_set_i_d_ref__unit(const char *value)
+uint8_t fast_mc_telemetries_set_i_d_ref__unit(const char *value, char **response_message)
 {
-  /* USER Code */
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   return 0;
 }
-uint8_t fast_mc_telemetries_set_v_q__enabled(bool value)
+uint8_t fast_mc_telemetries_set_v_q__enabled(bool value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   update_fast_telemetry_state(MC_REG_V_Q_IDX, value);
   return 0;
 }
-uint8_t fast_mc_telemetries_set_v_q__unit(const char *value)
+uint8_t fast_mc_telemetries_set_v_q__unit(const char *value, char **response_message)
 {
-  /* USER Code */
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   return 0;
 }
-uint8_t fast_mc_telemetries_set_v_d__enabled(bool value)
+uint8_t fast_mc_telemetries_set_v_d__enabled(bool value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   update_fast_telemetry_state(MC_REG_V_D_IDX, value);
   return 0;
 }
-uint8_t fast_mc_telemetries_set_v_d__unit(const char *value)
+uint8_t fast_mc_telemetries_set_v_d__unit(const char *value, char **response_message)
 {
-  /* USER Code */
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   return 0;
 }
-uint8_t fast_mc_telemetries_set_i_a__enabled(bool value)
+uint8_t fast_mc_telemetries_set_i_a__enabled(bool value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   update_fast_telemetry_state(MC_REG_I_A_IDX, value);
   return 0;
 }
-uint8_t fast_mc_telemetries_set_i_a__unit(const char *value)
+uint8_t fast_mc_telemetries_set_i_a__unit(const char *value, char **response_message)
 {
-  /* USER Code */
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   return 0;
 }
-uint8_t fast_mc_telemetries_set_i_b__enabled(bool value)
+uint8_t fast_mc_telemetries_set_i_b__enabled(bool value, char **response_message)
 {
+
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   update_fast_telemetry_state(MC_REG_I_B_IDX, value);
   return 0;
 }
-uint8_t fast_mc_telemetries_set_i_b__unit(const char *value)
+uint8_t fast_mc_telemetries_set_i_b__unit(const char *value, char **response_message)
 {
-  /* USER Code */
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   return 0;
 }
-uint8_t fast_mc_telemetries_set_v_a__enabled(bool value)
+uint8_t fast_mc_telemetries_set_v_a__enabled(bool value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   update_fast_telemetry_state(MC_REG_V_A_IDX, value);
   return 0;
 }
-uint8_t fast_mc_telemetries_set_v_a__unit(const char *value)
+uint8_t fast_mc_telemetries_set_v_a__unit(const char *value, char **response_message)
 {
-  /* USER Code */
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   return 0;
 }
-uint8_t fast_mc_telemetries_set_v_b__enabled(bool value)
+uint8_t fast_mc_telemetries_set_v_b__enabled(bool value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   update_fast_telemetry_state(MC_REG_V_B_IDX, value);
   return 0;
 }
-uint8_t fast_mc_telemetries_set_v_b__unit(const char *value)
+uint8_t fast_mc_telemetries_set_v_b__unit(const char *value, char **response_message)
 {
-  /* USER Code */
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   return 0;
 }
 
@@ -365,51 +454,51 @@ uint8_t fast_mc_telemetries_set_v_b__unit(const char *value)
 static void update_fast_telemetry_state(uint8_t fast_telemetry_idx, bool value)
 {
   /* Get current slow telemtry state*/
-    bool current_state = MCPTask_GetFastTelemetryState((MCPTaskFastTelemetry_idx_t)fast_telemetry_idx);
+  bool current_state = MCPTask_GetFastTelemetryState((MCPTaskFastTelemetry_idx_t) fast_telemetry_idx);
 
-    if(value)
+  if (value)
+  {
+    if (fast_mc_telemetries_model.active_telemetry_cnt < FAST_TELEMETRY_MAX_ENABLED)
     {
-      if(fast_mc_telemetries_model.active_telemetry_cnt < FAST_TELEMETRY_MAX_ENABLED)
-      {
-        if(current_state != value)
-        {
-          /* Enable fast telemetry */
-          MCPTask_SetFastTelemetryState((MCPTaskFastTelemetry_idx_t)fast_telemetry_idx, value);
-
-          /*Update fast telemetry counter*/
-          fast_mc_telemetries_model.active_telemetry_cnt++;
-
-          /* Check upper Level Component*/
-          if(!fast_mc_telemetries_model.actuatorStatus.is_active)
-          {
-            fast_mc_telemetries_model.actuatorStatus.is_active = true;
-          }
-        }
-      }
-    }
-    else
-    {
-      if(current_state != value)
+      if (current_state != value)
       {
         /* Enable fast telemetry */
-        MCPTask_SetFastTelemetryState((MCPTaskFastTelemetry_idx_t)fast_telemetry_idx, value);
+        MCPTask_SetFastTelemetryState((MCPTaskFastTelemetry_idx_t) fast_telemetry_idx, value);
 
         /*Update fast telemetry counter*/
-        fast_mc_telemetries_model.active_telemetry_cnt--;
+        fast_mc_telemetries_model.active_telemetry_cnt++;
 
-        /**/
-        if(0 == MCPTask_GetNumOfEnabledFastTelemetry())
+        /* Check upper Level Component*/
+        if (!fast_mc_telemetries_model.actuatorStatus.is_active)
         {
-          fast_mc_telemetries_model.actuatorStatus.is_active = false;
+          fast_mc_telemetries_model.actuatorStatus.is_active = true;
         }
       }
     }
+  }
+  else
+  {
+    if (current_state != value)
+    {
+      /* Enable fast telemetry */
+      MCPTask_SetFastTelemetryState((MCPTaskFastTelemetry_idx_t) fast_telemetry_idx, value);
 
-    /*Update USB DPS based on enabled fast telemetry*/
-    fast_mc_telemetries_configure_usb_dps();
+      /*Update fast telemetry counter*/
+      fast_mc_telemetries_model.active_telemetry_cnt--;
 
-    /*Update SD DPS based on enabled fast telemetry*/
-    fast_mc_telemetries_configure_sd_dps();
+      /**/
+      if (0 == MCPTask_GetNumOfEnabledFastTelemetry())
+      {
+        fast_mc_telemetries_model.actuatorStatus.is_active = false;
+      }
+    }
+  }
+
+  /*Update USB DPS based on enabled fast telemetry*/
+  fast_mc_telemetries_configure_usb_dps();
+
+  /*Update SD DPS based on enabled fast telemetry*/
+  fast_mc_telemetries_configure_sd_dps();
 }
 
 static inline void fast_mc_telemetries_configure_usb_dps(void)
@@ -419,30 +508,30 @@ static inline void fast_mc_telemetries_configure_usb_dps(void)
 
   fast_mc_telemetries_model.stream_params.usb_dps = STREAM_TIMESTAMP_DIM;
 
-  switch(num_of_enabled_tf)
+  switch (num_of_enabled_tf)
   {
     case FAST_TELEMETRY_ONE_ENABLED:
-      {
-        fast_mc_telemetries_model.stream_params.usb_dps += FAST_TELEMETRY_ONE_ENABLED_USB_DPS;
-      }
-      break;
+    {
+      fast_mc_telemetries_model.stream_params.usb_dps += FAST_TELEMETRY_ONE_ENABLED_USB_DPS;
+    }
+    break;
 
     case FAST_TELEMETRY_TWO_ENABLED:
-      {
-        fast_mc_telemetries_model.stream_params.usb_dps += FAST_TELEMETRY_TWO_ENABLED_USB_DPS;
-      }
-      break;
+    {
+      fast_mc_telemetries_model.stream_params.usb_dps += FAST_TELEMETRY_TWO_ENABLED_USB_DPS;
+    }
+    break;
 
     case FAST_TELEMETRY_THREE_ENABLED:
-      {
-        fast_mc_telemetries_model.stream_params.usb_dps += FAST_TELEMETRY_THREE_ENABLED_USB_DPS;
-      }
-      break;
+    {
+      fast_mc_telemetries_model.stream_params.usb_dps += FAST_TELEMETRY_THREE_ENABLED_USB_DPS;
+    }
+    break;
 
     case FAST_TELEMETRY_FOUR_ENABLED:
-      {
-        fast_mc_telemetries_model.stream_params.usb_dps += FAST_TELEMETRY_FOUR_ENABLED_USB_DPS;
-      }
+    {
+      fast_mc_telemetries_model.stream_params.usb_dps += FAST_TELEMETRY_FOUR_ENABLED_USB_DPS;
+    }
   }
 }
 
@@ -457,10 +546,9 @@ static inline void fast_mc_telemetries_configure_sd_dps(void)
   fast_mc_telemetries_model.stream_params.bandwidth = (FAST_TELEMETRY_ODR * FAST_TELEMETRY_SAMPLE_SIZE) * num_of_enabled_tf;
 
   /* 330ms of sensor data. Access to SD is optimized when buffer dimension is multiple of 512 */
-  fast_mc_telemetries_model.stream_params.sd_dps = (uint32_t)(fast_mc_telemetries_model.stream_params.bandwidth*0.33f);
-  fast_mc_telemetries_model.stream_params.sd_dps = fast_mc_telemetries_model.stream_params.sd_dps - (fast_mc_telemetries_model.stream_params.sd_dps % 512) + 512;
+  fast_mc_telemetries_model.stream_params.sd_dps = (uint32_t)(fast_mc_telemetries_model.stream_params.bandwidth * 0.33f);
+  fast_mc_telemetries_model.stream_params.sd_dps = fast_mc_telemetries_model.stream_params.sd_dps - (fast_mc_telemetries_model.stream_params.sd_dps % 512)
+                                                   + 512;
 
 }
-
-
 

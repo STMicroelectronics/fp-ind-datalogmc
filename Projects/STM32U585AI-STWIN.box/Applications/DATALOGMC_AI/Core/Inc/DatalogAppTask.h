@@ -12,7 +12,7 @@
   * This software is licensed under terms that can be found in the LICENSE file in
   * the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  *                             
+  *
   *
   ******************************************************************************
   */
@@ -57,15 +57,6 @@ typedef struct _DatalogAppTask DatalogAppTask;
 // Public API declaration
 //***********************
 
-uint8_t DatalogAppTask_start(int32_t interface);
-uint8_t DatalogAppTask_stop(void);
-uint8_t DatalogAppTask_save_config(void);
-uint8_t DatalogAppTask_set_time(const char *datetime);
-uint8_t DatalogAppTask_switch_bank(void);
-uint8_t DatalogAppTask_set_dfu_mode(void);
-
-DatalogAppTask *getDatalogAppTask(void);
-
 /**
   * Allocate an instance of DatalogAppTask.
   *
@@ -78,12 +69,20 @@ IEventListener *DatalogAppTask_GetEventListenerIF(DatalogAppTask *_this);
 
 IEventListener *DatalogAppTask_GetActuatorEventListenerIF(DatalogAppTask *_this);
 
-IEventListener* DatalogAppTask_GetAIClassifierEventListenerIF(DatalogAppTask *_this);
+IEventListener *DatalogAppTask_GetAIClassifierEventListenerIF(DatalogAppTask *_this);
 
 ICommandParse_t *DatalogAppTask_GetICommandParseIF(DatalogAppTask *_this);
 
 sys_error_code_t DatalogAppTask_msg(ULONG msg);
 
+uint8_t DatalogAppTask_start(int32_t interface);
+uint8_t DatalogAppTask_stop(void);
+uint8_t DatalogAppTask_save_config(void);
+uint8_t DatalogAppTask_switch_bank(void);
+uint8_t DatalogAppTask_set_time(const char *datetime);
+uint8_t DatalogAppTask_set_dfu_mode(void);
+
+void DatalogApp_Task_command_response(char *response_msg, uint32_t size);
 
 // Inline functions definition
 // ***************************

@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:stts22h_temp;4
+  * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:stts22h_temp;3
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -170,68 +170,105 @@ uint8_t Stts22h_Temp_PnPL_vtblSetProperty(IPnPLComponent_t *_this, char *seriali
   JSON_Object *respJSONObject = json_value_get_object(respJSON);
 
   uint8_t ret = PNPL_NO_ERROR_CODE;
+  bool valid_property = false;
+  char *resp_msg;
   if (json_object_dothas_value(tempJSONObject, "stts22h_temp.odr"))
   {
     int32_t odr = (int32_t)json_object_dotget_number(tempJSONObject, "stts22h_temp.odr");
-    ret = stts22h_temp_set_odr((pnpl_stts22h_temp_odr_t)odr);
+    valid_property = true;
+    ret = stts22h_temp_set_odr((pnpl_stts22h_temp_odr_t)odr, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_number(respJSONObject, "stts22h_temp.odr.value", odr);
+      json_object_dotset_number(respJSONObject, "PnPL_Response.value", odr);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "stts22h_temp.odr.value", "PNPL_SET_ERROR");
+      pnpl_stts22h_temp_odr_t old_odr;
+      stts22h_temp_get_odr(&old_odr);
+      json_object_dotset_number(respJSONObject, "PnPL_Response.value", old_odr);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   if (json_object_dothas_value(tempJSONObject, "stts22h_temp.enable"))
   {
     bool enable = json_object_dotget_boolean(tempJSONObject, "stts22h_temp.enable");
-    ret = stts22h_temp_set_enable(enable);
+    valid_property = true;
+    ret = stts22h_temp_set_enable(enable, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_boolean(respJSONObject, "stts22h_temp.enable.value", enable);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", enable);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "stts22h_temp.enable.value", "PNPL_SET_ERROR");
+      bool old_enable;
+      stts22h_temp_get_enable(&old_enable);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.value", old_enable);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   if (json_object_dothas_value(tempJSONObject, "stts22h_temp.samples_per_ts"))
   {
     int32_t samples_per_ts = (int32_t)json_object_dotget_number(tempJSONObject, "stts22h_temp.samples_per_ts");
-    ret = stts22h_temp_set_samples_per_ts(samples_per_ts);
+    valid_property = true;
+    ret = stts22h_temp_set_samples_per_ts(samples_per_ts, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_number(respJSONObject, "stts22h_temp.samples_per_ts.value", samples_per_ts);
+      json_object_dotset_number(respJSONObject, "PnPL_Response.value", samples_per_ts);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "stts22h_temp.samples_per_ts.value", "PNPL_SET_ERROR");
+      int32_t old_samples_per_ts;
+      stts22h_temp_get_samples_per_ts(&old_samples_per_ts);
+      json_object_dotset_number(respJSONObject, "PnPL_Response.value", old_samples_per_ts);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   if (json_object_dothas_value(tempJSONObject, "stts22h_temp.sensor_annotation"))
   {
     const char *sensor_annotation = json_object_dotget_string(tempJSONObject, "stts22h_temp.sensor_annotation");
-    ret = stts22h_temp_set_sensor_annotation(sensor_annotation);
+    valid_property = true;
+    ret = stts22h_temp_set_sensor_annotation(sensor_annotation, &resp_msg);
+    json_object_dotset_string(respJSONObject, "PnPL_Response.message", resp_msg);
     if (ret == PNPL_NO_ERROR_CODE)
     {
-      json_object_dotset_string(respJSONObject, "stts22h_temp.sensor_annotation.value", sensor_annotation);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.value", sensor_annotation);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", true);
     }
     else
     {
-      json_object_dotset_string(respJSONObject, "stts22h_temp.sensor_annotation.value", "PNPL_SET_ERROR");
+      char *old_sensor_annotation;
+      stts22h_temp_get_sensor_annotation(&old_sensor_annotation);
+      json_object_dotset_string(respJSONObject, "PnPL_Response.value", old_sensor_annotation);
+      json_object_dotset_boolean(respJSONObject, "PnPL_Response.status", false);
     }
   }
   json_value_free(tempJSON);
-  if (pretty == 1)
+  /* Check if received a valid request to modify an existing property */
+  if (valid_property)
   {
-    *response = json_serialize_to_string_pretty(respJSON);
-    *size = json_serialization_size_pretty(respJSON);
+    if (pretty == 1)
+    {
+      *response = json_serialize_to_string_pretty(respJSON);
+      *size = json_serialization_size_pretty(respJSON);
+    }
+    else
+    {
+      *response = json_serialize_to_string(respJSON);
+      *size = json_serialization_size(respJSON);
+    }
   }
   else
   {
-    *response = json_serialize_to_string(respJSON);
-    *size = json_serialization_size(respJSON);
+    /* Set property is not containing a valid property/parameter: PnPL_Error */
+    char *log_message = "Invalid property for stts22h_temp";
+    PnPLCreateLogMessage(response, size, log_message, PNPL_LOG_ERROR);
+    ret = PNPL_BASE_ERROR_CODE;
   }
   json_value_free(respJSON);
   return ret;

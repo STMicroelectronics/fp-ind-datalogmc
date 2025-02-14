@@ -12,7 +12,7 @@
   * This software is licensed under terms that can be found in the LICENSE file in
   * the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  *                             
+  *
   *
   ******************************************************************************
   */
@@ -26,7 +26,7 @@ extern "C" {
 
 #include "services/syserror.h"
 
- /* TODO: menage here all the msg ID ? */
+/* TODO: menage here all the msg ID ? */
 
 #define APP_REPORT_ID_BLE_CMD                           0x04
 #define APP_MESSAGE_ID_UTIL                             0x0B  ///< Message ID used for the messages class of Utility task.

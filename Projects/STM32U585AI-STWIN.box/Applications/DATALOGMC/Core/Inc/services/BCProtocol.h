@@ -1,58 +1,58 @@
 /**
- ******************************************************************************
- * @file    BCProtocol.h
- * @author  SRA
- * @brief   Battery Charger protocol declaration
- *
- * This file declare the public API for the Battery Charger protocol for
- * STBC02 device. This protocol class uses a driver of type ::BCDriver_t.
- *
- * To use the protocol the application must:
- * - allocate a protocol object. The allocation can be static or dynamic
- *   using the BCPAlloc() method.
- * - initialize the protocol object to connect it with the driver using the
- *   BCPInit() method.
- * - Use the generic BCPSendCmd() to control the battery charger, or the
- *   the others available public API.
- *
- * Features
- *
- * Single Wire protocol is implemented using 1 Timer in free running mode
- * That generates an interrupt each time the counter met the ARR value
- * The ARR value is directly updated i the ISR function to so that, in output
- *
- * SWire protocol example:
- * \code
- *
- *   Start  ....   N pulses (Short)  ....   Stop
- *    ____    __    __         __    __    ______
- *   |    |  |  |  |  |       |  |  |  |  |      |
- *   |    |  |  |  |  |       |  |  |  |  |      |
- * __|    |__|  |__|  |_ ... _|  |__|  |__|      |__
- *
- *  Start: 360 us
- *  Short: 105 us
- *  Stop:  505 us
- *
- * \endcode
- *
- * Battery charger state through CHG pin frequency detection
- * The CHG provides status information about VIN voltage level, battery charging
- * status and faults by toggling at different frequencies.
- * The frequency is detected thanks to a Timer set in Input Capture mode.
- *
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2022 STMicroelectronics
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file in
- * the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- ******************************************************************************
- */
- 
+  ******************************************************************************
+  * @file    BCProtocol.h
+  * @author  SRA
+  * @brief   Battery Charger protocol declaration
+  *
+  * This file declare the public API for the Battery Charger protocol for
+  * STBC02 device. This protocol class uses a driver of type ::BCDriver_t.
+  *
+  * To use the protocol the application must:
+  * - allocate a protocol object. The allocation can be static or dynamic
+  *   using the BCPAlloc() method.
+  * - initialize the protocol object to connect it with the driver using the
+  *   BCPInit() method.
+  * - Use the generic BCPSendCmd() to control the battery charger, or the
+  *   the others available public API.
+  *
+  * Features
+  *
+  * Single Wire protocol is implemented using 1 Timer in free running mode
+  * That generates an interrupt each time the counter met the ARR value
+  * The ARR value is directly updated i the ISR function to so that, in output
+  *
+  * SWire protocol example:
+  * \code
+  *
+  *   Start  ....   N pulses (Short)  ....   Stop
+  *    ____    __    __         __    __    ______
+  *   |    |  |  |  |  |       |  |  |  |  |      |
+  *   |    |  |  |  |  |       |  |  |  |  |      |
+  * __|    |__|  |__|  |_ ... _|  |__|  |__|      |__
+  *
+  *  Start: 360 us
+  *  Short: 105 us
+  *  Stop:  505 us
+  *
+  * \endcode
+  *
+  * Battery charger state through CHG pin frequency detection
+  * The CHG provides status information about VIN voltage level, battery charging
+  * status and faults by toggling at different frequencies.
+  * The frequency is detected thanks to a Timer set in Input Capture mode.
+  *
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2022 STMicroelectronics
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file in
+  * the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  ******************************************************************************
+  */
+
 #ifndef INC_SERVICES_BCPROTOCOL_H_
 #define INC_SERVICES_BCPROTOCOL_H_
 
@@ -101,8 +101,8 @@ typedef enum _ESTBC02_SW_CMD_t
 } ESTBC02_SW_CMD_t;
 
 /**
- * Specifies the 1-wire pulse state.
- */
+  * Specifies the 1-wire pulse state.
+  */
 typedef enum _ESTBC02_SW_STATE_t
 {
   E_BC_IDLE,   /**< IDLE */
@@ -115,8 +115,8 @@ typedef enum _ESTBC02_SW_STATE_t
 } ESTBC02_SW_STATE_t;
 
 /**
- * Specifies the CHG state.
- */
+  * Specifies the CHG state.
+  */
 typedef enum _ESTBC02_CHG_STATE_t
 {
   NOT_VALID_INPUT,
@@ -133,8 +133,8 @@ typedef enum _ESTBC02_CHG_STATE_t
 } ESTBC02_CHG_STATE_t;
 
 /**
- * Specifies the STBC02 state.
- */
+  * Specifies the STBC02 state.
+  */
 typedef enum _ESTBC02_STATE_t
 {
   LOW_BATTERY,
@@ -149,76 +149,76 @@ typedef enum _ESTBC02_STATE_t
 
 
 /**
- * Create  type name for struct _BCProtocol_t.
- */
+  * Create  type name for struct _BCProtocol_t.
+  */
 typedef struct _BCProtocol_t BCProtocol_t;
 
 /**
- * ::BCProtocol_t internal structure.
- */
+  * ::BCProtocol_t internal structure.
+  */
 struct _BCProtocol_t
 {
   /**
-   * Specifies the driver object used by the protocol to send command via Single Wire Protocol.
-   * It must be an object of type ::BCTimerDriver_t;
-   */
+    * Specifies the driver object used by the protocol to send command via Single Wire Protocol.
+    * It must be an object of type ::BCTimerDriver_t;
+    */
   IDriver *p_bc_tim_sw_driver;
 
   /**
-   * Specifies the driver object used by the protocol to read the CHG status of STBC02.
-   * It must be an object of type ::BCTimChgDriver_t;
-   */
+    * Specifies the driver object used by the protocol to read the CHG status of STBC02.
+    * It must be an object of type ::BCTimChgDriver_t;
+    */
   IDriver *p_bc_tim_chg_driver;
 
   /**
-   * Specifies the driver object used by the protocol to read the battery voltage by ADC.
-   * It must be an object of type ::BCDriver_t;
-   */
+    * Specifies the driver object used by the protocol to read the battery voltage by ADC.
+    * It must be an object of type ::BCDriver_t;
+    */
   IDriver *p_bc_adc_driver;
 
   /**
-   * Specifies the actual state of the 1-wire channel state machine.
-   */
+    * Specifies the actual state of the 1-wire channel state machine.
+    */
   ESTBC02_SW_STATE_t sw_state;
 
   /**
-   * Specifies the current command.
-   */
+    * Specifies the current command.
+    */
   ESTBC02_SW_CMD_t cmd;
 
   /**
-   * Specifies the current CHG state.
-   */
+    * Specifies the current CHG state.
+    */
   ESTBC02_CHG_STATE_t chg_state;
 
   /**
-   * Input Capture values (1)
-   */
+    * Input Capture values (1)
+    */
   uint32_t ic_value1;
 
   /**
-   * Input Capture values (2)
-   */
+    * Input Capture values (2)
+    */
   uint32_t ic_value2;
 
   /**
-   * Input Capture flag
-   */
+    * Input Capture flag
+    */
   uint8_t ic_flag;
 
   /**
-   * CHG pin IRQ counter
-   */
+    * CHG pin IRQ counter
+    */
   uint32_t chg_irq_counter;
 
   /**
-   * Previous CHG pin IRQ counter
-   */
+    * Previous CHG pin IRQ counter
+    */
   uint32_t chg_irq_counter_prev;
 
   /**
-   * Pulse counter for Single Wire implementation.
-   */
+    * Pulse counter for Single Wire implementation.
+    */
   uint8_t pulse;
 };
 
@@ -226,60 +226,61 @@ struct _BCProtocol_t
 /**************************/
 
 /**
- * Allocate an instance of ::BCProtocol_t. The protocol object is allocated
- * in the FreeRTOS heap.
- *
- * @return a pointer to the new object ::BCProtocol_t if success, or NULL if out of memory error occurs.
- */
+  * Allocate an instance of ::BCProtocol_t. The protocol object is allocated
+  * in the FreeRTOS heap.
+  *
+  * @return a pointer to the new object ::BCProtocol_t if success, or NULL if out of memory error occurs.
+  */
 BCProtocol_t *BCPAlloc(void);
 
 /**
- * Initialize the protocol object. It must be called after the object allocation and before using it.
- *
- * @param _this [IN] specifies a pointer to the protocol object.
- * @param p_bc_driver [IN] specifies a ::BCDriver_t object.
- * @return SYS_NO_ERROR_CODE if success, an error code otherwise.
- */
-sys_error_code_t BCPInit(BCProtocol_t *_this, IDriver *p_bc_tim_sw_driver, IDriver *p_bc_tim_chg_driver, IDriver *p_bc_adc_driver);
+  * Initialize the protocol object. It must be called after the object allocation and before using it.
+  *
+  * @param _this [IN] specifies a pointer to the protocol object.
+  * @param p_bc_driver [IN] specifies a ::BCDriver_t object.
+  * @return SYS_NO_ERROR_CODE if success, an error code otherwise.
+  */
+sys_error_code_t BCPInit(BCProtocol_t *_this, IDriver *p_bc_tim_sw_driver, IDriver *p_bc_tim_chg_driver,
+                         IDriver *p_bc_adc_driver);
 
 /**
- * Send a command over the 1-wire channel to STBC02
- *
- * @param _this [IN] specifies a pointer to the protocol object.
- * @param cmd [IN] specifies a command. Supported commands are:
- *              -
- * @return SYS_NO_ERROR_CODE if success, SYS_BC_CMD_NOT_SUPPORTED otherwise
- */
+  * Send a command over the 1-wire channel to STBC02
+  *
+  * @param _this [IN] specifies a pointer to the protocol object.
+  * @param cmd [IN] specifies a command. Supported commands are:
+  *              -
+  * @return SYS_NO_ERROR_CODE if success, SYS_BC_CMD_NOT_SUPPORTED otherwise
+  */
 sys_error_code_t BCPSendCmd(BCProtocol_t *_this, ESTBC02_SW_CMD_t cmd);
 
 /**
- * Acquire the rechargeable battery voltage by the ADC
- *
- * @param _this [IN] specifies a pointer to the protocol object.
- * @param voltage [IN] specifies a pointer to the voltage variable
- *              -
- * @return SYS_NO_ERROR_CODE if success
- */
+  * Acquire the rechargeable battery voltage by the ADC
+  *
+  * @param _this [IN] specifies a pointer to the protocol object.
+  * @param voltage [IN] specifies a pointer to the voltage variable
+  *              -
+  * @return SYS_NO_ERROR_CODE if success
+  */
 sys_error_code_t BCPAcquireBatteryVoltage(BCProtocol_t *_this, uint16_t *voltage);
 
 /**
- * Acquire the STBC02 charging state
- *
- * @param _this [IN] specifies a pointer to the protocol object.
- * @param voltage [IN] specifies a pointer to the rechargeable battery state
- * @param state [IN] specifies a pointer to the STBC02 state
- *
- *              -
- * @return SYS_NO_ERROR_CODE if success
- */
+  * Acquire the STBC02 charging state
+  *
+  * @param _this [IN] specifies a pointer to the protocol object.
+  * @param voltage [IN] specifies a pointer to the rechargeable battery state
+  * @param state [IN] specifies a pointer to the STBC02 state
+  *
+  *              -
+  * @return SYS_NO_ERROR_CODE if success
+  */
 sys_error_code_t BCPAcquireState(BCProtocol_t *_this, uint16_t *voltage, ESTBC02_STATE_t *state);
 
 /**
- * Sends the command E_SHIPPING_MODE_ON to power off the battery charger.
- *
- * @param _this [IN] specifies a pointer to the protocol object.
- * @return SYS_NO_ERROR_CODE if success, an error code otherwise.
- */
+  * Sends the command E_SHIPPING_MODE_ON to power off the battery charger.
+  *
+  * @param _this [IN] specifies a pointer to the protocol object.
+  * @return SYS_NO_ERROR_CODE if success, an error code otherwise.
+  */
 sys_error_code_t BCPPowerOff(BCProtocol_t *_this);
 
 

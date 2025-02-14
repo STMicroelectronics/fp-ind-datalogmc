@@ -22,7 +22,7 @@
   * This file has been auto generated from the following DTDL Component:
   * dtmi:vespucci:steval_stwinbx1:fpSnsDatalog2_datalog2:sensors:ism330dhcx_acc;4
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -49,21 +49,28 @@ uint8_t ism330dhcx_acc_comp_init(void)
   SQInit(&querySM, SMGetSensorManager());
   uint16_t id = SQNextByNameAndType(&querySM, "ism330dhcx", COM_TYPE_ACC);
   ism330dhcx_acc_model.id = id;
+
   ism330dhcx_acc_model.sensor_status = SMSensorGetStatusPointer(id);
   ism330dhcx_acc_model.stream_params.stream_id = -1;
   ism330dhcx_acc_model.stream_params.usb_ep = -1;
 
   addSensorToAppModel(id, &ism330dhcx_acc_model);
 
-  ism330dhcx_acc_set_sensor_annotation("\0");
-  ism330dhcx_acc_set_odr(pnpl_ism330dhcx_acc_odr_hz6667);
-  ism330dhcx_acc_set_fs(pnpl_ism330dhcx_acc_fs_g16);
-  ism330dhcx_acc_set_enable(true);
+  ism330dhcx_acc_set_sensor_annotation("\0", NULL);
+  ism330dhcx_acc_set_odr(pnpl_ism330dhcx_acc_odr_hz6667, NULL);
+  ism330dhcx_acc_set_fs(pnpl_ism330dhcx_acc_fs_g16, NULL);
+  ism330dhcx_acc_set_enable(true, NULL);
 #if (HSD_USE_DUMMY_DATA == 1)
-  ism330dhcx_acc_set_samples_per_ts(0);
+  ism330dhcx_acc_set_samples_per_ts(0, NULL);
 #else
-  ism330dhcx_acc_set_samples_per_ts(1000);
+  ism330dhcx_acc_set_samples_per_ts(1000, NULL);
 #endif
+
+  int32_t value = 0;
+  ism330dhcx_acc_get_dim(&value);
+  float sensitivity = 0.0f;
+  ism330dhcx_acc_get_sensitivity(&sensitivity);
+
   __stream_control(true);
   /* USER Component initialization code */
   return PNPL_NO_ERROR_CODE;
@@ -134,19 +141,15 @@ uint8_t ism330dhcx_acc_get_fs(pnpl_ism330dhcx_acc_fs_t *enum_id)
   }
   else if (fs < 5.0f)
   {
-	*enum_id = pnpl_ism330dhcx_acc_fs_g4;
+    *enum_id = pnpl_ism330dhcx_acc_fs_g4;
   }
   else if (fs < 9.0f)
   {
-	*enum_id = pnpl_ism330dhcx_acc_fs_g8;
-  }
-  else if (fs < 17.0f)
-  {
-	*enum_id = pnpl_ism330dhcx_acc_fs_g16;
+    *enum_id = pnpl_ism330dhcx_acc_fs_g8;
   }
   else
   {
-	  return 1;
+    *enum_id = pnpl_ism330dhcx_acc_fs_g16;
   }
   return PNPL_NO_ERROR_CODE;
 }
@@ -239,45 +242,52 @@ uint8_t ism330dhcx_acc_get_ep_id(int8_t *value)
   return PNPL_NO_ERROR_CODE;
 }
 
-
-uint8_t ism330dhcx_acc_set_odr(pnpl_ism330dhcx_acc_odr_t enum_id)
+uint8_t ism330dhcx_acc_set_odr(pnpl_ism330dhcx_acc_odr_t enum_id, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   float value;
   switch (enum_id)
   {
-  case pnpl_ism330dhcx_acc_odr_hz12_5:
-    value = 12.5f;
-    break;
-  case pnpl_ism330dhcx_acc_odr_hz26:
-    value = 26.0f;
-    break;
-  case pnpl_ism330dhcx_acc_odr_hz52:
-    value = 52.0f;
-    break;
-  case pnpl_ism330dhcx_acc_odr_hz104:
-    value = 104.0f;
-    break;
-  case pnpl_ism330dhcx_acc_odr_hz208:
-    value = 208.0f;
-    break;
-  case pnpl_ism330dhcx_acc_odr_hz416:
-    value = 416.0f;
-    break;
-  case pnpl_ism330dhcx_acc_odr_hz833:
-    value = 833.0f;
-    break;
-  case pnpl_ism330dhcx_acc_odr_hz1666:
-    value = 1666.0f;
-    break;
-  case pnpl_ism330dhcx_acc_odr_hz3332:
-    value = 3332.0f;
-    break;
-  case pnpl_ism330dhcx_acc_odr_hz6667:
-    value = 6667.0f;
-    break;
-  default:
-	return 1;
+    case pnpl_ism330dhcx_acc_odr_hz12_5:
+      value = 12.5f;
+      break;
+    case pnpl_ism330dhcx_acc_odr_hz26:
+      value = 26.0f;
+      break;
+    case pnpl_ism330dhcx_acc_odr_hz52:
+      value = 52.0f;
+      break;
+    case pnpl_ism330dhcx_acc_odr_hz104:
+      value = 104.0f;
+      break;
+    case pnpl_ism330dhcx_acc_odr_hz208:
+      value = 208.0f;
+      break;
+    case pnpl_ism330dhcx_acc_odr_hz416:
+      value = 416.0f;
+      break;
+    case pnpl_ism330dhcx_acc_odr_hz833:
+      value = 833.0f;
+      break;
+    case pnpl_ism330dhcx_acc_odr_hz1666:
+      value = 1666.0f;
+      break;
+    case pnpl_ism330dhcx_acc_odr_hz3332:
+      value = 3332.0f;
+      break;
+    case pnpl_ism330dhcx_acc_odr_hz6667:
+      value = 6667.0f;
+      break;
+    default:
+      if (response_message != NULL)
+      {
+        *response_message = "Error: Failed to set ODR";
+      }
+      return PNPL_BASE_ERROR_CODE;
   }
   ret = SMSensorSetODR(ism330dhcx_acc_model.id, value);
   if (ret == SYS_NO_ERROR_CODE)
@@ -287,33 +297,41 @@ uint8_t ism330dhcx_acc_set_odr(pnpl_ism330dhcx_acc_odr_t enum_id)
       app_model.mlc_ucf_valid = false;
     }
 #if (HSD_USE_DUMMY_DATA != 1)
-    ism330dhcx_acc_set_samples_per_ts((int32_t)value);
+    ism330dhcx_acc_set_samples_per_ts((int32_t)value, NULL);
 #endif
     __stream_control(true);
   }
   return ret;
 }
 
-uint8_t ism330dhcx_acc_set_fs(pnpl_ism330dhcx_acc_fs_t enum_id)
+uint8_t ism330dhcx_acc_set_fs(pnpl_ism330dhcx_acc_fs_t enum_id, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   float value;
   switch (enum_id)
   {
-  case pnpl_ism330dhcx_acc_fs_g2:
-    value = 2.0;
-    break;
-  case pnpl_ism330dhcx_acc_fs_g4:
-    value = 4.0;
-    break;
-  case pnpl_ism330dhcx_acc_fs_g8:
-    value = 8.0;
-    break;
-  case pnpl_ism330dhcx_acc_fs_g16:
-    value = 16.0;
-    break;
-  default:
-	return 1;
+    case pnpl_ism330dhcx_acc_fs_g2:
+      value = 2.0;
+      break;
+    case pnpl_ism330dhcx_acc_fs_g4:
+      value = 4.0;
+      break;
+    case pnpl_ism330dhcx_acc_fs_g8:
+      value = 8.0;
+      break;
+    case pnpl_ism330dhcx_acc_fs_g16:
+      value = 16.0;
+      break;
+    default:
+      if (response_message != NULL)
+      {
+        *response_message = "Error: Failed to set FS";
+      }
+      return PNPL_BASE_ERROR_CODE;
   }
   ret = SMSensorSetFS(ism330dhcx_acc_model.id, value);
   if (ret == SYS_NO_ERROR_CODE)
@@ -323,11 +341,18 @@ uint8_t ism330dhcx_acc_set_fs(pnpl_ism330dhcx_acc_fs_t enum_id)
       app_model.mlc_ucf_valid = false;
     }
   }
+
+  float sensitivity = 0.0f;
+  ism330dhcx_acc_get_sensitivity(&sensitivity);
   return ret;
 }
 
-uint8_t ism330dhcx_acc_set_enable(bool value)
+uint8_t ism330dhcx_acc_set_enable(bool value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   if (value)
   {
@@ -345,31 +370,54 @@ uint8_t ism330dhcx_acc_set_enable(bool value)
     }
     __stream_control(true);
   }
+  else
+  {
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Failed to enable the sensor";
+    }
+  }
   return ret;
 }
 
-uint8_t ism330dhcx_acc_set_samples_per_ts(int32_t value)
+uint8_t ism330dhcx_acc_set_samples_per_ts(int32_t value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   int32_t min_v = 0;
   int32_t max_v = 1000;
   if (value >= min_v && value <= max_v)
   {
-	ism330dhcx_acc_model.stream_params.spts = value;
+    ism330dhcx_acc_model.stream_params.spts = value;
   }
   else if (value > max_v)
   {
-	  ism330dhcx_acc_model.stream_params.spts = max_v;
+    ism330dhcx_acc_model.stream_params.spts = max_v;
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Value setting above maximum threshold (1000)";
+    }
   }
   else
   {
-	  ism330dhcx_acc_model.stream_params.spts = min_v;
+    ism330dhcx_acc_model.stream_params.spts = min_v;
+    if (response_message != NULL)
+    {
+      *response_message = "Error: Value setting below minimum threshold (0)";
+    }
   }
   return ret;
 }
 
-uint8_t ism330dhcx_acc_set_sensor_annotation(const char *value)
+uint8_t ism330dhcx_acc_set_sensor_annotation(const char *value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   uint8_t ret = PNPL_NO_ERROR_CODE;
   strcpy(ism330dhcx_acc_model.annotation, value);
   return ret;

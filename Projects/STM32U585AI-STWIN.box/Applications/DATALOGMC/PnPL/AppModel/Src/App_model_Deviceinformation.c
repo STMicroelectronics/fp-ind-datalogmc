@@ -22,7 +22,7 @@
   * This file has been auto generated from the following DTDL Component:
   * dtmi:azure:DeviceManagement:DeviceInformation;1
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -40,6 +40,8 @@
 /* Device Information PnPL Component -----------------------------------------*/
 uint8_t DeviceInformation_comp_init(void)
 {
+
+  /* USER Component initialization code */
   return PNPL_NO_ERROR_CODE;
 }
 
@@ -91,9 +93,9 @@ uint8_t DeviceInformation_get_totalStorage(float *value)
   if (SD_IsDetected())
   {
 //    BSP_SD_CardInfo CardInfo;
-  HAL_SD_CardInfoTypeDef CardInfo;
-  SD_GetCardInfo(&CardInfo);
-  *value = round(((float)CardInfo.BlockNbr * (float)CardInfo.BlockSize) / 1000000000.0f);
+    HAL_SD_CardInfoTypeDef CardInfo;
+    SD_GetCardInfo(&CardInfo);
+    *value = round(((float)CardInfo.BlockNbr * (float)CardInfo.BlockSize) / 1000000000.0f);
   }
   return PNPL_NO_ERROR_CODE;
 }
@@ -103,6 +105,7 @@ uint8_t DeviceInformation_get_totalMemory(float *value)
   *value = (SRAM1_SIZE + SRAM2_SIZE + SRAM3_SIZE + SRAM4_SIZE) / 1024;
   return PNPL_NO_ERROR_CODE;
 }
+
 
 
 

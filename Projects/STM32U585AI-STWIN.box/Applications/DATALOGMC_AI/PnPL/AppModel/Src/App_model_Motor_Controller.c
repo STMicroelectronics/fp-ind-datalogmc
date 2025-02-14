@@ -58,20 +58,71 @@ char *motor_controller_get_key(void)
 uint8_t motor_controller_get_motor_status(bool *value)
 {
   *value = MCPTask_GetMotorStarted();
-   return PNPL_NO_ERROR_CODE;
+  return PNPL_NO_ERROR_CODE;
 }
-
 uint8_t motor_controller_get_motor_speed(int32_t *value)
 {
   *value = MCPTask_GetMotorSpeed();
   return PNPL_NO_ERROR_CODE;
 }
-
-
-uint8_t motor_controller_set_motor_speed(int32_t value)
+uint8_t motor_controller_get_control_stage(char **value)
 {
-  int32_t min =MOTOR_CTRL_MIN_SPEED;
-  int32_t max =MOTOR_CTRL_MAX_SPEED;
+  *value = MCPTask_GetControlStageName();
+  return PNPL_NO_ERROR_CODE;
+}
+uint8_t motor_controller_get_power_stage(char **value)
+{
+  *value = MCPTask_GetPowerStageName();
+  return PNPL_NO_ERROR_CODE;
+}
+uint8_t motor_controller_get_motor_name(char **value)
+{
+  /* USER Code */
+  *value = MCPTask_GetMotorName();
+  return PNPL_NO_ERROR_CODE;
+}
+uint8_t motor_controller_get_mcwb_sdk_version(char **value)
+{
+  *value = MCPTask_GetMCWBSDKVersion();
+  return PNPL_NO_ERROR_CODE;
+}
+uint8_t motor_controller_get_pwm_frequency(int32_t *value)
+{
+  /* USER Code */
+  *value = MCPTask_GetMotorPWM();
+  return PNPL_NO_ERROR_CODE;
+}
+
+uint8_t motor_controller_get_ramp_speed(int32_t *value)
+{
+  /* USER Code */
+  *value = MCPTask_GetRampSpeed();
+  return PNPL_NO_ERROR_CODE;
+}
+
+uint8_t motor_controller_get_max_speed(int32_t *value)
+{
+  /* USER Code */
+  *value = MCPTask_GetMaxSpeed();
+  return PNPL_NO_ERROR_CODE;
+}
+
+uint8_t motor_controller_get_mcp_configured(bool *value)
+{
+  /* USER Code */
+  *value = MCPTask_GetMCPConfigured();
+  return PNPL_NO_ERROR_CODE ;
+}
+
+uint8_t motor_controller_set_motor_speed(int32_t value, char **response_message)
+{
+  int32_t min = MOTOR_CTRL_MIN_SPEED;
+  int32_t max = MOTOR_CTRL_MAX_SPEED;
+
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
 
   /* USER Code */
   if (value >= min && value <= max)
@@ -79,9 +130,8 @@ uint8_t motor_controller_set_motor_speed(int32_t value)
     MCPTask_SetMotorSpeed(value);
   }
 
-  return PNPL_NO_ERROR_CODE;
+  return PNPL_NO_ERROR_CODE ;
 }
-
 
 uint8_t motor_controller_start_motor(void)
 {
@@ -106,5 +156,4 @@ uint8_t motor_controller_ack_fault(void)
   MCPTask_ack_fault();
   return PNPL_NO_ERROR_CODE;
 }
-
 

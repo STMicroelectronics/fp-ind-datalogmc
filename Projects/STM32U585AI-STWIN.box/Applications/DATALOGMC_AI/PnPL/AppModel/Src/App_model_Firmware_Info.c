@@ -22,7 +22,7 @@
   * This file has been auto generated from the following DTDL Component:
   * dtmi:vespucci:other:firmware_info;3
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -35,8 +35,6 @@
 /* USER private function prototypes ------------------------------------------*/
 
 /* USER defines --------------------------------------------------------------*/
-#define DEVICE_ALIAS_LENGTH 16U
-#define MAC_ADDRESS_LENGTH  18U
 
 /* Firmware Information PnPL Component ---------------------------------------*/
 extern AppModel_t app_model;
@@ -46,7 +44,7 @@ uint8_t firmware_info_comp_init(void)
   app_model.firmware_info_model.comp_name = firmware_info_get_key();
 
   char default_alias[DEVICE_ALIAS_LENGTH] = "STWIN_BOX_001";
-  firmware_info_set_alias(default_alias);
+  firmware_info_set_alias(default_alias, NULL);
 
   char default_mac_address[MAC_ADDRESS_LENGTH] = "00:00:00:00:00:00";
   set_mac_address(default_mac_address);
@@ -91,7 +89,7 @@ uint8_t firmware_info_get_device_url(char **value)
 
 uint8_t firmware_info_get_fw_url(char **value)
 {
-  *value = "https://github.com/STMicroelectronics/fp-sns-datalog2";
+  *value = "https://github.com/STMicroelectronics/fp-ind-datalogmc";
   return PNPL_NO_ERROR_CODE;
 }
 
@@ -101,10 +99,16 @@ uint8_t firmware_info_get_mac_address(char **value)
   return PNPL_NO_ERROR_CODE;
 }
 
-uint8_t firmware_info_set_alias(const char *value)
+
+uint8_t firmware_info_set_alias(const char *value, char **response_message)
 {
+  if (response_message != NULL)
+  {
+    *response_message = "";
+  }
   strcpy(app_model.firmware_info_model.alias, value);
   return PNPL_NO_ERROR_CODE;
 }
+
 
 

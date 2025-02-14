@@ -12,7 +12,7 @@
   * This software is licensed under terms that can be found in the LICENSE file in
   * the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  *                             
+  *
   *
   ******************************************************************************
   */
@@ -26,7 +26,7 @@
 #define SYS_DEBUGF(level, message)      SYS_DEBUGF3(SYS_DBG_DRIVERS, level, message)
 
 #ifndef MAX_DATA_STREAM_ID
-  #define MAX_DATA_STREAM_ID    (0U)
+#define MAX_DATA_STREAM_ID    (0U)
 #endif
 #define ADV_OB_STREAM_ID        (MAX_DATA_STREAM_ID+1)
 
@@ -154,8 +154,8 @@ sys_error_code_t ble_stream_vtblStream_init(IStream_t *_this, uint8_t comm_inter
   }
 
   /* Allocate the message queue. */
-  obj->queue_memory_pointer = (UCHAR*) SysAlloc(DEFAULT_BLE_QUEUE_SIZE * sizeof(ULONG));
-  if(obj->queue_memory_pointer == NULL)
+  obj->queue_memory_pointer = (UCHAR *) SysAlloc(DEFAULT_BLE_QUEUE_SIZE * sizeof(ULONG));
+  if (obj->queue_memory_pointer == NULL)
   {
     res = SYS_TASK_HEAP_OUT_OF_MEMORY_ERROR_CODE;
     SYS_SET_SERVICE_LEVEL_ERROR_CODE(res);
@@ -194,7 +194,7 @@ sys_error_code_t ble_stream_vtblStream_enable(IStream_t *_this)
 
   obj->adv_id = MAX_CUSTOM_DATA_STREAM_ID + 1;
 
-  if(ble_stream_SetCustomStreamIDCallback!=NULL)
+  if (ble_stream_SetCustomStreamIDCallback != NULL)
   {
     ble_stream_SetCustomStreamIDCallback();
   }
@@ -230,7 +230,7 @@ sys_error_code_t ble_stream_vtblStream_deinit(IStream_t *_this)
 {
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
-  ble_stream_class_t *obj = (ble_stream_class_t*) _this;
+  ble_stream_class_t *obj = (ble_stream_class_t *) _this;
 
   tx_queue_delete(&obj->ble_app_queue);
   tx_thread_delete(&obj->ble_receive_thread);
@@ -267,20 +267,20 @@ sys_error_code_t ble_stream_vtblStream_post_data(IStream_t *_this, uint8_t id_st
   sys_error_code_t res = SYS_NOT_IMPLEMENTED_ERROR_CODE;
   ble_stream_class_t *obj = (ble_stream_class_t *) _this;
 
-  if(id_stream == obj->adv_id)
-   {
-     obj->adv_buf[0] = buf[0];
-     obj->adv_buf[1] = buf[1];
-     obj->adv_buf[2] = buf[2];
-   }
+  if (id_stream == obj->adv_id)
+  {
+    obj->adv_buf[0] = buf[0];
+    obj->adv_buf[1] = buf[1];
+    obj->adv_buf[2] = buf[2];
+  }
   else
   {
-    if(ble_stream_PostCustomDataCallback!=NULL)
+    if (ble_stream_PostCustomDataCallback != NULL)
     {
       res = ble_stream_PostCustomDataCallback(id_stream, buf, size);
     }
 
-    if(res == SYS_NO_ERROR_CODE)
+    if (res == SYS_NO_ERROR_CODE)
     {
       streamMsg_t msg;
       msg.messageId = BLE_ISTREAM_MSG_SEND_CUSTOM_DATA;
@@ -293,7 +293,7 @@ sys_error_code_t ble_stream_vtblStream_post_data(IStream_t *_this, uint8_t id_st
 }
 
 sys_error_code_t ble_stream_vtblStream_alloc_resource(IStream_t *_this, uint8_t id_stream, uint32_t size,
-                                                     const char *stream_name)
+                                                      const char *stream_name)
 {
   assert_param(_this != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
@@ -354,14 +354,14 @@ void hci_tl_lowlevel_isr(uint16_t nPin)
 }
 
 
-sys_error_code_t ble_stream_msg(streamMsg_t* msg)
+sys_error_code_t ble_stream_msg(streamMsg_t *msg)
 {
   assert_param(msg != NULL);
   sys_error_code_t res = SYS_NO_ERROR_CODE;
 
   streamMsg_t message = *msg;
 
-  if(tx_queue_send(&sObj.ble_app_queue, &message, TX_NO_WAIT) != TX_SUCCESS)
+  if (tx_queue_send(&sObj.ble_app_queue, &message, TX_NO_WAIT) != TX_SUCCESS)
   {
     res = 1;
   }
@@ -467,14 +467,14 @@ static void ble_send_thread_entry(ULONG thread_input)
   while (1)
   {
     /* Retrieve a message from the queue. */
-    if(TX_SUCCESS == tx_queue_receive(&obj->ble_app_queue, &received_message, TX_WAIT_FOREVER))
+    if (TX_SUCCESS == tx_queue_receive(&obj->ble_app_queue, &received_message, TX_WAIT_FOREVER))
     {
       if (sObj.status)
       {
-        switch(received_message.messageId)
+        switch (received_message.messageId)
         {
           case BLE_ISTREAM_MSG_SEND_CMD:
-            if(ble_stream_SendCommandCallback!=NULL)
+            if (ble_stream_SendCommandCallback != NULL)
             {
               ble_stream_SendCommandCallback(obj->serialized_cmd, obj->serialized_cmd_size);
               BLE_FREE_FUNCTION(obj->serialized_cmd);
@@ -482,7 +482,7 @@ static void ble_send_thread_entry(ULONG thread_input)
             break;
 
           case BLE_ISTREAM_MSG_SEND_CUSTOM_DATA:
-            if(ble_stream_SendCustomDataCallback!=NULL)
+            if (ble_stream_SendCustomDataCallback != NULL)
             {
               ble_stream_SendCustomDataCallback(received_message.streamID);
             }
@@ -529,8 +529,4 @@ static void ble_receive_thread_entry(ULONG thread_input)
   }
 
 }
-
-
-
-
 

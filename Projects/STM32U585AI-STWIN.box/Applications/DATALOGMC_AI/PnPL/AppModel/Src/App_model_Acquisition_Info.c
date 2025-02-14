@@ -20,9 +20,9 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:vespucci:other:acquisition_info;1
+  * dtmi:vespucci:other:acquisition_info;2
   *
-  * Created by: DTDL2PnPL_cGen version 2.0.0
+  * Created by: DTDL2PnPL_cGen version 2.1.0
   *
   * WARNING! All changes made to this file will be lost if this is regenerated
   ******************************************************************************
@@ -44,8 +44,8 @@ uint8_t acquisition_info_comp_init(void)
   app_model.acquisition_info_model.comp_name = acquisition_info_get_key();
 
   /* USER Component initialization code */
-  acquisition_info_set_name("STWIN.Box_acquisition");
-  acquisition_info_set_description("");
+  acquisition_info_set_name("STWIN.Box_acquisition", NULL);
+  acquisition_info_set_description("", NULL);
   app_model.acquisition_info_model.interface = -1;
 
   return PNPL_NO_ERROR_CODE;
@@ -116,15 +116,15 @@ uint8_t acquisition_info_get_tags(JSON_Value *value)
   uint8_t tag_list_size = TMGetTagListSize();
   if (tag_list_size > 0)
   {
-  for (i = 0; i < tag_list_size; i++)
-  {
-    tempJSON1 = json_value_init_object();
-    JSON_Object *tag_object = json_value_get_object(tempJSON1);
-    json_object_set_string(tag_object, "l", tag_list[i].label);
-    json_object_set_boolean(tag_object, "e", tag_list[i].status);
-    json_object_set_string(tag_object, "ta", tag_list[i].abs_timestamp);
-    json_array_append_value(JSON_TagsArray, tempJSON1);
-  }
+    for (i = 0; i < tag_list_size; i++)
+    {
+      tempJSON1 = json_value_init_object();
+      JSON_Object *tag_object = json_value_get_object(tempJSON1);
+      json_object_set_string(tag_object, "l", tag_list[i].label);
+      json_object_set_boolean(tag_object, "e", tag_list[i].status);
+      json_object_set_string(tag_object, "ta", tag_list[i].abs_timestamp);
+      json_array_append_value(JSON_TagsArray, tempJSON1);
+    }
   }
   /* no need to free tempJSON1 as it is part of value */
   return PNPL_NO_ERROR_CODE;
@@ -132,14 +132,14 @@ uint8_t acquisition_info_get_tags(JSON_Value *value)
 
 uint8_t acquisition_info_get_interface(pnpl_acquisition_info_interface_t *enum_id)
 {
-  switch(app_model.acquisition_info_model.interface)
+  switch (app_model.acquisition_info_model.interface)
   {
-  case 0:
-  *enum_id = pnpl_acquisition_info_interface_sd;
-  break;
-  case 1:
-  *enum_id = pnpl_acquisition_info_interface_usb;
-  break;
+    case 0:
+      *enum_id = pnpl_acquisition_info_interface_sd;
+      break;
+    case 1:
+      *enum_id = pnpl_acquisition_info_interface_usb;
+      break;
   }
   /* USER Code */
   return PNPL_NO_ERROR_CODE;
@@ -152,19 +152,70 @@ uint8_t acquisition_info_get_schema_version(char **value)
 }
 
 
-uint8_t acquisition_info_set_name(const char *value)
+uint8_t acquisition_info_set_name(const char *value, char **response_message)
 {
-  if (strlen(value) != 0)
+  size_t value_len = strlen(value);
+  if (value_len > 0 && value_len <= HSD_ACQ_NAME_LENGTH)
   {
-  strcpy(app_model.acquisition_info_model.name, value);
+    strcpy(app_model.acquisition_info_model.name, value);
+    if (response_message != NULL)
+    {
+      *response_message = "";
+    }
   }
-  return PNPL_NO_ERROR_CODE;
+  else
+  {
+    if (value_len <= 0)
+    {
+      if (response_message != NULL)
+      {
+        *response_message = "Empty acquisition name";
+      }
+      return PNPL_BASE_ERROR_CODE ;
+    }
+    else if (value_len > HSD_ACQ_NAME_LENGTH)
+    {
+      if (response_message != NULL)
+      {
+        *response_message = "Max number of character (64) exceeded for the acquisition name";
+      }
+      return PNPL_BASE_ERROR_CODE ;
+    }
+  }
+  return PNPL_NO_ERROR_CODE ;
 }
 
-uint8_t acquisition_info_set_description(const char *value)
+uint8_t acquisition_info_set_description(const char *value, char **response_message)
 {
-  strcpy(app_model.acquisition_info_model.description, value);
-  return PNPL_NO_ERROR_CODE;
+  size_t value_len = strlen(value);
+  if (value_len > 0 && value_len <= HSD_ACQ_DESC_LENGTH)
+  {
+    strcpy(app_model.acquisition_info_model.description, value);
+    if (response_message != NULL)
+    {
+      *response_message = "";
+    }
+  }
+  else
+  {
+    if (value_len <= 0)
+    {
+      if (response_message != NULL)
+      {
+        *response_message = "Empty acquisition description";
+      }
+      return PNPL_BASE_ERROR_CODE ;
+    }
+    else if (value_len > HSD_ACQ_DESC_LENGTH)
+    {
+      if (response_message != NULL)
+      {
+        *response_message = "Max number of character (100) exceeded for the acquisition description";
+      }
+      return PNPL_BASE_ERROR_CODE ;
+    }
+  }
+  return PNPL_NO_ERROR_CODE ;
 }
 
 
