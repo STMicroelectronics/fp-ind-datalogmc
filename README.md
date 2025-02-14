@@ -59,4 +59,4 @@ Here is the list of references to user documents:
 
 ## Dependencies
 
-- None
+- HSDPython_SDK has been moved in a separate software product: **[STDATALOG_PYSDK](https://github.com/STMicroelectronics/stdatalog-pysdk)**
