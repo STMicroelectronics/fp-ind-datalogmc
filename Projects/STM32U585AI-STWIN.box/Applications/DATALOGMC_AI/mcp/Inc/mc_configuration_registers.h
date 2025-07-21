@@ -25,9 +25,9 @@
 
 typedef struct
 {
-  float voltage;
-  float current;
-  float frequency;
+  float_t voltage;
+  float_t current;
+  float_t frequency;
 } scaleFlashParams_t;
 
 typedef struct

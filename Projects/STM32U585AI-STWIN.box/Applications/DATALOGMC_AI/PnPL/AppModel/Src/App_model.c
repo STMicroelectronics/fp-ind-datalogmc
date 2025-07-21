@@ -152,7 +152,7 @@ uint8_t __stream_control(bool status)
           {
 
             /* in case of slow sensor send 1 sample for each usb packet */
-            float low_odr = 0;
+            float_t low_odr = 0;
             if (app_model.s_models[i]->sensor_status->isensor_class == ISENSOR_CLASS_MEMS)
             {
               low_odr = app_model.s_models[i]->sensor_status->type.mems.odr;
@@ -204,7 +204,7 @@ uint8_t __stream_control(bool status)
             }
 #ifdef SYS_DEBUG
             SensorDescriptor_t descriptor = SMSensorGetDescription(i);
-            float ms = app_model.s_models[i]->stream_params.usb_dps / app_model.s_models[i]->stream_params.bandwidth;
+            float_t ms = app_model.s_models[i]->stream_params.usb_dps / app_model.s_models[i]->stream_params.bandwidth;
             SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("**** %s, odr: %f, DPS: %d, ms: %f, proposed FIFO WM: %d \r\n", descriptor.p_name,
                                                app_model.s_models[i]->sensor_status->type.mems.odr, app_model.s_models[i]->stream_params.usb_dps, ms,
                                                proposed_fifoWM));

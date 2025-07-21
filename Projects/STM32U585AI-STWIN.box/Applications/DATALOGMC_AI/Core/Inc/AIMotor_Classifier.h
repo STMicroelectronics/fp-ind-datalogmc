@@ -65,8 +65,8 @@ INeaiNcc_Model_t *Motor_Classifier_Alloc(void);
 void Motor_Classifier_Init(INeaiNcc_Model_t *_this);
 
 /* IAI_Network virtual functions */
-uint8_t ANeai_Classification_vtblInit_ncc(INeaiNcc_Model_t *_this, const float knowledge_buffer[]);
-uint8_t ANeai_Classification_vtbl_ncc(INeaiNcc_Model_t *_this, float data_input[], float output_buffer[],
+uint8_t ANeai_Classification_vtblInit_ncc(INeaiNcc_Model_t *_this, const float_t knowledge_buffer[]);
+uint8_t ANeai_Classification_vtbl_ncc(INeaiNcc_Model_t *_this, float_t data_input[], float_t output_buffer[],
                                       uint16_t *id_class);
 
 /* Inline functions definition */

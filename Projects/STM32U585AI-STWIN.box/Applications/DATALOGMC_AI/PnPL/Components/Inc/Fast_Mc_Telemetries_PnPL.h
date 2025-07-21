@@ -20,7 +20,7 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:dtmi:vespucci:steval_stwinbx1:FP_IND_DATALOGMC_DatalogMC:actuators:fast_mc_telemetries;2
+  * dtmi:dtmi:vespucci:steval_stwinbx1:FP_IND_DATALOGMC_DatalogMC:actuators:fast_mc_telemetries;3
   *
   * Created by: DTDL2PnPL_cGen version 2.1.0
   *

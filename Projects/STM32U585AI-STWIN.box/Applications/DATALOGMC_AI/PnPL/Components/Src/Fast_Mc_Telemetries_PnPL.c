@@ -20,7 +20,7 @@
 /**
   ******************************************************************************
   * This file has been auto generated from the following DTDL Component:
-  * dtmi:dtmi:vespucci:steval_stwinbx1:FP_IND_DATALOGMC_DatalogMC:actuators:fast_mc_telemetries;2
+  * dtmi:dtmi:vespucci:steval_stwinbx1:FP_IND_DATALOGMC_DatalogMC:actuators:fast_mc_telemetries;3
   *
   * Created by: DTDL2PnPL_cGen version 2.1.0
   *
@@ -157,13 +157,19 @@ uint8_t Fast_Mc_Telemetries_PnPL_vtblGetStatus(IPnPLComponent_t *_this, char **s
   json_object_dotset_boolean(JSON_Status, "fast_mc_telemetries.v_b.enabled", temp_b);
   fast_mc_telemetries_get_v_b__unit(&temp_s);
   json_object_dotset_string(JSON_Status, "fast_mc_telemetries.v_b.unit", temp_s);
-  float temp_f = 0;
+  float_t temp_f = 0;
   fast_mc_telemetries_get_sensitivity__voltage(&temp_f);
   json_object_dotset_number(JSON_Status, "fast_mc_telemetries.sensitivity.voltage", temp_f);
   fast_mc_telemetries_get_sensitivity__current(&temp_f);
   json_object_dotset_number(JSON_Status, "fast_mc_telemetries.sensitivity.current", temp_f);
   fast_mc_telemetries_get_sensitivity__frequency(&temp_f);
   json_object_dotset_number(JSON_Status, "fast_mc_telemetries.sensitivity.frequency", temp_f);
+  fast_mc_telemetries_get_samples_per_ts(&temp_i);
+  json_object_dotset_number(JSON_Status, "fast_mc_telemetries.samples_per_ts", temp_i);
+  fast_mc_telemetries_get_odr(&temp_i);
+  json_object_dotset_number(JSON_Status, "fast_mc_telemetries.odr", temp_i);
+  fast_mc_telemetries_get_ioffset(&temp_f);
+  json_object_dotset_number(JSON_Status, "fast_mc_telemetries.ioffset", temp_f);
   /* Next fields are not in DTDL model but added looking @ the component schema
   field (this is :sensors). ONLY for Sensors, Algorithms and Actuators*/
   json_object_dotset_number(JSON_Status, "fast_mc_telemetries.c_type", COMP_TYPE_ACTUATOR);

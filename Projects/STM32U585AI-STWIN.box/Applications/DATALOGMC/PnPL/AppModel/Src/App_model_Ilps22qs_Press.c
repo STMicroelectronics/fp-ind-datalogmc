@@ -68,7 +68,7 @@ uint8_t ilps22qs_press_comp_init(void)
 
   int32_t value = 0;
   ilps22qs_press_get_dim(&value);
-  float sensitivity = 0.0f;
+  float_t sensitivity = 0.0f;
   ilps22qs_press_get_sensitivity(&sensitivity);
 
   __stream_control(true);
@@ -84,7 +84,7 @@ char *ilps22qs_press_get_key(void)
 
 uint8_t ilps22qs_press_get_odr(pnpl_ilps22qs_press_odr_t *enum_id)
 {
-  float odr = ilps22qs_press_model.sensor_status->type.mems.odr;
+  float_t odr = ilps22qs_press_model.sensor_status->type.mems.odr;
   if (odr < 2.0f)
   {
     *enum_id = pnpl_ilps22qs_press_odr_hz1;
@@ -122,7 +122,7 @@ uint8_t ilps22qs_press_get_odr(pnpl_ilps22qs_press_odr_t *enum_id)
 
 uint8_t ilps22qs_press_get_fs(pnpl_ilps22qs_press_fs_t *enum_id)
 {
-  float fs = ilps22qs_press_model.sensor_status->type.mems.fs;
+  float_t fs = ilps22qs_press_model.sensor_status->type.mems.fs;
   if (fs <= 1261.0f)
   {
     *enum_id = pnpl_ilps22qs_press_fs_hpa1260;
@@ -158,14 +158,14 @@ uint8_t ilps22qs_press_get_dim(int32_t *value)
   return PNPL_NO_ERROR_CODE;
 }
 
-uint8_t ilps22qs_press_get_ioffset(float *value)
+uint8_t ilps22qs_press_get_ioffset(float_t *value)
 {
   *value = ilps22qs_press_model.stream_params.ioffset;
   /* USER Code */
   return PNPL_NO_ERROR_CODE;
 }
 
-uint8_t ilps22qs_press_get_measodr(float *value)
+uint8_t ilps22qs_press_get_measodr(float_t *value)
 {
   *value = ilps22qs_press_model.sensor_status->type.mems.measured_odr;
   /* USER Code */
@@ -186,7 +186,7 @@ uint8_t ilps22qs_press_get_sd_dps(int32_t *value)
   return PNPL_NO_ERROR_CODE;
 }
 
-uint8_t ilps22qs_press_get_sensitivity(float *value)
+uint8_t ilps22qs_press_get_sensitivity(float_t *value)
 {
   *value = ilps22qs_press_model.sensor_status->type.mems.sensitivity;
   /* USER Code */
@@ -234,7 +234,7 @@ uint8_t ilps22qs_press_set_odr(pnpl_ilps22qs_press_odr_t enum_id, char **respons
     *response_message = "";
   }
   uint8_t ret = PNPL_NO_ERROR_CODE;
-  float value;
+  float_t value;
   switch (enum_id)
   {
     case pnpl_ilps22qs_press_odr_hz1:
@@ -286,7 +286,7 @@ uint8_t ilps22qs_press_set_fs(pnpl_ilps22qs_press_fs_t enum_id, char **response_
     *response_message = "";
   }
   uint8_t ret = PNPL_NO_ERROR_CODE;
-  float value;
+  float_t value;
   switch (enum_id)
   {
     case pnpl_ilps22qs_press_fs_hpa1260:
@@ -308,7 +308,7 @@ uint8_t ilps22qs_press_set_fs(pnpl_ilps22qs_press_fs_t enum_id, char **response_
     /* USER Code */
   }
 
-  float sensitivity = 0.0f;
+  float_t sensitivity = 0.0f;
   ilps22qs_press_get_sensitivity(&sensitivity);
 
   return ret;

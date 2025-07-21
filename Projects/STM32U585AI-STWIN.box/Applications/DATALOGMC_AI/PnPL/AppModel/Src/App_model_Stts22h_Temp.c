@@ -67,7 +67,7 @@ uint8_t stts22h_temp_comp_init(void)
 
   int32_t value = 0;
   stts22h_temp_get_dim(&value);
-  float sensitivity = 0.0f;
+  float_t sensitivity = 0.0f;
   stts22h_temp_get_sensitivity(&sensitivity);
 
   __stream_control(true);
@@ -83,7 +83,7 @@ char *stts22h_temp_get_key(void)
 
 uint8_t stts22h_temp_get_odr(pnpl_stts22h_temp_odr_t *enum_id)
 {
-  float odr = stts22h_temp_model.sensor_status->type.mems.odr;
+  float_t odr = stts22h_temp_model.sensor_status->type.mems.odr;
   if (odr < 2.0f)
   {
     *enum_id = pnpl_stts22h_temp_odr_hz1;
@@ -113,7 +113,7 @@ uint8_t stts22h_temp_get_odr(pnpl_stts22h_temp_odr_t *enum_id)
 
 uint8_t stts22h_temp_get_fs(pnpl_stts22h_temp_fs_t *enum_id)
 {
-  float fs = stts22h_temp_model.sensor_status->type.mems.fs;
+  float_t fs = stts22h_temp_model.sensor_status->type.mems.fs;
   if (fs > 99.0f && fs < 101.0f)
   {
     *enum_id = pnpl_stts22h_temp_fs_cdeg100;
@@ -145,14 +145,14 @@ uint8_t stts22h_temp_get_dim(int32_t *value)
   return PNPL_NO_ERROR_CODE;
 }
 
-uint8_t stts22h_temp_get_ioffset(float *value)
+uint8_t stts22h_temp_get_ioffset(float_t *value)
 {
   *value = stts22h_temp_model.stream_params.ioffset;
   /* USER Code */
   return PNPL_NO_ERROR_CODE;
 }
 
-uint8_t stts22h_temp_get_measodr(float *value)
+uint8_t stts22h_temp_get_measodr(float_t *value)
 {
   *value = stts22h_temp_model.sensor_status->type.mems.measured_odr;
   /* USER Code */
@@ -173,7 +173,7 @@ uint8_t stts22h_temp_get_sd_dps(int32_t *value)
   return PNPL_NO_ERROR_CODE;
 }
 
-uint8_t stts22h_temp_get_sensitivity(float *value)
+uint8_t stts22h_temp_get_sensitivity(float_t *value)
 {
   *value = stts22h_temp_model.sensor_status->type.mems.sensitivity;
   /* USER Code */
@@ -221,7 +221,7 @@ uint8_t stts22h_temp_set_odr(pnpl_stts22h_temp_odr_t enum_id, char **response_me
     *response_message = "";
   }
   uint8_t ret = PNPL_NO_ERROR_CODE;
-  float value;
+  float_t value;
   switch (enum_id)
   {
     case pnpl_stts22h_temp_odr_hz1:

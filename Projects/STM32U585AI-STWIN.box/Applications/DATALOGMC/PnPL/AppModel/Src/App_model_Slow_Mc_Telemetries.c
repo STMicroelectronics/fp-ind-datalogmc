@@ -214,6 +214,27 @@ uint8_t slow_mc_telemetries_get_st_ble_stream__fault_format(char **value)
   *value = slow_mc_telemetries_ble_stream_model.st_ble_stream_objects[MC_REG_FAULTS_FLAGS_IDX].format;
   return 0;
 }
+uint8_t slow_mc_telemetries_get_dim(int32_t *value)
+{
+  *value = MCPTask_GetNumOfEnabledSlowTelemetry();
+  return PNPL_NO_ERROR_CODE;
+}
+uint8_t slow_mc_telemetries_get_odr(float_t *value)
+{
+  *value = MCPTask_GetSlowTelemetryODR();
+  return PNPL_NO_ERROR_CODE;
+
+}
+uint8_t slow_mc_telemetries_get_ioffset(float_t *value)
+{
+  *value = slow_mc_telemetries_model.stream_params.ioffset;
+  return PNPL_NO_ERROR_CODE;
+}
+uint8_t slow_mc_telemetries_get_samples_per_ts(int32_t *value)
+{
+  *value = 1;
+  return PNPL_NO_ERROR_CODE;
+}
 uint8_t slow_mc_telemetries_get_stream_id(int8_t *value)
 {
   *value = slow_mc_telemetries_model.stream_params.stream_id;
@@ -422,7 +443,7 @@ uint8_t slow_mc_telemetries_set_st_ble_stream__fault_format(const char *value, c
 /* Private function definition */
 static void update_slow_telemetry_state(uint8_t slow_telemetry_idx, bool value)
 {
-  /* Get current slow telemtry state*/
+  /* Get current slow telemetry state*/
   bool current_state = MCPTask_GetSlowTelemetryState((MCPTaskSlowTelemetry_idx_t) slow_telemetry_idx);
 
   /* Set new state */

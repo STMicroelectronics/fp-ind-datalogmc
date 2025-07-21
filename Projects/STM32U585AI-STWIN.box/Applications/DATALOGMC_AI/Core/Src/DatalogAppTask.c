@@ -741,7 +741,7 @@ sys_error_code_t DatalogAppTask_OnNewDataReady_vtbl(IEventListener *_this, const
           data_buf += p_obj->sensorContext[sId].n_samples_to_timestamp * nBytesPerSample;
           samplesToSend -= p_obj->sensorContext[sId].n_samples_to_timestamp;
 
-          float measuredODR;
+          float_t measuredODR;
           double newTS;
 
           SensorStatus_t sensor_status = SMSensorGetStatus(sId);

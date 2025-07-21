@@ -340,7 +340,7 @@
               <MiscControls>--include=sysconfig.h</MiscControls>
               <Define>DEBUG, SYS_DEBUG, SYS_TP_MCU_STM32U5, USE_FULL_ASSERT, SYS_TRACE=0, SYS_DBG_ENABLE_TA4=0, TX_INCLUDE_USER_DEFINE_FILE, UX_INCLUDE_USER_DEFINE_FILE, USE_HAL_DRIVER, STM32U585xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../FileX/Target;../FileX/App;../USBX/Target;../USBX/App;../mx/Inc;..\NanoEdgeAI\Keil\Inc;..\PnPL\AppModel\Inc;..\PnPL\Components\Inc;../../../../eLooM_Components/SensorManager/Inc;../../../../eLooM_Components/TagManager/Inc;..\..\..\..\..\Middlewares\ST\PnPLCompManager\Inc;..\..\..\..\eLooM_Components\EMData\Inc;..\..\..\..\eLooM_Components\DPU\Inc;../../../../../Middlewares/ST/STM32_BLE_Manager/Inc;../../../../../Middlewares/ST/BlueNRG-2/includes;../../../../../Middlewares/ST/BlueNRG-2/hci/hci_tl_patterns/Basic;../../../../../Middlewares/ST/BlueNRG-2/utils;../../../../../Middlewares/ST/filex/common/inc;../../../../../Middlewares/ST/filex/ports/generic/inc;../../../../../Middlewares/ST/threadx/common/inc;../../../../../Middlewares/ST/usbx/common/core/inc;../../../../../Middlewares/ST/SensorStreaming_USBX;../../../../../Middlewares/ST/usbx/common/usbx_stm32_device_controllers;../../../../../Middlewares/ST/usbx/ports/generic/inc;..\..\..\..\..\Middlewares\ST\CircularBufferDL2;../../../../../Middlewares/ST/eLooM/Inc;../../../../../Middlewares/Third_Party/parson;../../../../../Middlewares/ST/threadx/ports/cortex_m33/ac6/inc;../../../../../Drivers/CMSIS/Include;../../../../../Drivers/CMSIS/Device/ST/STM32U5xx/Include;../../../../../Drivers/STM32U5xx_HAL_Driver/Inc;../../../../../Drivers/BSP/Components/iis2dlpc;../../../../../Drivers/BSP/Components/iis2iclx;../../../../../Drivers/BSP/Components/iis2mdc;../../../../../Drivers/BSP/Components/iis3dwb;../../../../../Drivers/BSP/Components/ilps22qs;../../../../../Drivers/BSP/Components/ism330is;../../../../../Drivers/BSP/Components/ism330dhcx;../../../../../Drivers/BSP/Components/lps22hh;../../../../../Drivers/BSP/Components/stts22h;../../../../../Drivers/BSP/STWIN.box;..\..\..\..\..\Middlewares\ST\threadx\utility\execution_profile_kit;..\Mcp\Inc;..\Mcp\ASPEP\Inc</IncludePath>
+              <IncludePath>../Core/Inc;../FileX/Target;../FileX/App;../USBX/Target;../USBX/App;..\MCPTask\Inc;../mx/Inc;..\NanoEdgeAI\Keil\Inc;..\PnPL\AppModel\Inc;..\PnPL\Components\Inc;../../../../eLooM_Components/SensorManager/Inc;../../../../eLooM_Components/TagManager/Inc;..\..\..\..\..\Middlewares\ST\PnPLCompManager\Inc;..\..\..\..\eLooM_Components\EMData\Inc;..\..\..\..\eLooM_Components\DPU\Inc;../../../../../Middlewares/ST/STM32_BLE_Manager/Inc;../../../../../Middlewares/ST/BlueNRG-2/includes;../../../../../Middlewares/ST/BlueNRG-2/hci/hci_tl_patterns/Basic;../../../../../Middlewares/ST/BlueNRG-2/utils;../../../../../Middlewares/ST/filex/common/inc;../../../../../Middlewares/ST/filex/ports/generic/inc;../../../../../Middlewares/ST/threadx/common/inc;../../../../../Middlewares/ST/usbx/common/core/inc;../../../../../Middlewares/ST/SensorStreaming_USBX;../../../../../Middlewares/ST/usbx/common/usbx_stm32_device_controllers;../../../../../Middlewares/ST/usbx/ports/generic/inc;..\..\..\..\..\Middlewares\ST\CircularBufferDL2;../../../../../Middlewares/ST/eLooM/Inc;../../../../../Middlewares/Third_Party/parson;../../../../../Middlewares/ST/threadx/ports/cortex_m33/ac6/inc;../../../../../Drivers/CMSIS/Include;../../../../../Drivers/CMSIS/Device/ST/STM32U5xx/Include;../../../../../Drivers/STM32U5xx_HAL_Driver/Inc;../../../../../Drivers/BSP/Components/iis2dlpc;../../../../../Drivers/BSP/Components/iis2iclx;../../../../../Drivers/BSP/Components/iis2mdc;../../../../../Drivers/BSP/Components/iis3dwb;../../../../../Drivers/BSP/Components/ilps22qs;../../../../../Drivers/BSP/Components/ism330is;../../../../../Drivers/BSP/Components/ism330dhcx;../../../../../Drivers/BSP/Components/lps22hh;../../../../../Drivers/BSP/Components/stts22h;../../../../../Drivers/BSP/STWIN.box;..\..\..\..\..\Middlewares\ST\threadx\utility\execution_profile_kit;..\Mcp\Inc;..\Mcp\ASPEP\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -405,9 +405,9 @@
               <FilePath>..\Core\Src\AppPowerModeHelper.c</FilePath>
             </File>
             <File>
-              <FileName>BLE_Implementation.c</FileName>
+              <FileName>ble_implementation.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Core\Src\BLE_Implementation.c</FilePath>
+              <FilePath>..\Core\Src\ble_implementation.c</FilePath>
             </File>
             <File>
               <FileName>ble_stream_class.c</FileName>
@@ -453,11 +453,6 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>MCPTask.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\MCPTask.c</FilePath>
             </File>
             <File>
               <FileName>OTA.c</FileName>
@@ -563,6 +558,16 @@
               <FileName>mcp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\mcp\Src\mcp.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/MCPTask</GroupName>
+          <Files>
+            <File>
+              <FileName>MCPTask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MCPTask\Src\MCPTask.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1305,9 +1310,9 @@
           <GroupName>Middlewares/ST/BlueNRG-2</GroupName>
           <Files>
             <File>
-              <FileName>bluenrg1_devConfig.c</FileName>
+              <FileName>bluenrg1_dev_config.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Middlewares\ST\BlueNRG-2\hci\bluenrg1_devConfig.c</FilePath>
+              <FilePath>..\..\..\..\..\Middlewares\ST\BlueNRG-2\hci\bluenrg1_dev_config.c</FilePath>
             </File>
             <File>
               <FileName>bluenrg1_events.c</FileName>
@@ -2410,19 +2415,19 @@
           <GroupName>Middlewares/ST/STM32_BLE_Manager</GroupName>
           <Files>
             <File>
-              <FileName>BLE_Manager.c</FileName>
+              <FileName>ble_manager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Middlewares\ST\STM32_BLE_Manager\Src\BLE_Manager.c</FilePath>
+              <FilePath>..\..\..\..\..\Middlewares\ST\STM32_BLE_Manager\Src\ble_manager.c</FilePath>
             </File>
             <File>
-              <FileName>BLE_PnPLike.c</FileName>
+              <FileName>ble_pn_p_like.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Middlewares\ST\STM32_BLE_Manager\Src\BLE_PnPLike.c</FilePath>
+              <FilePath>..\..\..\..\..\Middlewares\ST\STM32_BLE_Manager\Src\ble_pn_p_like.c</FilePath>
             </File>
             <File>
-              <FileName>BLE_RawPnPLControlled.c</FileName>
+              <FileName>ble_raw_pn_pl_controlled.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Middlewares\ST\STM32_BLE_Manager\Src\BLE_RawPnPLControlled.c</FilePath>
+              <FilePath>..\..\..\..\..\Middlewares\ST\STM32_BLE_Manager\Src\ble_raw_pn_pl_controlled.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4308,7 +4313,7 @@
               <MiscControls>--include=sysconfig.h</MiscControls>
               <Define>SYS_TP_MCU_STM32U5, USE_FULL_ASSERT, SYS_TRACE=0, SYS_DBG_ENABLE_TA4=0, TX_INCLUDE_USER_DEFINE_FILE, UX_INCLUDE_USER_DEFINE_FILE, USE_HAL_DRIVER, STM32U585xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../FileX/Target;../FileX/App;../USBX/Target;../USBX/App;../mx/Inc;..\NanoEdgeAI\Keil\Inc;..\PnPL\AppModel\Inc;..\PnPL\Components\Inc;../../../../eLooM_Components/SensorManager/Inc;../../../../eLooM_Components/TagManager/Inc;..\..\..\..\..\Middlewares\ST\PnPLCompManager\Inc;..\..\..\..\eLooM_Components\EMData\Inc;..\..\..\..\eLooM_Components\DPU\Inc;../../../../../Middlewares/ST/STM32_BLE_Manager/Inc;../../../../../Middlewares/ST/BlueNRG-2/includes;../../../../../Middlewares/ST/BlueNRG-2/hci/hci_tl_patterns/Basic;../../../../../Middlewares/ST/BlueNRG-2/utils;../../../../../Middlewares/ST/filex/common/inc;../../../../../Middlewares/ST/filex/ports/generic/inc;../../../../../Middlewares/ST/threadx/common/inc;../../../../../Middlewares/ST/usbx/common/core/inc;../../../../../Middlewares/ST/SensorStreaming_USBX;../../../../../Middlewares/ST/usbx/common/usbx_stm32_device_controllers;../../../../../Middlewares/ST/usbx/ports/generic/inc;..\..\..\..\..\Middlewares\ST\CircularBufferDL2;../../../../../Middlewares/ST/eLooM/Inc;../../../../../Middlewares/Third_Party/parson;../../../../../Middlewares/ST/threadx/ports/cortex_m33/ac6/inc;../../../../../Drivers/CMSIS/Include;../../../../../Drivers/CMSIS/Device/ST/STM32U5xx/Include;../../../../../Drivers/STM32U5xx_HAL_Driver/Inc;../../../../../Drivers/BSP/Components/hts221;../../../../../Drivers/BSP/Components/iis2dlpc;../../../../../Drivers/BSP/Components/iis2iclx;../../../../../Drivers/BSP/Components/iis2mdc;../../../../../Drivers/BSP/Components/iis3dwb;../../../../../Drivers/BSP/Components/ilps22qs;../../../../../Drivers/BSP/Components/ism330is;../../../../../Drivers/BSP/Components/ism330dhcx;../../../../../Drivers/BSP/Components/lps22hh;../../../../../Drivers/BSP/Components/stts22h;../../../../../Drivers/BSP/STWIN.box;..\Mcp\Inc;..\Mcp\ASPEP\Inc</IncludePath>
+              <IncludePath>../Core/Inc;../FileX/Target;../FileX/App;../USBX/Target;../USBX/App;..\MCPTask\Inc;../mx/Inc;..\NanoEdgeAI\Keil\Inc;..\PnPL\AppModel\Inc;..\PnPL\Components\Inc;../../../../eLooM_Components/SensorManager/Inc;../../../../eLooM_Components/TagManager/Inc;..\..\..\..\..\Middlewares\ST\PnPLCompManager\Inc;..\..\..\..\eLooM_Components\EMData\Inc;..\..\..\..\eLooM_Components\DPU\Inc;../../../../../Middlewares/ST/STM32_BLE_Manager/Inc;../../../../../Middlewares/ST/BlueNRG-2/includes;../../../../../Middlewares/ST/BlueNRG-2/hci/hci_tl_patterns/Basic;../../../../../Middlewares/ST/BlueNRG-2/utils;../../../../../Middlewares/ST/filex/common/inc;../../../../../Middlewares/ST/filex/ports/generic/inc;../../../../../Middlewares/ST/threadx/common/inc;../../../../../Middlewares/ST/usbx/common/core/inc;../../../../../Middlewares/ST/SensorStreaming_USBX;../../../../../Middlewares/ST/usbx/common/usbx_stm32_device_controllers;../../../../../Middlewares/ST/usbx/ports/generic/inc;..\..\..\..\..\Middlewares\ST\CircularBufferDL2;../../../../../Middlewares/ST/eLooM/Inc;../../../../../Middlewares/Third_Party/parson;../../../../../Middlewares/ST/threadx/ports/cortex_m33/ac6/inc;../../../../../Drivers/CMSIS/Include;../../../../../Drivers/CMSIS/Device/ST/STM32U5xx/Include;../../../../../Drivers/STM32U5xx_HAL_Driver/Inc;../../../../../Drivers/BSP/Components/hts221;../../../../../Drivers/BSP/Components/iis2dlpc;../../../../../Drivers/BSP/Components/iis2iclx;../../../../../Drivers/BSP/Components/iis2mdc;../../../../../Drivers/BSP/Components/iis3dwb;../../../../../Drivers/BSP/Components/ilps22qs;../../../../../Drivers/BSP/Components/ism330is;../../../../../Drivers/BSP/Components/ism330dhcx;../../../../../Drivers/BSP/Components/lps22hh;../../../../../Drivers/BSP/Components/stts22h;../../../../../Drivers/BSP/STWIN.box;..\Mcp\Inc;..\Mcp\ASPEP\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -4373,9 +4378,9 @@
               <FilePath>..\Core\Src\AppPowerModeHelper.c</FilePath>
             </File>
             <File>
-              <FileName>BLE_Implementation.c</FileName>
+              <FileName>ble_implementation.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Core\Src\BLE_Implementation.c</FilePath>
+              <FilePath>..\Core\Src\ble_implementation.c</FilePath>
             </File>
             <File>
               <FileName>ble_stream_class.c</FileName>
@@ -4421,11 +4426,6 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>MCPTask.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\MCPTask.c</FilePath>
             </File>
             <File>
               <FileName>OTA.c</FileName>
@@ -4531,6 +4531,16 @@
               <FileName>mcp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\mcp\Src\mcp.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/MCPTask</GroupName>
+          <Files>
+            <File>
+              <FileName>MCPTask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MCPTask\Src\MCPTask.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5273,9 +5283,9 @@
           <GroupName>Middlewares/ST/BlueNRG-2</GroupName>
           <Files>
             <File>
-              <FileName>bluenrg1_devConfig.c</FileName>
+              <FileName>bluenrg1_dev_config.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Middlewares\ST\BlueNRG-2\hci\bluenrg1_devConfig.c</FilePath>
+              <FilePath>..\..\..\..\..\Middlewares\ST\BlueNRG-2\hci\bluenrg1_dev_config.c</FilePath>
             </File>
             <File>
               <FileName>bluenrg1_events.c</FileName>
@@ -6378,19 +6388,19 @@
           <GroupName>Middlewares/ST/STM32_BLE_Manager</GroupName>
           <Files>
             <File>
-              <FileName>BLE_Manager.c</FileName>
+              <FileName>ble_manager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Middlewares\ST\STM32_BLE_Manager\Src\BLE_Manager.c</FilePath>
+              <FilePath>..\..\..\..\..\Middlewares\ST\STM32_BLE_Manager\Src\ble_manager.c</FilePath>
             </File>
             <File>
-              <FileName>BLE_PnPLike.c</FileName>
+              <FileName>ble_pn_p_like.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Middlewares\ST\STM32_BLE_Manager\Src\BLE_PnPLike.c</FilePath>
+              <FilePath>..\..\..\..\..\Middlewares\ST\STM32_BLE_Manager\Src\ble_pn_p_like.c</FilePath>
             </File>
             <File>
-              <FileName>BLE_RawPnPLControlled.c</FileName>
+              <FileName>ble_raw_pn_pl_controlled.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Middlewares\ST\STM32_BLE_Manager\Src\BLE_RawPnPLControlled.c</FilePath>
+              <FilePath>..\..\..\..\..\Middlewares\ST\STM32_BLE_Manager\Src\ble_raw_pn_pl_controlled.c</FilePath>
             </File>
           </Files>
         </Group>

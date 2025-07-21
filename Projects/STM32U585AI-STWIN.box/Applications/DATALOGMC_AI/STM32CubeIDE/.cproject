@@ -93,6 +93,7 @@
 									<listOptionValue builtIn="false" value="../../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../../mcp/Inc"/>
 									<listOptionValue builtIn="false" value="../../mcp/ASPEP/Inc"/>
+									<listOptionValue builtIn="false" value="../../MCPTask/Inc"/>
 									<listOptionValue builtIn="false" value="../../FileX/Target"/>
 									<listOptionValue builtIn="false" value="../../PnPL/AppModel/Inc"/>
 									<listOptionValue builtIn="false" value="../../PnPL/Components/Inc"/>
@@ -244,6 +245,7 @@
 									<listOptionValue builtIn="false" value="../../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../../mcp/Inc"/>
 									<listOptionValue builtIn="false" value="../../mcp/ASPEP/Inc"/>
+									<listOptionValue builtIn="false" value="../../MCPTask/Inc"/>
 									<listOptionValue builtIn="false" value="../../FileX/Target"/>
 									<listOptionValue builtIn="false" value="../../PnPL/AppModel/Inc"/>
 									<listOptionValue builtIn="false" value="../../PnPL/Components/Inc"/>

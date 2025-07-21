@@ -117,7 +117,7 @@ uint8_t Iis3dwb_Acc_PnPL_vtblGetStatus(IPnPLComponent_t *_this, char **serialize
   json_object_dotset_number(JSON_Status, "iis3dwb_acc.samples_per_ts", temp_i);
   iis3dwb_acc_get_dim(&temp_i);
   json_object_dotset_number(JSON_Status, "iis3dwb_acc.dim", temp_i);
-  float temp_f = 0;
+  float_t temp_f = 0;
   iis3dwb_acc_get_ioffset(&temp_f);
   json_object_dotset_number(JSON_Status, "iis3dwb_acc.ioffset", temp_f);
   iis3dwb_acc_get_measodr(&temp_f);

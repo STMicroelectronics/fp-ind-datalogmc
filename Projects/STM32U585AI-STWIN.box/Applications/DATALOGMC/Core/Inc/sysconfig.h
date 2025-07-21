@@ -31,8 +31,8 @@
 // *********************
 
 #define BOARD_ID_BOXA           0x0E
-#define BLE_FW_ID_DATALOG2_BOXA 0x2C
-#define USB_FW_ID_DATALOG2_BOXA 0x1D
+#define BLE_FW_ID_DATALOG2_BOXA 0x30
+#define USB_FW_ID_DATALOG2_BOXA 0x2F
 
 #define BOARD_ID_BOXB           0x12
 #define BLE_FW_ID_DATALOG2_BOXB 0x04

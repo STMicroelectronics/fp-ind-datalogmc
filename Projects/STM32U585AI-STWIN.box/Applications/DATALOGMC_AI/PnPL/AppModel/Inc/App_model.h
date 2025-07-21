@@ -103,7 +103,7 @@ extern "C" {
 #define FAST_TELEMETRY_APP_MODEL_STREAM_ID    2u
 
 #define FW_VERSION_MAJOR    "2"
-#define FW_VERSION_MINOR    "0"
+#define FW_VERSION_MINOR    "1"
 #define FW_VERSION_PATCH    "0"
 
 typedef struct _StreamParams_t
@@ -115,8 +115,8 @@ typedef struct _StreamParams_t
   uint32_t usb_dps;
   uint32_t ble_dps;
   uint32_t serial_dps;
-  float ioffset;
-  float bandwidth;
+  float_t ioffset;
+  float_t bandwidth;
   /* Stream Parameters Model USER code */
 } StreamParams_t;
 

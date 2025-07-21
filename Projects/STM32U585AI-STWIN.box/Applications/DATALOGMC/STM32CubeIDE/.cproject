@@ -99,6 +99,7 @@
 									<listOptionValue builtIn="false" value="../../FileX/App"/>
 									<listOptionValue builtIn="false" value="../../USBX/Target"/>
 									<listOptionValue builtIn="false" value="../../USBX/App"/>
+									<listOptionValue builtIn="false" value="../../MCPTask/Inc"/>
 									<listOptionValue builtIn="false" value="../../mx/Inc"/>
 									<listOptionValue builtIn="false" value="../../../../../eLooM_Components/SensorManager/Inc"/>
 									<listOptionValue builtIn="false" value="../../../../../eLooM_Components/TagManager/Inc"/>
@@ -240,6 +241,7 @@
 									<listOptionValue builtIn="false" value="../../FileX/App"/>
 									<listOptionValue builtIn="false" value="../../USBX/Target"/>
 									<listOptionValue builtIn="false" value="../../USBX/App"/>
+									<listOptionValue builtIn="false" value="../../MCPTask/Inc"/>
 									<listOptionValue builtIn="false" value="../../mx/Inc"/>
 									<listOptionValue builtIn="false" value="../../../../../eLooM_Components/SensorManager/Inc"/>
 									<listOptionValue builtIn="false" value="../../../../../eLooM_Components/TagManager/Inc"/>

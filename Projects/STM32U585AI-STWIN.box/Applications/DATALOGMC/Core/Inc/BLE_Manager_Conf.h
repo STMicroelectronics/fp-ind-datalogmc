@@ -1,7 +1,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    BLE_Manager_Conf_Template.h
+  * @file    ble_manager_conf.h
   * @author  System Research & Applications Team - Catania Lab.
   * @brief   BLE Manager configuration template file.
   *          This file should be copied to the application folder and renamed
@@ -9,7 +9,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -29,7 +29,25 @@
 extern "C" {
 #endif
 
+#include "services/sysmem.h"
+#include "tx_api.h"
+
 /* Exported define ------------------------------------------------------------*/
+#ifndef CUBE_MX_2
+#define ble_status_t tBleStatus
+
+#define service_uuid_t Service_UUID_t
+#define service_uuid_128 Service_UUID_128
+
+#define char_uuid_t Char_UUID_t
+#define char_uuid_128 Char_UUID_128
+
+#define hci_le_meta_events_table_type_t hci_le_meta_events_table_type
+#define hci_vendor_specific_events_table_type_t hci_vendor_specific_events_table_type
+#define hci_events_table_type_t hci_events_table_type
+#define bonded_device_entry_t Bonded_Device_Entry_t
+#endif /* CUBE_MX_2 */
+
 /* Select the used bluetooth core:
  *
  * BLUENRG_1_2     0x00
@@ -38,10 +56,9 @@ extern "C" {
  * BLUE_WB         0x03
 */
 
-/* Comment this define if do not use parson */
-#define BLE_MANAGER_USE_PARSON
-
 #define BLUE_CORE BLUENRG_1_2
+
+#define BLE_MANAGER_USE_PARSON
 
 #ifndef BLE_MANAGER_USE_PARSON
 #define BLE_MANAGER_NO_PARSON
@@ -61,10 +78,10 @@ extern "C" {
 #define CONFIG_VALUE_LENGTH      6
 /* GAP Roles */
 #define GAP_ROLES      0x01
-/* Maximum number of allocable bluetooth characteristics */
-#define BLE_MANAGER_MAX_ALLOCABLE_CHARS      32
 /* Configuration values */
 #define CONFIG_VALUE_OFFSETS      0x00
+/* Maximum number of allocable bluetooth characteristics */
+#define BLE_MANAGER_MAX_ALLOCABLE_CHARS      32
 /* Defines the Max dimension of the Bluetooth std error characteristic */
 #define DEFAULT_MAX_STDERR_CHAR_LEN      20
 /* Defines the Max dimension of the Bluetooth characteristics for each packet */
@@ -87,23 +104,20 @@ extern "C" {
 
 #define DEFAULT_MAX_STDOUT_CHAR_LEN     DEFAULT_MAX_CHAR_LEN
 #define DEFAULT_MAX_EXTCONFIG_CHAR_LEN  DEFAULT_MAX_CHAR_LEN
+#define DEFAULT_MAX_PNPL_NOTIFICATION_CHAR_LEN DEFAULT_MAX_CHAR_LEN
+#define DEFAULT_MAX_RAW_NOTIFICATION_CHAR_LEN DEFAULT_MAX_CHAR_LEN
 
 /* For enabling the capability to handle BlueNRG Congestion */
 #define ACC_BLUENRG_CONGESTION
-
-/* Define the Max Dimension of the Bluetooth characteristics for PnPL (only for Notification) */
-#define DEFAULT_MAX_PNPL_NOTIFICATION_CHAR_LEN 217
 
 /* USER CODE END 1 */
 
 /* Define the Delay function to use inside the BLE Manager (HAL_Delay/osDelay) */
 #define BLE_MANAGER_DELAY tx_thread_sleep
-/* Function InitBleManager_BLE_Stack use this define as delay if defined */
-/* #define BLE_INITIAL_DELAY HAL_Delay */
 
-/****************** Memory management functions **************************/
-#define BLE_MALLOC_FUNCTION      SysAlloc
-#define BLE_FREE_FUNCTION        SysFree
+/****************** Malloc/Free **************************/
+#define BLE_MALLOC_FUNCTION SysAlloc
+#define BLE_FREE_FUNCTION SysFree
 #define BLE_MEM_CPY              memcpy
 
 /*---------- Print messages from BLE Manager files at middleware level -----------*/
@@ -113,7 +127,7 @@ extern "C" {
 /* Uncomment/Comment the following define for  disabling/enabling print messages from BLE Manager files */
 //#define BLE_MANAGER_DEBUG
 
-#define BLE_DEBUG_LEVEL 3
+#define BLE_DEBUG_LEVEL 1
 
 #ifdef BLE_MANAGER_DEBUG
 /**

@@ -117,7 +117,7 @@ uint8_t fast_mc_telemetries_get_dim(int32_t *value)
    * @fast_mc_telemetries_model.stream_params.usb_dps/2
    * sample in the buffers
    **/
-  *value = (fast_mc_telemetries_model.stream_params.usb_dps - STREAM_TIMESTAMP_DIM) / 2;
+  *value = MCPTask_GetNumOfEnabledFastTelemetry();//(fast_mc_telemetries_model.stream_params.usb_dps - STREAM_TIMESTAMP_DIM) / 2;
   return 0;
 }
 uint8_t fast_mc_telemetries_get_i_q__enabled(bool *value)
@@ -221,19 +221,72 @@ uint8_t fast_mc_telemetries_get_v_b__unit(char **value)
   /* USER Code */
   return 0;
 }
-uint8_t fast_mc_telemetries_get_sensitivity__voltage(float *value)
+uint8_t fast_mc_telemetries_get_sensitivity__voltage(float_t *value)
 {
   *value = MCPTask_GetVoltageScaler();
   return PNPL_NO_ERROR_CODE ;
 }
-uint8_t fast_mc_telemetries_get_sensitivity__current(float *value)
+uint8_t fast_mc_telemetries_get_sensitivity__current(float_t *value)
 {
   *value = MCPTask_GetCurrentScaler();
   return PNPL_NO_ERROR_CODE ;
 }
-uint8_t fast_mc_telemetries_get_sensitivity__frequency(float *value)
+uint8_t fast_mc_telemetries_get_sensitivity__frequency(float_t *value)
 {
   *value = MCPTask_GetFrequencyScaler();
+  return PNPL_NO_ERROR_CODE ;
+}
+uint8_t fast_mc_telemetries_get_samples_per_ts(int32_t *value)
+{
+  uint32_t sample_per_ts = 0u;
+  uint32_t num_enabled_tele = 0u;
+
+  num_enabled_tele = MCPTask_GetNumOfEnabledFastTelemetry();
+  switch (num_enabled_tele)
+  {
+    case 0:
+    {
+      sample_per_ts = 0;
+    }
+    break;
+
+    case 1:
+    {
+      sample_per_ts = FAST_TELEMETRY_ONE_ENABLED_USB_DPS / (sizeof(uint16_t) * 1);
+    }
+    break;
+
+    case 2:
+    {
+      sample_per_ts = FAST_TELEMETRY_TWO_ENABLED_USB_DPS / (sizeof(uint16_t) * 2);
+    }
+    break;
+
+    case 3:
+    {
+      sample_per_ts = FAST_TELEMETRY_THREE_ENABLED_USB_DPS / (sizeof(uint16_t) * 3);
+    }
+    break;
+
+    case 4:
+    {
+      sample_per_ts = FAST_TELEMETRY_FOUR_ENABLED_USB_DPS / (sizeof(uint16_t) * 4);
+    }
+    break;
+  }
+
+  *value = sample_per_ts;
+
+  return PNPL_NO_ERROR_CODE ;
+}
+uint8_t fast_mc_telemetries_get_odr(int32_t *value)
+{
+  *value = MCPTask_GetMotorPWM();
+  return PNPL_NO_ERROR_CODE ;
+}
+uint8_t fast_mc_telemetries_get_ioffset(float_t *value)
+{
+  *value = fast_mc_telemetries_model.stream_params.ioffset;
   return PNPL_NO_ERROR_CODE ;
 }
 uint8_t fast_mc_telemetries_get_stream_id(int8_t *value)
@@ -453,7 +506,7 @@ uint8_t fast_mc_telemetries_set_v_b__unit(const char *value, char **response_mes
 /* Private Function definition */
 static void update_fast_telemetry_state(uint8_t fast_telemetry_idx, bool value)
 {
-  /* Get current slow telemtry state*/
+  /* Get current slow telemetry state*/
   bool current_state = MCPTask_GetFastTelemetryState((MCPTaskFastTelemetry_idx_t) fast_telemetry_idx);
 
   if (value)

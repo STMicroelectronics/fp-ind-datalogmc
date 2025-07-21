@@ -75,7 +75,7 @@ static FwId_BoardName_t CurrentFwInfo, OtherBankFwInfo;
 static void DeleteOtherFlashBankFwId(void);
 
 /* Exported functions --------------------------------------------------------*/
-extern int32_t CurrentActiveBank;
+extern uint8_t CurrentActiveBank;
 /**
   * @brief Function for Updating the Firmware
   * @param uint32_t *SizeOfUpdate Remaining size of the firmware image [bytes]

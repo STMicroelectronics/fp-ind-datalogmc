@@ -117,7 +117,7 @@ uint8_t Deviceinformation_PnPL_vtblGetStatus(IPnPLComponent_t *_this, char **ser
   json_object_dotset_string(JSON_Status, "DeviceInformation.processorArchitecture", temp_s);
   DeviceInformation_get_processorManufacturer(&temp_s);
   json_object_dotset_string(JSON_Status, "DeviceInformation.processorManufacturer", temp_s);
-  float temp_f = 0;
+  float_t temp_f = 0;
   DeviceInformation_get_totalStorage(&temp_f);
   json_object_dotset_number(JSON_Status, "DeviceInformation.totalStorage", temp_f);
   DeviceInformation_get_totalMemory(&temp_f);

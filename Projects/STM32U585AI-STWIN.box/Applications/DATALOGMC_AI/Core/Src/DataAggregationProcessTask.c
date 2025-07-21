@@ -769,7 +769,7 @@ static void array_decimation(int16_t *p_array, float_t *p_output, uint32_t len, 
   uint32_t next_position = 0;
   uint32_t axis_increment = 0;
   uint8_t next_axis = 0;
-  float sum = 0;
+  float_t sum = 0;
 
   decimated_array_len = len / decimation;
 

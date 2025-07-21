@@ -44,9 +44,9 @@ Here is the list of references to user documents:
 
 ## Development Toolchains and Compilers
 
--   IAR Embedded Workbench for ARM (EWARM) toolchain V9.20.1
+-   IAR Embedded Workbench for ARM (EWARM) toolchain V9.60.3
 -   RealView Microcontroller Development Kit (MDK-ARM) toolchain V5.38
--   STM32CubeIDE v1.17.0
+-   STM32CubeIDE v1.18.1
 
 ## Supported Devices and Boards
 
@@ -59,4 +59,4 @@ Here is the list of references to user documents:
 
 ## Dependencies
 
-- HSDPython_SDK has been moved in a separate software product: **[STDATALOG_PYSDK](https://github.com/STMicroelectronics/stdatalog-pysdk)**
+- None
