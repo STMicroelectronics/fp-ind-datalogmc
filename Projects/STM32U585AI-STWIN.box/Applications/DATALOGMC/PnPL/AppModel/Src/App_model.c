@@ -32,12 +32,32 @@
 #include <string.h>
 #include <stdio.h>
 /* USER includes -------------------------------------------------------------*/
-
+#include "ble_manager_conf.h"
+#include "ux_user.h"
 /* USER defines --------------------------------------------------------------*/
 uint8_t algorithms_cnt = 0;
 uint8_t actuators_cnt = 0;
 #define SYS_DEBUGF(level, message)                SYS_DEBUGF3(SYS_DBG_DT, level, message)
+
+/* Maximum time between two consecutive stream packets */
+#define SC_SDCARD_WRITE_PERIOD           0.33f
+#define SC_DL2_PROTOCOL_COUNTER_SIZE     4U
+#define SC_DL2_PROTOCOL_TIMESTAMP_SIZE   8U
+/* Max DPS for USB */
+#define SC_USB_DPS_MAX                7000U
+/* Under this limit the stream is considered "slow" */
+#define SC_USB_SLOW_ODR_LIMIT_HZ      20.0f
+/* Maximum time between two consecutive stream packets */
+#define SC_USB_MAX_PACKETS_PERIOD     0.05f
+/* Maximum data bandwidth supported (byte) */
+#define SC_SAFE_BANDWIDTH             786432 /* maximum baudrate = 6 Mbps = (6*1024*1024)/8 */
+
 /* USER private function prototypes ------------------------------------------*/
+static sys_error_code_t __sc_set_sd_stream_params(uint32_t id);
+static sys_error_code_t __sc_set_usb_stream_params(uint32_t id);
+static sys_error_code_t __sc_set_fifo_wtm(uint32_t id);
+static void __sc_set_usb_enpoints(void);
+static void __sc_reset_stream_params(void);
 
 AppModel_t app_model;
 
@@ -77,20 +97,23 @@ uint8_t addActuatorToAppModel(uint16_t id, ActuatorModel_t *model)
   return PNPL_BASE_ERROR_CODE;
 }
 
+
+
 uint8_t __stream_control(bool status)
 {
+  uint8_t ret = PNPL_NO_ERROR_CODE;
   int8_t i;
-  if (status) //set stream ids
+  if (status) /* Set stream ids */
   {
-    int8_t j, st_i = 0;
-    uint16_t proposed_fifoWM = 1;
-    //sort stream id by bandwidth
+    int8_t j, stream_id = 0;
+    app_model.total_bandwidth = 0;
     for (i = 0; i < SENSOR_NUMBER; i++)
     {
       if (app_model.s_models[i] != NULL)
       {
         if (app_model.s_models[i]->sensor_status->is_active == true)
         {
+          /* Get sensor's bandwidth */
           if (app_model.s_models[i]->sensor_status->isensor_class == ISENSOR_CLASS_MEMS)
           {
             app_model.s_models[i]->stream_params.bandwidth = app_model.s_models[i]->sensor_status->type.mems.odr * SMGetnBytesPerSample(i);
@@ -99,121 +122,48 @@ uint8_t __stream_control(bool status)
           {
             app_model.s_models[i]->stream_params.bandwidth = app_model.s_models[i]->sensor_status->type.audio.frequency * SMGetnBytesPerSample(i);
           }
+          else if (app_model.s_models[i]->sensor_status->isensor_class == ISENSOR_CLASS_POWERMONITOR)
+          {
+            app_model.s_models[i]->stream_params.bandwidth = (1000000.0f / (float_t)app_model.s_models[i]->sensor_status->type.power_meter.adc_conversion_time) * SMGetnBytesPerSample(i);
+          }
           else
           {
             /* TODO: add support for other ISENSOR_CLASS */
           }
 
-          if (app_model.log_controller_model.interface == LOG_CTRL_MODE_SD)
+          __sc_set_sd_stream_params(i);
+          __sc_set_usb_stream_params(i);
+          __sc_set_fifo_wtm(i);
+
+          app_model.s_models[i]->stream_params.stream_id = stream_id;
+          stream_id++;
+
+          /*
+           * Ensure that elements with higher bandwidth are assigned lower stream_id.
+           * Check if the current element has a higher bandwidth than any previous elements (j).
+           * If so, the current elements take the place of the previous one that is incremented by one.
+           */
+          StreamParams_t *p_current = &(app_model.s_models[i]->stream_params);
+          StreamParams_t *p_other;
+          j = i - 1;
+          while (j >= 0)
           {
-            /* 330ms of sensor data. Access to SD is optimized when buffer dimension is multiple of 512 */
-            app_model.s_models[i]->stream_params.sd_dps = (uint32_t)(app_model.s_models[i]->stream_params.bandwidth * 0.33f);
-            app_model.s_models[i]->stream_params.sd_dps = app_model.s_models[i]->stream_params.sd_dps - (app_model.s_models[i]->stream_params.sd_dps % 512) + 512;
-
-            /*********** IS IT STILL multiple of 512?  **************/
-            if (app_model.s_models[i]->stream_params.sd_dps > app_model.s_models[i]->stream_params.bandwidth)
+            if (app_model.s_models[j] != NULL)
             {
-              app_model.s_models[i]->stream_params.sd_dps = (uint32_t)app_model.s_models[i]->stream_params.bandwidth + 8 + 4;  /* 8 = timestamp dimension in bytes; 4 = dataloss protocol */
-            }
-
-            proposed_fifoWM = app_model.s_models[i]->stream_params.sd_dps / SMGetnBytesPerSample(i) / 2;
-            if (proposed_fifoWM == 0)
-            {
-              proposed_fifoWM = 1;
-            }
-            sys_error_code_t ret = SMSensorSetFifoWM(i, proposed_fifoWM);
-            if (ret != SYS_NO_ERROR_CODE)
-            {
-
-            }
-          }
-          else if (app_model.log_controller_model.interface == LOG_CTRL_MODE_USB)
-          {
-
-            /* in case of slow sensor send 1 sample for each usb packet */
-            float_t low_odr = 0;
-            if (app_model.s_models[i]->sensor_status->isensor_class == ISENSOR_CLASS_MEMS)
-            {
-              low_odr = app_model.s_models[i]->sensor_status->type.mems.odr;
-            }
-            else if (app_model.s_models[i]->sensor_status->isensor_class == ISENSOR_CLASS_AUDIO)
-            {
-              low_odr = app_model.s_models[i]->sensor_status->type.audio.frequency;
-            }
-            else
-            {
-              /* TODO: add support for other ISENSOR_CLASS */
-            }
-
-            if (low_odr <= 20)
-            {
-              /* When there's a timestamp, more then one packet will be sent */
-              app_model.s_models[i]->stream_params.usb_dps = SMGetnBytesPerSample(i) + 8; /* 8 = timestamp dimension in bytes */
-              proposed_fifoWM = 1;
-              sys_error_code_t ret = SMSensorSetFifoWM(i, proposed_fifoWM);
-              if (ret != SYS_NO_ERROR_CODE)
+              p_other = &(app_model.s_models[j]->stream_params);
+              if (p_other->bandwidth <= p_current->bandwidth)
               {
-
-              }
-            }
-            else
-            {
-              /* 50ms of sensor data; when there's a timestamp packets will be sent fastly */
-              app_model.s_models[i]->stream_params.usb_dps = (uint32_t)(app_model.s_models[i]->stream_params.bandwidth * 0.05f);
-              if (app_model.s_models[i]->stream_params.usb_dps > 7000)
-              {
-                app_model.s_models[i]->stream_params.usb_dps = 7000; // set a limit to avoid buffer to big
-              }
-              else if (app_model.s_models[i]->stream_params.usb_dps < SMGetnBytesPerSample(i) + 8)
-              {
-                /* In case usb_dps is a very low value, verify the setup to send at least 1 sensor data + timestamp */
-                app_model.s_models[i]->stream_params.usb_dps = SMGetnBytesPerSample(i) + 8;
-              }
-
-              proposed_fifoWM = app_model.s_models[i]->stream_params.usb_dps / SMGetnBytesPerSample(i) / 2;
-              if (proposed_fifoWM == 0)
-              {
-                proposed_fifoWM = 1;
-              }
-              sys_error_code_t ret = SMSensorSetFifoWM(i, proposed_fifoWM);
-              if (ret != SYS_NO_ERROR_CODE)
-              {
-
-              }
-            }
-#ifdef SYS_DEBUG
-            SensorDescriptor_t descriptor = SMSensorGetDescription(i);
-            float_t ms = app_model.s_models[i]->stream_params.usb_dps / app_model.s_models[i]->stream_params.bandwidth;
-            SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("**** %s, odr: %f, DPS: %d, ms: %f, proposed FIFO WM: %d \r\n", descriptor.p_name,
-                                               app_model.s_models[i]->sensor_status->type.mems.odr, app_model.s_models[i]->stream_params.usb_dps, ms,
-                                               proposed_fifoWM));
-#endif
-          }
-
-          app_model.s_models[i]->stream_params.stream_id = st_i;
-          st_i++;
-
-          if (i > 0)
-          {
-            j = i - 1;
-            while (j >= 0)
-            {
-              if (app_model.s_models[j] != NULL)
-              {
-                if (app_model.s_models[j]->stream_params.bandwidth <= app_model.s_models[i]->stream_params.bandwidth)
+                if (p_other->stream_id >= 0)
                 {
-                  if (app_model.s_models[j]->stream_params.stream_id >= 0)
+                  if (p_other->stream_id < p_current->stream_id)
                   {
-                    if (app_model.s_models[j]->stream_params.stream_id < app_model.s_models[i]->stream_params.stream_id)
-                    {
-                      app_model.s_models[i]->stream_params.stream_id = app_model.s_models[j]->stream_params.stream_id;
-                    }
-                    app_model.s_models[j]->stream_params.stream_id++;
+                    p_current->stream_id = p_other->stream_id;
                   }
+                  p_other->stream_id++;
                 }
               }
-              j--;
             }
+            j--;
           }
         }
         else
@@ -221,56 +171,251 @@ uint8_t __stream_control(bool status)
           app_model.s_models[i]->stream_params.bandwidth = 0;
           app_model.s_models[i]->stream_params.stream_id = -1;
         }
-      }
-    }
-    for (i = 0; i < SENSOR_NUMBER; i++)
-    {
-      if (app_model.s_models[i] != NULL)
-      {
-        int8_t stream = app_model.s_models[i]->stream_params.stream_id;
-        if (stream < N_MAX_EP - 2)
+        app_model.total_bandwidth += app_model.s_models[i]->stream_params.bandwidth;
+        if (app_model.total_bandwidth > SC_SAFE_BANDWIDTH)
         {
-          app_model.s_models[i]->stream_params.usb_ep = stream;
-        }
-        else
-        {
-          if (stream >= FAST_TELEMETRY_APP_MODEL_STREAM_ID)
-          {
-            app_model.s_models[i]->stream_params.stream_id += 2;
-          }
-          app_model.s_models[i]->stream_params.usb_ep = N_MAX_EP - 1;
+          /* Safe bandwidth limit exceeded - return error */
+          ret = PNPL_BASE_ERROR_CODE;
         }
       }
     }
-//    for(i = 0; i < ALGORITHM_NUMBER; i++)     /* Generated only when algorithms are available */
-//    {
-//      //TODO
-//      if(app_model.a_models[i] != NULL)
-//      {
-//        app_model.a_models[i]->stream_params.stream_id = i + SENSOR_NUMBER;
-//      }
-//    }
+    __sc_set_usb_enpoints();
   }
   else
   {
-    for (i = 0; i < SENSOR_NUMBER; i++)
+    __sc_reset_stream_params();
+  }
+  return ret;
+}
+
+static sys_error_code_t __sc_set_sd_stream_params(uint32_t id)
+{
+  sys_error_code_t res = SYS_NO_ERROR_CODE;
+  SensorModel_t **p_s_models = app_model.s_models;
+
+  /* SD write every SC_SDCARD_WRITE_PERIOD ms of sensor data. */
+  p_s_models[id]->stream_params.sd_dps = (uint32_t)(p_s_models[id]->stream_params.bandwidth * SC_SDCARD_WRITE_PERIOD);
+  /* Access to SD is optimized when buffer dimension is multiple of 512 */
+  p_s_models[id]->stream_params.sd_dps = p_s_models[id]->stream_params.sd_dps - (p_s_models[id]->stream_params.sd_dps % 512) + 512;
+
+  /* If the sensor is very slow, we force a write every 1 second --> sd_dps = bandwidth
+   * It's no longer multiple of 512 */
+  if (p_s_models[id]->stream_params.sd_dps > p_s_models[id]->stream_params.bandwidth)
+  {
+    p_s_models[id]->stream_params.sd_dps = (uint32_t)p_s_models[id]->stream_params.bandwidth
+                                           + SC_DL2_PROTOCOL_TIMESTAMP_SIZE + SC_DL2_PROTOCOL_COUNTER_SIZE;
+  }
+
+  return res;
+}
+
+sys_error_code_t __sc_set_ble_stream_params(uint32_t id)
+{
+  sys_error_code_t res = SYS_NO_ERROR_CODE;
+  SensorModel_t **p_s_models = app_model.s_models;
+  uint32_t elements_in_byte = 0;
+
+  /* Get sensor's bandwidth */
+  if (p_s_models[id]->sensor_status->isensor_class == ISENSOR_CLASS_MEMS)
+  {
+    p_s_models[id]->stream_params.bandwidth = p_s_models[id]->sensor_status->type.mems.odr * SMGetnBytesPerSample(id);
+  }
+  else if (p_s_models[id]->sensor_status->isensor_class == ISENSOR_CLASS_AUDIO)
+  {
+    p_s_models[id]->stream_params.bandwidth = p_s_models[id]->sensor_status->type.audio.frequency * SMGetnBytesPerSample(id);
+  }
+
+  /* set BLE data buffer size based on max ble bandwidth chosen and period of ble data streaming */
+  if (p_s_models[id]->stream_params.bandwidth > MAX_BLE_BANDWIDTH)
+  {
+    p_s_models[id]->stream_params.ble_dps = (MAX_BLE_BANDWIDTH * BLE_SEND_PERIOD) / 1000;
+    /* BLE dps must be multiple of Byte per samples */
+    p_s_models[id]->stream_params.ble_dps = p_s_models[id]->stream_params.ble_dps - (p_s_models[id]->stream_params.ble_dps % SMGetnBytesPerSample(id));
+    /* set the real ODR streamed */
+    p_s_models[id]->st_ble_stream.st_ble_stream_objects.odr = (int32_t)(MAX_BLE_BANDWIDTH / SMGetnBytesPerSample(id));
+  }
+  else
+  {
+    p_s_models[id]->stream_params.ble_dps = (uint32_t)((p_s_models[id]->stream_params.bandwidth * BLE_SEND_PERIOD) / 1000);
+    /* BLE dps must be multiple of Byte per samples */
+    p_s_models[id]->stream_params.ble_dps = p_s_models[id]->stream_params.ble_dps - (p_s_models[id]->stream_params.ble_dps % SMGetnBytesPerSample(id));
+    /* set the real ODR streamed */
+    p_s_models[id]->st_ble_stream.st_ble_stream_objects.odr = (int32_t)(p_s_models[id]->sensor_status->type.mems.odr);
+  }
+
+  /* BLE dps must be at least Byte per samples */
+  if (p_s_models[id]->stream_params.ble_dps <= SMGetnBytesPerSample(id))
+  {
+    p_s_models[id]->stream_params.ble_dps = 3 * SMGetnBytesPerSample(id);
+  }
+
+  if (p_s_models[id]->stream_params.ble_dps < (p_s_models[id]->fifo_watermark * SMGetnBytesPerSample(id)))
+  {
+    p_s_models[id]->stream_params.ble_dps = p_s_models[id]->fifo_watermark * SMGetnBytesPerSample(id);
+
+    if (p_s_models[id]->stream_params.ble_dps > MAX_BLE_BANDWIDTH)
     {
-      if (app_model.s_models[i] != NULL)
+      p_s_models[id]->stream_params.ble_dps = MAX_BLE_BANDWIDTH;
+    }
+  }
+
+  if (p_s_models[id]->stream_params.ble_dps > DEFAULT_MAX_RAW_NOTIFICATION_CHAR_LEN)
+  {
+    /* need to leave 1 Byte for stream ID */
+    p_s_models[id]->st_ble_stream.st_ble_stream_objects.elements = (uint32_t)(floor((DEFAULT_MAX_RAW_NOTIFICATION_CHAR_LEN - 1) / SMGetnBytesPerSample(id)));
+    /* BLE ds must be multiple of ble packet size (element * bytePerSamples)*/
+    elements_in_byte = p_s_models[id]->st_ble_stream.st_ble_stream_objects.elements * SMGetnBytesPerSample(id);
+
+    p_s_models[id]->stream_params.ble_dps = p_s_models[id]->stream_params.ble_dps - (p_s_models[id]->stream_params.ble_dps % elements_in_byte) + elements_in_byte;
+  }
+  else
+  {
+    p_s_models[id]->st_ble_stream.st_ble_stream_objects.elements = (uint32_t)(floor(p_s_models[id]->stream_params.ble_dps / SMGetnBytesPerSample(id)));
+  }
+
+  return res;
+}
+
+static sys_error_code_t __sc_set_usb_stream_params(uint32_t id)
+{
+  sys_error_code_t res = SYS_NO_ERROR_CODE;
+  SensorModel_t **p_s_models = app_model.s_models;
+
+  /* in case of slow sensor send 1 sample for each usb packet */
+  float_t low_odr = 0;
+
+  low_odr = SMSensorGetSamplesPerSecond(id);
+
+  if (low_odr <= SC_USB_SLOW_ODR_LIMIT_HZ)
+  {
+    /* When there's a timestamp, more then one packet will be sent */
+    p_s_models[id]->stream_params.usb_dps = SMGetnBytesPerSample(id) + 8; /* 8 = timestamp dimension in bytes */
+  }
+  else
+  {
+    /* 50ms of sensor data; when there's a timestamp packets will be sent fastly */
+    p_s_models[id]->stream_params.usb_dps = (uint32_t)(p_s_models[id]->stream_params.bandwidth * SC_USB_MAX_PACKETS_PERIOD);
+    if (p_s_models[id]->stream_params.usb_dps > SC_USB_DPS_MAX)
+    {
+      p_s_models[id]->stream_params.usb_dps = SC_USB_DPS_MAX; // set a limit to avoid buffer to big
+    }
+    else if (p_s_models[id]->stream_params.usb_dps < SMGetnBytesPerSample(id) + 8)
+    {
+      /* In case usb_dps is a very low value, verify the setup to send at least 1 sensor data + timestamp */
+      p_s_models[id]->stream_params.usb_dps = SMGetnBytesPerSample(id) + 8;
+    }
+  }
+  return res;
+}
+
+static sys_error_code_t __sc_set_fifo_wtm(uint32_t id)
+{
+  sys_error_code_t res = SYS_NO_ERROR_CODE;
+  SensorModel_t **p_s_models = app_model.s_models;
+  uint16_t fifo_watermark;
+
+  fifo_watermark = p_s_models[id]->stream_params.sd_dps / SMGetnBytesPerSample(id) / 2;
+  if (fifo_watermark == 0)
+  {
+    fifo_watermark = 1;
+  }
+
+  if (app_model.log_controller_model.interface == LOG_CTRL_MODE_SD)
+  {
+    res = SMSensorSetFifoWM(id, fifo_watermark);
+  }
+  else if (app_model.log_controller_model.interface == LOG_CTRL_MODE_USB)
+  {
+    /* in case of slow sensor send 1 sample for each usb packet */
+    float_t low_odr = 0;
+    low_odr = SMSensorGetSamplesPerSecond(id);
+    if (low_odr <= SC_USB_SLOW_ODR_LIMIT_HZ)
+    {
+      fifo_watermark = 1;
+    }
+    else
+    {
+      fifo_watermark = p_s_models[id]->stream_params.usb_dps / SMGetnBytesPerSample(id) / 2;
+    }
+    res = SMSensorSetFifoWM(id, fifo_watermark);
+  }
+  else
+  {
+    /**/
+  }
+
+  p_s_models[id]->fifo_watermark = fifo_watermark;
+
+
+#ifdef SYS_DEBUG
+  SensorDescriptor_t descriptor = SMSensorGetDescription(id);
+  float_t ms = p_s_models[id]->stream_params.usb_dps / p_s_models[id]->stream_params.bandwidth;
+  if (p_s_models[id]->sensor_status->isensor_class == ISENSOR_CLASS_MEMS)
+  {
+    SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("**** %s, odr: %f, DPS: %d, ms: %f, FIFO WM: %d \r\n",
+                                       descriptor.p_name, p_s_models[id]->sensor_status->type.mems.odr,
+                                       p_s_models[id]->stream_params.usb_dps, ms, fifo_watermark));
+  }
+  else if (p_s_models[id]->sensor_status->isensor_class == ISENSOR_CLASS_AUDIO)
+  {
+    SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("**** %s, odr: %d, DPS: %d, ms: %f, FIFO WM: %d \r\n",
+                                       descriptor.p_name, p_s_models[id]->sensor_status->type.audio.frequency,
+                                       p_s_models[id]->stream_params.usb_dps, ms, fifo_watermark));
+  }
+  else if (p_s_models[id]->sensor_status->isensor_class == ISENSOR_CLASS_POWERMONITOR)
+  {
+    SYS_DEBUGF(SYS_DBG_LEVEL_VERBOSE, ("**** %s, odr: %d, DPS: %d, ms: %f \r\n",
+                                       descriptor.p_name, 1000000 / p_s_models[id]->sensor_status->type.power_meter.adc_conversion_time,
+                                       p_s_models[id]->stream_params.usb_dps, ms));
+  }
+#endif
+
+  return res;
+}
+
+static void __sc_set_usb_enpoints(void)
+{
+  SensorModel_t **p_s_models = app_model.s_models;
+  uint32_t i;
+  int8_t stream_id;
+
+  for(i = 0; i < SENSOR_NUMBER; i++)
+  {
+    if(p_s_models[i] != NULL)
+    {
+       stream_id = p_s_models[i]->stream_params.stream_id;
+
+      if(stream_id < SS_N_IN_ENDPOINTS - 2)
       {
-        app_model.s_models[i]->stream_params.stream_id = -1;
-        app_model.s_models[i]->stream_params.usb_ep = -1;
-        app_model.s_models[i]->stream_params.bandwidth = 0;
+        p_s_models[i]->stream_params.usb_ep = stream_id;
+      }
+      else
+      {
+        if(stream_id >= FAST_TELEMETRY_APP_MODEL_STREAM_ID)
+        {
+          p_s_models[i]->stream_params.stream_id += 2;
+        }
+
+        p_s_models[i]->stream_params.usb_ep = SS_N_IN_ENDPOINTS - 1;
       }
     }
-//    for(i = 0; i < ALGORITHM_NUMBER; i++)     /* Generated only when algorithms are available */
-//    {
-//
-//      app_model.a_models[i]->stream_params.stream_id = -1;
-//      app_model.a_models[i]->stream_params.usb_ep = -1;
-//      app_model.a_models[i]->stream_params.bandwidth = 0;
-//    }
   }
-  return 0;
+}
+
+static void __sc_reset_stream_params()
+{
+  SensorModel_t **p_s_models = app_model.s_models;
+  uint32_t i;
+
+  for (i = 0; i < SENSOR_NUMBER; i++)
+  {
+    if (p_s_models[i] != NULL)
+    {
+      p_s_models[i]->stream_params.stream_id = -1;
+      p_s_models[i]->stream_params.usb_ep = -1;
+      p_s_models[i]->stream_params.bandwidth = 0;
+    }
+  }
 }
 
 /* USER functions ------------------------------------------------------------*/

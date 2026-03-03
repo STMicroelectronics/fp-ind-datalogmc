@@ -103,9 +103,17 @@ extern "C" {
 #define N_MAX_EP 5
 #define FAST_TELEMETRY_APP_MODEL_STREAM_ID    3u
 
+#define UNIT_LEN 20U
+#define FORMAT_LEN 10U
+
 #define FW_VERSION_MAJOR    "2"
-#define FW_VERSION_MINOR    "1"
+#define FW_VERSION_MINOR    "2"
 #define FW_VERSION_PATCH    "0"
+
+/* Max BLE bandwidth for each sensor (in Byte) */
+#define MAX_BLE_BANDWIDTH   4000
+/* How often send BLE data in milliseconds */
+#define BLE_SEND_PERIOD     50
 
 typedef struct _StreamParams_t
 {
@@ -121,6 +129,26 @@ typedef struct _StreamParams_t
   /* Stream Parameters Model USER code */
 } StreamParams_t;
 
+typedef struct _StBleStreamSensorObjectModel_t
+{
+  /* Component that describe the data format to be sent via BLE */
+  bool status;
+  char format[FORMAT_LEN];
+  /* ST BLE Stream property Model USER code */
+  char unit[UNIT_LEN];
+  uint32_t elements;
+  uint32_t channel;
+  float_t multiply_factor;
+  uint32_t odr;
+} StBleStreamSensorObjectModel_t;
+
+typedef struct _StBleStreamSensorModel_t
+{
+  /* Component that enable the data stream via BLE */
+  int32_t st_ble_stream_id;
+  StBleStreamSensorObjectModel_t st_ble_stream_objects;
+} StBleStreamSensorModel_t;
+
 #define SENSOR_NOTES_LEN 20U
 typedef struct _SensorModel_t
 {
@@ -132,6 +160,8 @@ typedef struct _SensorModel_t
   SensorStatus_t *sensor_status;
   char annotation[SENSOR_NOTES_LEN];
   /* Sensor Components Model USER code */
+  uint16_t fifo_watermark;
+  StBleStreamSensorModel_t st_ble_stream;
 } SensorModel_t;
 
 typedef struct _AlgorithmModel_t
@@ -193,6 +223,7 @@ typedef struct _AppModel_t
   FirmwareInfoModel_t firmware_info_model;
   /* Insert here your custom App Model code */
   bool mlc_ucf_valid;
+  uint32_t total_bandwidth;
 } AppModel_t;
 
 uint8_t __stream_control(bool status);

@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>MotorControl_Debug</TargetName>
+      <TargetName>DATALOGMC-STWIN.Box_Debug</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
@@ -48,8 +48,8 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>MotorControl\Exe\</OutputDirectory>
-          <OutputName>MotorControl_Debug</OutputName>
+          <OutputDirectory>DATALOGMC-STWIN.Box\Exe\</OutputDirectory>
+          <OutputName>DATALOGMC-STWIN.Box_Debug</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -190,7 +190,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>0</useUlib>
+            <useUlib>1</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -485,11 +485,6 @@
               <FilePath>..\Core\Src\tx_initialize_low_level.s</FilePath>
             </File>
             <File>
-              <FileName>usart_aspep_driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\usart_aspep_driver.c</FilePath>
-            </File>
-            <File>
               <FileName>UtilTask.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\UtilTask.c</FilePath>
@@ -540,14 +535,19 @@
           <GroupName>Application/Mcp</GroupName>
           <Files>
             <File>
-              <FileName>aspep.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\mcp\ASPEP\Src\aspep.c</FilePath>
-            </File>
-            <File>
               <FileName>mcp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\mcp\Src\mcp.c</FilePath>
+            </File>
+            <File>
+              <FileName>aspep_ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\mcp\ASPEP\Src\aspep_ctrl.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart_aspep_driver_U5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\mcp\ASPEP\Target\Src\usart_aspep_driver_U5.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3960,7 +3960,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>MotorControl_Release</TargetName>
+      <TargetName>DATALOGMC-STWIN.Box_Release</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
@@ -4001,8 +4001,8 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>MotorControl\Exe\</OutputDirectory>
-          <OutputName>MotorControl_Release</OutputName>
+          <OutputDirectory>DATALOGMC-STWIN.Box\Exe\</OutputDirectory>
+          <OutputName>DATALOGMC-STWIN.Box_Release</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -4143,7 +4143,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>0</useUlib>
+            <useUlib>1</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -4438,11 +4438,6 @@
               <FilePath>..\Core\Src\tx_initialize_low_level.s</FilePath>
             </File>
             <File>
-              <FileName>usart_aspep_driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\usart_aspep_driver.c</FilePath>
-            </File>
-            <File>
               <FileName>UtilTask.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\UtilTask.c</FilePath>
@@ -4493,14 +4488,19 @@
           <GroupName>Application/Mcp</GroupName>
           <Files>
             <File>
-              <FileName>aspep.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\mcp\ASPEP\Src\aspep.c</FilePath>
-            </File>
-            <File>
               <FileName>mcp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\mcp\Src\mcp.c</FilePath>
+            </File>
+            <File>
+              <FileName>aspep_ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\mcp\ASPEP\Src\aspep_ctrl.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart_aspep_driver_U5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\mcp\ASPEP\Target\Src\usart_aspep_driver_U5.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -7920,15 +7920,15 @@
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.6.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
         <targetInfos>
-          <targetInfo name="MotorControl_Debug"/>
-          <targetInfo name="MotorControl_Release"/>
+          <targetInfo name="DATALOGMC-STWIN.Box_Debug"/>
+          <targetInfo name="DATALOGMC-STWIN.Box_Release"/>
         </targetInfos>
       </component>
       <component Cbundle="ARM Compiler" Cclass="Compiler" Cgroup="I/O" Csub="STDERR" Cvariant="ITM" Cvendor="Keil" Cversion="1.2.0" condition="ARMCC Cortex-M with ITM">
         <package name="ARM_Compiler" schemaVersion="1.7.7" url="https://www.keil.com/pack/" vendor="Keil" version="1.7.2"/>
         <targetInfos>
-          <targetInfo name="MotorControl_Debug"/>
-          <targetInfo name="MotorControl_Release"/>
+          <targetInfo name="DATALOGMC-STWIN.Box_Debug"/>
+          <targetInfo name="DATALOGMC-STWIN.Box_Release"/>
         </targetInfos>
       </component>
     </components>

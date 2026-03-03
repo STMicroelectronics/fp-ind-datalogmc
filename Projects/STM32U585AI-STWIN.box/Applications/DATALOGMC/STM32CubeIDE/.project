@@ -1113,6 +1113,16 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/applowpower.h</locationURI>
 		</link>
 		<link>
+			<name>User/Core/Inc/aspep_ctrl_conf.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/aspep_ctrl_conf.h</locationURI>
+		</link>
+		<link>
+			<name>User/Core/Inc/aspep_ctrl_hw_conf.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/aspep_ctrl_hw_conf.h</locationURI>
+		</link>
+		<link>
 			<name>User/Core/Inc/automode.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/automode.h</locationURI>
@@ -1186,11 +1196,6 @@
 			<name>User/Core/Inc/tx_user.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/tx_user.h</locationURI>
-		</link>
-		<link>
-			<name>User/Core/Inc/usart_aspep_driver.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Core/Inc/usart_aspep_driver.h</locationURI>
 		</link>
 		<link>
 			<name>User/Core/Src/App.c</name>
@@ -1301,11 +1306,6 @@
 			<name>User/Core/Src/tx_initialize_low_level.s</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/tx_initialize_low_level.s</locationURI>
-		</link>
-		<link>
-			<name>User/Core/Src/usart_aspep_driver.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/usart_aspep_driver.c</locationURI>
 		</link>
 		<link>
 			<name>User/Core/Startup/startup_stm32u585aiixq.s</name>
@@ -1983,14 +1983,19 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/services/BCProtocol.c</locationURI>
 		</link>
 		<link>
-			<name>User/Mcp/ASPEP/Inc/aspep.h</name>
+			<name>User/Mcp/ASPEP/Inc/aspep_ctrl.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/mcp/ASPEP/Inc/aspep.h</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/mcp/ASPEP/Inc/aspep_ctrl.h</locationURI>
 		</link>
 		<link>
-			<name>User/Mcp/ASPEP/Src/aspep.c</name>
+			<name>User/Mcp/ASPEP/Inc/usart_aspep_driver.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/mcp/ASPEP/Src/aspep.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/mcp/ASPEP/Inc/usart_aspep_driver.h</locationURI>
+		</link>
+		<link>
+			<name>User/Mcp/ASPEP/Src/aspep_ctrl.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/mcp/ASPEP/Src/aspep_ctrl.c</locationURI>
 		</link>
 		<link>
 			<name>User/PnPL/AppModel/Inc/App_model.h</name>
@@ -4726,6 +4731,16 @@
 			<name>Middlewares/ST/usbx/common/usbx_stm32_device_controllers/ux_dcd_stm32_uninitialize.c</name>
 			<type>1</type>
 			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/ST/usbx/common/usbx_stm32_device_controllers/ux_dcd_stm32_uninitialize.c</locationURI>
+		</link>
+		<link>
+			<name>User/Mcp/ASPEP/Target/Inc/usart_aspep_driver_U5.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/mcp/ASPEP/Target/Inc/usart_aspep_driver_U5.h</locationURI>
+		</link>
+		<link>
+			<name>User/Mcp/ASPEP/Target/Src/usart_aspep_driver_U5.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/mcp/ASPEP/Target/Src/usart_aspep_driver_U5.c</locationURI>
 		</link>
 		<link>
 			<name>User/eLooM_Components/EMData/Inc/events/DataEvent.h</name>

@@ -50,9 +50,6 @@
 /* MCP telemetry timer request time in ms */
 #define MCP_TELEMETRY_REQUEST_TIMER_PERIOD_MS      300U
 
-#ifdef SYS_ENABLE_FAKE_AI_CLASSIFIER
-#define MCP_FAKE_FAST_TELEMETRY 51U
-#endif
 
 #define MCP_SEND_CFG_STACK_DEPTH                  (TX_MINIMUM_STACK*15)
 #define MCP_FAST_TELEMETRY_EMDATA_TAG 1u
@@ -193,7 +190,7 @@ static sys_error_code_t MCPTask_SendTelemetryRequest(MCPTask_t *_this);
 static void MCPTask_SendAsyncsRequest(void);
 static void MCPTask_DisableAsyncsRequest(void);
 
-static void MCPTask_SendThread(ULONG thread_input);
+static void MCPTask_PnPLCmdThread(ULONG thread_input);
 static void MCPTask_SlowTelemetryUpdateEMDataBuffer(uint32_t *emDataBuffer,
                                                     MCPTask_Slow_telemetry_t *slowTelemetryArray, uint16_t slowTelemetryArrayLen);
 static void MCPTask_SlowTelemetrySendEMData(void);
@@ -218,9 +215,7 @@ static void MCPTask_saveAsyncTelemetry_cb(uint8_t *rxAsyncData, uint32_t rxLengt
 static void MCPTask_connection_completed_cb(bool state);
 static void MCPTask_RequestTelemtryTimerCb(ULONG timer);
 static void MCPTask_delay_cb(uint8_t delay);
-#ifdef SYS_ENABLE_FAKE_AI_CLASSIFIER
-static void MCPTask_FakeFastTelemtryTimerCb(ULONG timer);
-#endif
+
 
 /* Inline Function declaration ---------------------------------------------------------------------*/
 static inline sys_error_code_t MCPTask_postReportToFront(MCPTask_t *_this, MCPTask_cmd_t *pReport);
@@ -360,7 +355,7 @@ static uint32_t MCPTask_Fast_telemetry_receive_buff_dim[] =
 typedef void (*OnSlaveConnectedEvt_cb)(void);
 
 // Define the state functions
-StateFunction stateFunctions[MCPTASK_NUM_STATES] =
+StateFunction MCPTask_PnPLCmdStateFp[MCPTASK_NUM_STATES] =
 {
   MCPTask_StateInit,
   MCPTask_StateConnected,
@@ -371,7 +366,7 @@ StateFunction stateFunctions[MCPTASK_NUM_STATES] =
 };
 
 // Create a state machine instance
-StateMachine MCPTask_sm;
+StateMachine MCPTask_PnLCmdSm;
 
 /* MCP Send semaphore */
 TX_SEMAPHORE connect_sema;
@@ -450,10 +445,7 @@ int32_t MCPTask_GetMotorSpeed(void)
 
 uint8_t MCPTask_SetMotorSpeed(int32_t speed)
 {
-  MCPTask_cmd_t send_msg =
-  {
-    0
-  };
+  MCPTask_cmd_t send_msg = {0};
 
   /* Prepare massage*/
   send_msg.cmd_id = MCPTASK_SET_SPEED_EVT;
@@ -687,26 +679,9 @@ sys_error_code_t MCPTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_function
     return res;
   }
 
-  p_obj->p_tx_regValue_buff = (uint8_t *) SysAlloc(sizeof(uint8_t) * MCP_TX_REG_VALUE_BUFF_DIM);
-
-  if (NULL == p_obj->p_tx_regValue_buff)
-  {
-    res = SYS_MCP_TASK_INIT_ERROR_CODE;
-    SYS_SET_SERVICE_LEVEL_ERROR_CODE(res);
-    return res;
-  }
-
   /* Alloc MCP Task async buffers */
   p_obj->p_asyncRegIDBuff = (uint16_t *) SysAlloc(sizeof(uint16_t) * MCPTASK_ASYNC_REGID_BUFF_SIZE);
   if (NULL == p_obj->p_asyncRegIDBuff)
-  {
-    res = SYS_MCP_TASK_INIT_ERROR_CODE;
-    SYS_SET_SERVICE_LEVEL_ERROR_CODE(res);
-    return res;
-  }
-
-  p_obj->p_asyncRegValBuff = (uint8_t *) SysAlloc(sizeof(uint8_t) * MCPTASK_ASYNC_REGVAL_BUFF_SIZE);
-  if (NULL == p_obj->p_asyncRegValBuff)
   {
     res = SYS_MCP_TASK_INIT_ERROR_CODE;
     SYS_SET_SERVICE_LEVEL_ERROR_CODE(res);
@@ -723,7 +698,7 @@ sys_error_code_t MCPTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_function
   }
 
   /* Create the MCP send thread.  */
-  tx_thread_create(&p_obj->mcp_send_thread, "MCP Send Thread", MCPTask_SendThread, (ULONG)p_obj,
+  tx_thread_create(&p_obj->mcp_send_thread, "MCP Send Thread", MCPTask_PnPLCmdThread, (ULONG)p_obj,
                    p_obj->mcp_send_thread_memory_pointer,
                    MCP_SEND_CFG_STACK_DEPTH, MCPTASK_CFG_PRIORITY, MCPTASK_CFG_PRIORITY, TX_NO_TIME_SLICE, TX_AUTO_START);
 
@@ -756,18 +731,6 @@ sys_error_code_t MCPTask_vtblOnCreateTask(AManagedTask *_this, tx_entry_function
     return res;
   }
 
-#ifdef SYS_ENABLE_FAKE_AI_CLASSIFIER
-  /* create the MCP telemetry request timer */
-  if (TX_SUCCESS
-      != tx_timer_create(&p_obj->mcp_fake_fastlemetry_timer, "MCP_FAKE_FAST_TELE", MCPTask_FakeFastTelemtryTimerCb,
-                         (ULONG)TX_NULL,
-                         AMT_MS_TO_TICKS(MCP_FAKE_FAST_TELEMETRY), AMT_MS_TO_TICKS(MCP_FAKE_FAST_TELEMETRY), TX_NO_ACTIVATE))
-  {
-    res = SYS_MCP_TASK_INIT_ERROR_CODE;
-    SYS_SET_SERVICE_LEVEL_ERROR_CODE(res);
-    return res;
-  }
-#endif
   /* Allocate the MCP send message queue. */
   p_obj->p_mcp_receive_queue_memory = (UCHAR *) SysAlloc(DEFAULT_MCP_SEND_QUEUE_SIZE * sizeof(MCPTask_cmd_t));
   if (p_obj->p_mcp_receive_queue_memory == NULL)
@@ -852,19 +815,19 @@ sys_error_code_t MCPTask_vtblOnEnterTaskControlLoop(AManagedTask *_this)
   MCP_RegisterConnectCompletedCb(p_obj->MCP_handle, MCPTask_connection_completed_cb);
 
   /* Register ASPEP after sending cb */
-  ASPEP_RegisterTransmitting_cb(MCPTask_after_sending_cb);
+  ASPEP_CTRL_RegisterTransmitting_cb(MCPTask_after_sending_cb);
 
   /* Register ASPEP send complete cb */
-  ASPEP_RegisterTxComplete_cb(MCPTask_send_complete_cb);
+  ASPEP_CTRL_RegisterTxComplete_cb(MCPTask_send_complete_cb);
 
   /* Register ASPEP new packet available cb */
-  ASPEP_RegisterNewPacket_cb(MCPTask_receive_new_packet_cb);
+  ASPEP_CTRL_RegisterNewPacket_cb(MCPTask_receive_new_packet_cb);
 
   /* Register ASPEP delay function*/
-  ASPEP_RegisterDelay_cb(MCPTask_delay_cb);
+  ASPEP_CTRL_RegisterDelay_cb(MCPTask_delay_cb);
 
   /* Initialize the state machine */
-  (void) StateMachine_Init(&MCPTask_sm, stateFunctions, MCPTASK_NUM_STATES);
+  (void) StateMachine_Init(&MCPTask_PnLCmdSm, MCPTask_PnPLCmdStateFp, MCPTASK_NUM_STATES);
 
   /* initialize MCP send semaphore */
   if (TX_SUCCESS != tx_semaphore_create(&connect_sema, "mcp_connect_sema", 0))
@@ -996,25 +959,25 @@ static sys_error_code_t MCPTask_ExecuteStepState1(AManagedTask *_this)
 }
 
 /**
-  * @Brief Motor control protocol Send message thread
+  * @brief  Thread function to receive PNPL commands and run the state machine.
+  *
+  * This thread continuously listens for incoming PNPL commands,
+  * processes them, and advances the state machine accordingly.
+  *
+  * @param[in] argument  Pointer to thread-specific arguments (if any).
   */
-static void MCPTask_SendThread(ULONG thread_input)
+static void MCPTask_PnPLCmdThread(ULONG thread_input)
 {
-
   MCPTask_t *p_obj = (MCPTask_t *) thread_input;
-  MCPTask_cmd_t send_cmd =
-  {
-    0
-  };
+
+  MCPTask_cmd_t incoming_cmd = {0};
 
   while (1)
   {
-    if (TX_SUCCESS == tx_queue_receive(&p_obj->mcp_send_queue, &send_cmd, TX_WAIT_FOREVER))
+    if (TX_SUCCESS == tx_queue_receive(&p_obj->mcp_send_queue, &incoming_cmd, TX_WAIT_FOREVER))
     {
-      StateMachine_Run(&MCPTask_sm, send_cmd.cmd_id, p_obj);
+      StateMachine_Run(&MCPTask_PnLCmdSm, incoming_cmd.cmd_id, p_obj);
     }
-
-    tx_thread_sleep(AMT_MS_TO_TICKS(4));
   }
 }
 
@@ -1119,24 +1082,6 @@ static void MCPTask_RequestTelemtryTimerCb(ULONG timer)
     sys_error_handler();
   }
 }
-
-#ifdef SYS_ENABLE_FAKE_AI_CLASSIFIER
-uint16_t fake_fast_telemetry[1020];
-static void MCPTask_FakeFastTelemtryTimerCb(ULONG timer)
-{
-  /* Get timestamp */
-  double timestamp = SysTsGetTimestampF(SysGetTimestampSrv());
-
-  /* Initialize Fast Async telemetry EMData */
-  DataEvent_t evt;
-  EMD_1dInit(&sTaskObj.async_telemetry_data, (uint8_t *)sTaskObj.aspepOverUartB.asyncBufferA.buffer, E_EM_UINT16, 1020);
-  DataEventInit((IEvent *) &evt, sTaskObj.p_slow_telemetries_evt_src, &sTaskObj.async_telemetry_data, timestamp,
-                MCP_FAST_TELEMETRY_EMDATA_TAG);
-
-  /* Send EMData to the linked observer */
-  IEventSrcSendEvent(sTaskObj.p_slow_telemetries_evt_src, (IEvent *) &evt, NULL);
-}
-#endif
 
 static void MCPTask_OnDeliveredTelemetryPacketCb(uint8_t CallbackID, uint8_t MCPResponse, uint8_t *rxData,
                                                  uint16_t *rxLength)
@@ -1537,13 +1482,13 @@ static void MCPTask_SendAsyncsRequest(void)
   }
 
   /* Send asynchronous requests using MCPA_SetAsyncs function */
-  MCP_SetAsyncs(sTaskObj.MCP_handle, sTaskObj.p_asyncRegIDBuff, sTaskObj.p_asyncRegValBuff, HFNum);
+  MCP_EnableAsyncTelemetries(sTaskObj.MCP_handle, sTaskObj.p_asyncRegIDBuff, HFNum);
 }
 
 static void MCPTask_DisableAsyncsRequest(void)
 {
   /* Send asynchronous requests using MCPA_SetAsyncs function */
-  MCP_DisableAsyncs(sTaskObj.MCP_handle, sTaskObj.p_asyncRegValBuff);
+  MCP_DisableAsyncTelemetries(sTaskObj.MCP_handle);
 }
 
 static void MCPTask_start_conf_cmd(void)
@@ -1563,10 +1508,7 @@ static void MCPTask_start_conf_cmd(void)
 
 static void MCPTask_connected_evt(void)
 {
-  MCPTask_cmd_t send_msg =
-  {
-    0
-  };
+  MCPTask_cmd_t send_msg = {0};
   send_msg.cmd_id = SLAVE_CONNECTED_EVT;
 
   if (TX_SUCCESS != tx_queue_send(&sTaskObj.mcp_send_queue, &send_msg, TX_NO_WAIT))
@@ -1579,10 +1521,7 @@ static void MCPTask_connected_evt(void)
 static void MCPTask_start_cmd(void)
 {
   /* Prepare massage*/
-  MCPTask_cmd_t send_msg =
-  {
-    0
-  };
+  MCPTask_cmd_t send_msg = {0};
   send_msg.cmd_id = START_MOTOR_EVT;
 
   if (TX_SUCCESS != tx_queue_send(&sTaskObj.mcp_send_queue, &send_msg, TX_NO_WAIT))
@@ -1594,10 +1533,7 @@ static void MCPTask_start_cmd(void)
 
 static void MCPTask_conf_comlete_evt(void)
 {
-  MCPTask_cmd_t send_msg =
-  {
-    0
-  };
+  MCPTask_cmd_t send_msg = {0};
   send_msg.cmd_id = CONF_COMPLETE_EVT;
 
   if (TX_SUCCESS != tx_queue_send(&sTaskObj.mcp_send_queue, &send_msg, TX_NO_WAIT))
@@ -1609,10 +1545,7 @@ static void MCPTask_conf_comlete_evt(void)
 
 static void MCPTask_start_log_cmd(void)
 {
-  MCPTask_cmd_t send_msg =
-  {
-    0
-  };
+  MCPTask_cmd_t send_msg = {0};
   send_msg.cmd_id = START_LOG_EVT;
 
   if (TX_SUCCESS != tx_queue_send(&sTaskObj.mcp_send_queue, &send_msg, TX_NO_WAIT))
@@ -1624,10 +1557,7 @@ static void MCPTask_start_log_cmd(void)
 
 static void MCPTask_stop_log_cmd(void)
 {
-  MCPTask_cmd_t send_msg =
-  {
-    0
-  };
+  MCPTask_cmd_t send_msg = {0};
   send_msg.cmd_id = STOP_LOG_EVT;
 
   if (TX_SUCCESS != tx_queue_send(&sTaskObj.mcp_send_queue, &send_msg, TX_NO_WAIT))
@@ -1635,13 +1565,6 @@ static void MCPTask_stop_log_cmd(void)
     /* unable to send the message. Signal the error */
     sys_error_handler();
   }
-}
-
-/* IMotor_Controller_vtbl virtual functions */
-/********************************************/
-uint8_t MCPTask_connect_vtbl(void)
-{
-  return 0;
 }
 
 uint8_t MCPTask_start_motor(void)
@@ -1685,11 +1608,7 @@ uint8_t MCPTask_stop_motor(void)
 
 uint8_t MCPTask_motor_reset(void)
 {
-  MCPTask_cmd_t send_msg =
-  {
-    0
-  };
-
+  MCPTask_cmd_t send_msg = {0};
   send_msg.cmd_id = MCPTASK_RESET_EVT;
 
   if (TX_SUCCESS != tx_queue_send(&sTaskObj.mcp_send_queue, &send_msg, TX_NO_WAIT))
@@ -1702,10 +1621,7 @@ uint8_t MCPTask_motor_reset(void)
 
 uint8_t MCPTask_ack_fault(void)
 {
-  MCPTask_cmd_t send_msg =
-  {
-    0
-  };
+  MCPTask_cmd_t send_msg = {0};
   char *responseJSON;
   uint32_t size;
   char *message = "";
@@ -1780,7 +1696,6 @@ static State MCPTask_StateInit(Event event, const void *param)
 
     default:
       break;
-
   }
 
   return next_state;
@@ -1987,16 +1902,17 @@ static State MCPTask_StateMotorRunningSystemLoggin(Event event, const void *para
 
   switch (event)
   {
-    case STOP_LOG_EVT:
+
+    case STOP_MOTOR_EVT:
     {
+      MCP_StopMotorRequest(p_obj->MCP_handle);
+      (void) tx_semaphore_get(&mcp_stop_motor_sema, 100);
+      p_obj->motor_started = false;
+
       if (p_obj->enabled_slow_telemetries_cnt)
       {
         /* Stop timer for synchronous telemetry */
         tx_timer_deactivate(&p_obj->mcp_telemetry_request_timer);
-
-#ifdef SYS_ENABLE_FAKE_AI_CLASSIFIER
-        tx_timer_deactivate(&p_obj->mcp_fake_fastlemetry_timer);
-#endif
 
         /* On stop log deallocate the memory buffer used for slow telemetries*/
         SysFree(p_obj->p_slow_telemetry_buffer);
@@ -2008,41 +1924,7 @@ static State MCPTask_StateMotorRunningSystemLoggin(Event event, const void *para
         (void) tx_semaphore_get(&mcp_cmd_sema, 100);
       }
 
-      next_state = MCPTASK_STATE_CONNECTED;
-    }
-    break;
-
-    case STOP_MOTOR_EVT:
-    {
-      MCP_StopMotorRequest(p_obj->MCP_handle);
-      (void) tx_semaphore_get(&mcp_stop_motor_sema, 100);
-      p_obj->motor_started = false;
-
-      /* Stop timer for synchronous telemetry */
-      tx_timer_deactivate(&p_obj->mcp_telemetry_request_timer);
-
-      if (MCPTask_GetNumOfEnabledFastTelemetry())
-      {
-        MCPTask_DisableAsyncsRequest();
-        (void) tx_semaphore_get(&mcp_cmd_sema, 100);
-      }
-    }
-    break;
-
-    case START_MOTOR_EVT:
-    {
-      MCP_StartMotorRequest(p_obj->MCP_handle);
-      (void) tx_semaphore_get(&mcp_start_motor_sema, 100);
-      p_obj->motor_started = true;
-
-      if (MCPTask_GetNumOfEnabledFastTelemetry())
-      {
-        MCPTask_SendAsyncsRequest();
-        (void) tx_semaphore_get(&mcp_cmd_sema, 100);
-      }
-
-      /* Start timer for synchronous telemetries */
-      tx_timer_activate(&p_obj->mcp_telemetry_request_timer);
+      next_state = MCPTASK_STATE_SYSTEM_LOGGING;
     }
     break;
 

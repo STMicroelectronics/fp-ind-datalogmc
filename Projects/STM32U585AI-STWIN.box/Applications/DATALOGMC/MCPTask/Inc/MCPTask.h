@@ -36,7 +36,7 @@ extern "C" {
 #include "events/IDataEventListener_vtbl.h"
 #include "tx_api.h"
 
-#include "aspep.h"
+#include "aspep_ctrl.h"
 #include "mcp.h"
 #include "mc_configuration_registers.h"
 
@@ -168,10 +168,6 @@ struct _MCPTask
   uint32_t ramp_speed;
 
   TX_TIMER mcp_telemetry_request_timer;
-
-#ifdef SYS_ENABLE_FAKE_AI_CLASSIFIER
-  TX_TIMER mcp_fake_fastlemetry_timer;
-#endif
 
   /* MCP Send Queue memory ptr */
   UCHAR *p_mcp_receive_queue_memory;

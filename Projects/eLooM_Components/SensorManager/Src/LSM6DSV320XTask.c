@@ -2951,10 +2951,6 @@ static sys_error_code_t LSM6DSV320XTaskSensorInit(LSM6DSV320XTask *_this)
     {
       lsm6dsv320x_wtm_level = LSM6DSV320X_MAX_WTM_LEVEL;
     }
-    else if (lsm6dsv320x_wtm_level < LSM6DSV320X_MIN_WTM_LEVEL)
-    {
-      lsm6dsv320x_wtm_level = LSM6DSV320X_MIN_WTM_LEVEL;
-    }
     _this->samples_per_it = lsm6dsv320x_wtm_level;
   }
 
@@ -3356,7 +3352,7 @@ static sys_error_code_t LSM6DSV320XTaskSensorInitTaskParams(LSM6DSV320XTask *_th
   _this->gyro_sensor_status.is_active = TRUE;
   _this->gyro_sensor_status.type.mems.fs = 4000.0f;
   _this->gyro_sensor_status.type.mems.odr = 7680.0f;
-  _this->gyro_sensor_status.type.mems.sensitivity = 0.035f * _this->gyro_sensor_status.type.mems.fs;
+  _this->gyro_sensor_status.type.mems.sensitivity = 0.000035f * _this->gyro_sensor_status.type.mems.fs;
   _this->gyro_sensor_status.type.mems.measured_odr = 0.0f;
 #if LSM6DSV320X_FIFO_ENABLED
   EMD_Init(&_this->data_gyro, _this->p_slow_sensor_data_buff, E_EM_INT16, E_EM_MODE_INTERLEAVED, 2, 1, 3);
@@ -3689,7 +3685,7 @@ static sys_error_code_t LSM6DSV320XTaskSensorSetFS(LSM6DSV320XTask *_this, SMMes
     if (!SYS_IS_ERROR_CODE(res))
     {
       _this->gyro_sensor_status.type.mems.fs = fs;
-      _this->gyro_sensor_status.type.mems.sensitivity = 0.035f * _this->gyro_sensor_status.type.mems.fs;
+      _this->gyro_sensor_status.type.mems.sensitivity = 0.000035f * _this->gyro_sensor_status.type.mems.fs;
     }
   }
   else if (id == _this->mlc_id)
@@ -4306,7 +4302,7 @@ static sys_error_code_t LSM6DSV320X_FS_Sync(LSM6DSV320XTask *_this)
         break;
     }
     _this->gyro_sensor_status.type.mems.fs = fs;
-    _this->gyro_sensor_status.type.mems.sensitivity = 0.035f * _this->gyro_sensor_status.type.mems.fs;
+    _this->gyro_sensor_status.type.mems.sensitivity = 0.000035f * _this->gyro_sensor_status.type.mems.fs;
   }
   else
   {

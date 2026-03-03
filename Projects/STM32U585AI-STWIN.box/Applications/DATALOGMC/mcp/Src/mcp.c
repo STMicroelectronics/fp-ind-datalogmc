@@ -20,190 +20,333 @@
 #include "string.h"
 #include "mcp.h"
 #include "register_interface.h"
-#include "aspep.h"
-
-#define MCP_MAX_ASYNC_BUFF_SIZE 2048
-
-/* Global variables ----------------------------------------------------------*/
-/* Private typedef -----------------------------------------------------------*/
-struct _MCP_Handle_t
-{
-  uint8_t *rxBuffer;
-  uint8_t *txBuffer;
-  uint16_t rxLength;
-  uint16_t txLength;
-
-  /* Async Telemetries Properties */
-  uint16_t MaxBuffSize;
-  uint8_t HFRate;
-  uint8_t HFNum;
-  uint8_t MFRate;
-  uint8_t MFNum;
-  uint8_t Mark;
-
-  MCP_DeliverPacket fDeliverPacket;
-  MCP_Connected fConnected;
-  MCP_DeliverAsync fDeliverAsync;
-
-  MCP_Cmd_Type_def LastCmdSent;
-
-};
+#include "aspep_ctrl.h"
+#include "usart_aspep_driver.h"
 
 /* Private defines -----------------------------------------------------------*/
+#define MCP_ID_SIZE                 2 /* Number of byte */
+#define MCP_HEADER_SIZE             2 //octet
+
+#define TX_ENABLE_ASYNC_MAX_REGISTER      5U
+#define TX_ENABLE_ASYNC_HEADER_BYTE_DIM   8U
+#define TX_ENABLE_ASYNC_BUFF_DIM ((sizeof(uint16_t)*TX_ENABLE_ASYNC_MAX_REGISTER)+TX_ENABLE_ASYNC_HEADER_BYTE_DIM)
+
+/* Private typedef -----------------------------------------------------------*/
+/**
+  * @brief MCP command type enumeration.
+  *
+  * Enumerates the supported MCP command types, mapping each to its corresponding command ID.
+  */
+typedef enum
+{
+  SetRampCmd    = SET_DATA_ELEMENT,  /**< Set ramp command. */
+  StartMotorCmd = START_MOTOR,       /**< Start motor command. */
+  StopMotorCmd  = STOP_MOTOR,        /**< Stop motor command. */
+  ReadRegCmd    = GET_DATA_ELEMENT,  /**< Read register command. */
+} MCP_Cmd_Type_def;
 
 /**
-  * MCP Async request structure declaration
+  * @brief MCP asynchronous request structure.
+  *
+  * Structure used to manage asynchronous MCP requests and related buffer configurations.
   */
 typedef struct
 {
-  uint16_t MaxBuffSize;
-  uint8_t HFRate;
-  uint8_t HFNum;
-  uint8_t MFRate;
-  uint8_t MFNum;
-  uint8_t Mark;
+  uint8_t confBuff[TX_ENABLE_ASYNC_BUFF_DIM]; /**< Configuration buffer for async requests. */
+  uint16_t MaxBuffSize;                       /**< Maximum buffer size. */
+  uint8_t HFRate;                             /**< High-frequency rate. */
+  uint8_t HFNum;                              /**< High-frequency number. */
+  uint8_t MFRate;                             /**< Medium-frequency rate. */
+  uint8_t MFNum;                              /**< Medium-frequency number. */
+  uint8_t Mark;                               /**< Mark or flag for internal use. */
 } MCPA_Handle_t;
 
+/**
+  * @brief MCP handle structure.
+  *
+  * Structure containing all relevant data and callback pointers for MCP communication and event handling.
+  */
+struct _MCP_Handle_t
+{
+  uint8_t *rxBuffer;                        /**< Pointer to the receive buffer. */
+  uint8_t *txBuffer;                        /**< Pointer to the transmit buffer. */
+  uint16_t rxLength;                        /**< Length of received data. */
+  uint16_t txLength;                        /**< Length of data to transmit. */
+  uint16_t MaxBuffSize;                     /**< Maximum buffer size. */
+  MCPA_Handle_t asyncHandle;             /**< Handle for asynchronous MCP requests. */
+  MCP_DeliverSyncPacket fDeliverPacket;     /**< Callback for delivering synchronous packets. */
+  MCP_Connected fConnected;                 /**< Callback for connection status changes. */
+  MCP_DeliverAsync fDeliverAsync;           /**< Callback for delivering asynchronous packets. */
+  MCP_Cmd_Type_def LastCmdSent;             /**< Last command sent. */
+};
+
 /* Private macros ------------------------------------------------------------*/
+
 /* Private variables ---------------------------------------------------------*/
-MCPA_Handle_t MCPA_handle;
 MCP_Handle_t MCP_Handle;
+
 /* Private function prototypes -----------------------------------------------*/
 static void MCP_SetReg(uint8_t TypeID, uint8_t *dataValue, uint8_t *data, uint16_t *size);
 static void MCP_SendPacket(MCP_Handle_t *pHandle, uint16_t command);
 static void MCP_EventProcess(MCP_Handle_t *pSupHandle);
 static void MCP_ReceivedPacket(MCP_Handle_t *pHandle);
+
 /* Functions Definition ------------------------------------------------------*/
 
-void MCP_Init(MCP_Handle_t **pHandle)
+/**
+  * @brief  Initializes the MCP handle and configures the ASPEP transport layer.
+  *
+  * @param[out] pHandle  Double pointer to an MCP_Handle_t structure. After initialization,
+  *                      *pHandle will point to the global MCP_Handle.
+  *
+  * @retval MCP_NULL_POINTER_ERROR      If pHandle is NULL.
+  * @retval MCP_TRANSPORT_LAYER_ERROR   If ASPEP transport layer initialization fails.
+  * @retval MCP_SUCCESS                 On successful initialization.
+  *
+  */
+MCP_RetVal_t MCP_Init(MCP_Handle_t **pHandle)
 {
-  *pHandle = &MCP_Handle;
+  MCP_RetVal_t retVal = MCP_NULL_POINTER_ERROR;
 
-  MCPA_handle.MaxBuffSize = MCP_MAX_ASYNC_BUFF_SIZE;
-  MCPA_handle.HFRate = 0;
-  MCPA_handle.HFNum = 0;
-  MCPA_handle.MFRate = 0xff;
-  MCPA_handle.MFNum = 0;
-  MCPA_handle.Mark = 1;
+  if (NULL != pHandle)
+  {
+    *pHandle = &MCP_Handle;
 
-  ASPEP_Init();
+    MCP_Handle.asyncHandle.MaxBuffSize = ASPEP_CTRL_RX_SYNC_PAYLOAD_MAX;
+    MCP_Handle.asyncHandle.HFRate = 0;
+    MCP_Handle.asyncHandle.HFNum = 0;
+    MCP_Handle.asyncHandle.MFRate = 0xff;
+    MCP_Handle.asyncHandle.MFNum = 0;
+    MCP_Handle.asyncHandle.Mark = 1;
+
+    ASPEP_Transport_Layer_def_t ASPEP_Transport_Layer;
+    ASPEP_Transport_Layer.ASPEP_hwinit_cb = UASPEP_INIT;
+    ASPEP_Transport_Layer.ASPEP_config_reception_cb = UASPEP_RECEIVE_BUFFER;
+    ASPEP_Transport_Layer.ASPEP_config_transmission_cb = UASPEP_SEND_PACKET;
+    ASPEP_Transport_Layer.ASPEP_hwsync_cb = UASPEP_IDLE_ENABLE;
+
+    if (ASPEP_SUCCESS != ASPEP_CTRL_Init(&ASPEP_Transport_Layer))
+    {
+      retVal = MCP_TRANSPORT_LAYER_ERROR;
+    }
+  }
+
+  return retVal;
 }
 
+/**
+  * @brief  Initiates a connection request via the ASPEP control layer.
+  *
+  * This function triggers the start of a connection process by calling
+  * the ASPEP_CTRL_StartConnection function.
+  */
+void MCP_ConnectionRequest(void)
+{
+  ASPEP_CTRL_StartConnection();
+}
+
+/**
+  * @brief  Initiates a disconnection request for the MCP.
+  *
+  * This function triggers the ASPEP control layer to disconnect the current connection.
+  *
+  * @param[in] pHandle  Pointer to an MCP_Handle_t structure
+  */
+void MCP_DisconnectionRequest(MCP_Handle_t *pHandle)
+{
+  ASPEP_CTRL_Disconnection();
+  pHandle->fConnected(false);
+}
+
+/**
+  * @brief Processes received MCP frames and handles related events.
+  *
+  * This function processes the latest received frame from the ASPEP transport layer
+  * and then handles any resulting MCP events, such as connection status changes,
+  * response packets, or asynchronous events.
+  *
+  * @param[in] pSupHandle Pointer to the MCP handle structure.
+  */
 void MCP_ReceiveAndEventProcess(MCP_Handle_t *pSupHandle)
 {
-  pSupHandle->rxBuffer = ASPEP_RxFrameProcess(&pSupHandle->rxLength);
+  ASPEP_CTRL_RxFrameProcess(&pSupHandle->rxBuffer, &pSupHandle->rxLength);
   MCP_EventProcess(pSupHandle);
 }
 
-void MCP_ConnectionRequest(void)
+/**
+  * @brief  Sends a request to start the motor via the MCP interface.
+  *
+  * @param[in] pHandle  Pointer to an MCP_Handle_t structure.
+  *
+  * @retval MCP_NULL_POINTER_ERROR      If pHandle is NULL.
+  * @retval MCP_TRANSPORT_LAYER_ERROR   If the transmission buffer could not be acquired.
+  * @retval MCP_SUCCESS                 If the start motor request was successfully sent.
+  */
+
+MCP_RetVal_t MCP_StartMotorRequest(MCP_Handle_t *pHandle)
 {
-  ASPEP_StartConnection();
-}
+  MCP_RetVal_t retVal = MCP_NULL_POINTER_ERROR;
 
-void MCP_DisconnectionRequest(MCP_Handle_t *pSupHandle)
-{
-  ASPEP_Disconnection();
-  pSupHandle->fConnected(false);
-}
+  if (NULL != pHandle)
+  {
+    retVal = MCP_TRANSPORT_LAYER_ERROR;
 
-bool MCP_StartMotorRequest(MCP_Handle_t *pSupHandle)
-{
-  bool result = true;
-  if (ASPEP_getBuffer((void **) &pSupHandle->txBuffer))
-  {
-    MCP_SendPacket(pSupHandle, START_MOTOR);
-  }
-  else
-  {
-    result = false;
-  }
-  return result;
-}
-
-bool MCP_StopMotorRequest(MCP_Handle_t *pSupHandle)
-{
-  bool result = true;
-  if (ASPEP_getBuffer((void **) &pSupHandle->txBuffer))
-  {
-    MCP_SendPacket(pSupHandle, STOP_MOTOR);
-  }
-  else
-  {
-    result = false;
-  }
-  return result;
-}
-
-bool MCP_SendAckFault(MCP_Handle_t *pSupHandle)
-{
-  bool result = true;
-  if (ASPEP_getBuffer((void **) &pSupHandle->txBuffer))
-  {
-    MCP_SendPacket(pSupHandle, FAULT_ACK);
-  }
-  else
-  {
-    result = false;
-  }
-  return result;
-}
-
-bool MCP_ResetMotor(MCP_Handle_t *pSupHandle)
-{
-  bool result = true;
-  if (ASPEP_getBuffer((void **) &pSupHandle->txBuffer))
-  {
-    MCP_SendPacket(pSupHandle, SW_RESET);
-  }
-  else
-  {
-    result = false;
-  }
-  return result;
-}
-
-bool MCP_SetRegister(MCP_Handle_t *pSupHandle, uint16_t NumberReg, uint16_t *RegID, uint8_t *RegValue)
-{
-  bool result = true;
-  if (ASPEP_getBuffer((void **) &pSupHandle->txBuffer))
-  {
-    uint8_t *txData = pSupHandle->txBuffer;
-    txData += MCP_HEADER_SIZE;
-
-    uint16_t i;
-    uint8_t typeID;
-    uint16_t dataID;
-    uint16_t size = 0u;
-
-    for (i = 0; i < NumberReg; i++)
+    if (ASPEP_SUCCESS == ASPEP_CTRL_GetTxBuffer((void **) &pHandle->txBuffer))
     {
-
-      dataID = (uint16_t) * RegID;
-      RegID += 1; //shift to next Reg ID
-
-      // Data ID
-      *txData = (uint8_t) dataID;
-      txData += 1;
-      *txData = (uint8_t)(dataID >> 8);
-      txData += 1;
-
-      pSupHandle->txLength += MCP_ID_SIZE;
-
-      typeID = dataID & TYPE_MASK;
-      MCP_SetReg(typeID, RegValue, txData, &size);
-      RegValue += size;
-      pSupHandle->txLength += size;
-      txData += size; //shift buffer
+      MCP_SendPacket(pHandle, START_MOTOR);
+      retVal = MCP_SUCCESS;
     }
-
-    MCP_SendPacket(pSupHandle, SET_DATA_ELEMENT);
   }
 
-  else
+  return retVal;
+}
+
+/**
+  * @brief  Sends a request to stop the motor via the MCP interface.
+  *
+  * @param[in] pHandle  Pointer to an MCP_Handle_t structure.
+  *
+  * @retval MCP_NULL_POINTER_ERROR      If pHandle is NULL.
+  * @retval MCP_TRANSPORT_LAYER_ERROR   If the transmission buffer could not be acquired.
+  * @retval MCP_SUCCESS                 If the stop motor request was successfully sent.
+  *
+  * @note  The MCP handle must be initialized before calling this function.
+  */
+MCP_RetVal_t MCP_StopMotorRequest(MCP_Handle_t *pHandle)
+{
+  MCP_RetVal_t retVal = MCP_NULL_POINTER_ERROR;
+
+  if (NULL != pHandle)
   {
-    result = false;
+    retVal = MCP_TRANSPORT_LAYER_ERROR;
+
+    if (ASPEP_SUCCESS == ASPEP_CTRL_GetTxBuffer((void **) &pHandle->txBuffer))
+    {
+      MCP_SendPacket(pHandle, STOP_MOTOR);
+      retVal = MCP_SUCCESS;
+    }
   }
-  return result;
+
+  return retVal;
+}
+
+/**
+  * @brief  Sends a fault acknowledgment packet via the MCP interface.
+  *
+  * @param[in] pHandle  Pointer to an MCP_Handle_t structure.
+  *
+  * @retval MCP_NULL_POINTER_ERROR      If pHandle is NULL.
+  * @retval MCP_TRANSPORT_LAYER_ERROR   If the transmission buffer could not be acquired.
+  * @retval MCP_SUCCESS                 If the fault acknowledgment was successfully sent.
+  *
+  * @note  The MCP handle must be initialized before calling this function.
+  */
+MCP_RetVal_t MCP_SendAckFault(MCP_Handle_t *pHandle)
+{
+  MCP_RetVal_t retVal = MCP_NULL_POINTER_ERROR;
+
+  if (NULL != pHandle)
+  {
+    retVal = MCP_TRANSPORT_LAYER_ERROR;
+
+    if (ASPEP_SUCCESS == ASPEP_CTRL_GetTxBuffer((void **) &pHandle->txBuffer))
+    {
+      MCP_SendPacket(pHandle, FAULT_ACK);
+      retVal = MCP_SUCCESS;
+    }
+  }
+  return retVal;
+}
+
+/**
+  * @brief  Sends a software reset request to the motor via the MCP interface.
+  *
+  * @param[in] pHandle  Pointer to an MCP_Handle_t structure.
+  *
+  * @retval MCP_NULL_POINTER_ERROR      If pHandle is NULL.
+  * @retval MCP_TRANSPORT_LAYER_ERROR   If the transmission buffer could not be acquired.
+  * @retval MCP_SUCCESS                 If the reset request was successfully sent.
+  *
+  */
+MCP_RetVal_t MCP_ResetMotor(MCP_Handle_t *pHandle)
+{
+  MCP_RetVal_t retVal = MCP_NULL_POINTER_ERROR;
+
+  if (NULL != pHandle)
+  {
+    retVal = MCP_TRANSPORT_LAYER_ERROR;
+
+    if (ASPEP_SUCCESS == ASPEP_CTRL_GetTxBuffer((void **) &pHandle->txBuffer))
+    {
+      MCP_SendPacket(pHandle, SW_RESET);
+      retVal = MCP_SUCCESS;
+    }
+  }
+
+  return retVal;
+}
+
+/**
+  * @brief  Writes values to one or more registers via the MCP interface.
+  *
+  * @param[in] pHandle    Pointer to an MCP_Handle_t structure.
+  * @param[in] NumberReg  Number of registers to write.
+  * @param[in] RegID      Pointer to an array of register IDs to be written.
+  * @param[in] RegValue   Pointer to an array of values to write to the registers.
+  *
+  * @retval MCP_NULL_POINTER_ERROR      If any input pointer is NULL.
+  * @retval MCP_TRANSPORT_LAYER_ERROR   If the transmission buffer could not be acquired.
+  * @retval MCP_SUCCESS                 If the register write request was successfully sent.
+  *
+  * @note  The MCP handle must be initialized before calling this function.
+  */
+MCP_RetVal_t MCP_SetRegister(MCP_Handle_t *pHandle, uint16_t NumberReg, uint16_t *pRegID, uint8_t *pRegValue)
+{
+  MCP_RetVal_t retVal = MCP_NULL_POINTER_ERROR;
+
+  if (NULL != pHandle &&
+      NULL != pRegID  &&
+      NULL != pRegValue)
+  {
+    retVal = MCP_TRANSPORT_LAYER_ERROR;
+
+    if (ASPEP_SUCCESS == ASPEP_CTRL_GetTxBuffer((void **) &pHandle->txBuffer))
+    {
+      uint8_t *txData = pHandle->txBuffer;
+      txData += MCP_HEADER_SIZE;
+
+      uint8_t typeID;
+      uint16_t dataID;
+      uint16_t size = 0u;
+
+      for (uint16_t i = 0; i < NumberReg; i++)
+      {
+
+        dataID = (uint16_t) * pRegID;
+        pRegID += 1;
+
+        *txData = (uint8_t) dataID;
+        txData += 1;
+        *txData = (uint8_t)(dataID >> 8);
+        txData += 1;
+
+        pHandle->txLength += MCP_ID_SIZE;
+        typeID = dataID & TYPE_MASK;
+
+        MCP_SetReg(typeID, pRegValue, txData, &size);
+
+        pRegValue += size;
+        pHandle->txLength += size;
+        txData += size;
+      }
+
+      MCP_SendPacket(pHandle, SET_DATA_ELEMENT);
+
+      retVal = MCP_SUCCESS;
+    }
+  }
+
+  return retVal;
 }
 
 static void MCP_ReceivedPacket(MCP_Handle_t *pHandle)
@@ -213,7 +356,11 @@ static void MCP_ReceivedPacket(MCP_Handle_t *pHandle)
   uint8_t MCPResponse = rxData[Length - 1];
 
   pHandle->txBuffer += MCP_HEADER_SIZE;
-  pHandle->fDeliverPacket(pHandle->LastCmdSent, MCPResponse, rxData, &pHandle->rxLength);
+
+  if (NULL != pHandle->fDeliverPacket)
+  {
+    pHandle->fDeliverPacket(pHandle->LastCmdSent, MCPResponse, rxData, &pHandle->rxLength);
+  }
 }
 
 static void MCP_SetReg(uint8_t TypeID, uint8_t *dataValue, uint8_t *data, uint16_t *size)
@@ -253,72 +400,107 @@ static void MCP_SetReg(uint8_t TypeID, uint8_t *dataValue, uint8_t *data, uint16
   }
 }
 
+/**
+  * @brief Handles MCP events based on the latest ASPEP event.
+  *
+  * This function processes the current ASPEP event and triggers the appropriate
+  * MCP callbacks or actions, such as connection status changes, response packet
+  * handling, or asynchronous packet delivery.
+  *
+  * @param[in] pSupHandle Pointer to the MCP handle structure.
+  */
 static void MCP_EventProcess(MCP_Handle_t *pSupHandle)
 {
-  if (ASPEP_GetStatus(EVENT_CONNECTED, false))
+  ASPEP_CTRL_Event_t aspep_evt = ASPEP_CTRL_GetEvent(true);
+
+  switch (aspep_evt)
   {
-    if (pSupHandle->fConnected)
+    case ASPEP_CTRL_CONNECTED_EVT:
     {
-      pSupHandle->fConnected(true);
+      if (pSupHandle->fConnected)
+      {
+        pSupHandle->fConnected(true);
+      }
     }
-    ASPEP_GetStatus(EVENT_CONNECTED, true); //clear flag
-  }
+    break;
 
-  if (ASPEP_GetStatus(EVENT_RESPONSE, false))
-  {
-    MCP_ReceivedPacket(pSupHandle);
-    ASPEP_GetStatus(EVENT_RESPONSE, true); //clear flag
-  }
-
-  if (ASPEP_GetStatus(EVENT_DISCONNECTED, false))
-  {
-    if (pSupHandle->fConnected)
+    case ASPEP_CTRL_DISCONNECT_EVT:
     {
-      pSupHandle->fConnected(false);
+      if (pSupHandle->fConnected)
+      {
+        pSupHandle->fConnected(false);
+      }
     }
-    ASPEP_GetStatus(EVENT_DISCONNECTED, true);  //clear flag
-  }
+    break;
 
-  if (ASPEP_GetStatus(EVENT_ASYNC, false))
-  {
-    if (pSupHandle->fDeliverAsync)
+    case ASPEP_CTRL_RESPONSE_EVT:
     {
-      pSupHandle->fDeliverAsync(pSupHandle->rxBuffer, pSupHandle->rxLength);
+      MCP_ReceivedPacket(pSupHandle);
     }
+    break;
 
-    ASPEP_GetStatus(EVENT_ASYNC, true);  //clear flag
-    ASPEP_FreeBuffer();
+    case ASPEP_CTRL_ASYNC_EVT:
+    {
+      if (pSupHandle->fDeliverAsync)
+      {
+        pSupHandle->fDeliverAsync(pSupHandle->rxBuffer, pSupHandle->rxLength);
+      }
+      ASPEP_CTRL_FreeAsyncBuffer();
+
+    }
+    break;
+
+    case ASPEP_CTRL_NONE_EVT:
+    default:
+      break;
   }
 }
 
-bool MCP_GetRegister(MCP_Handle_t *pSupHandle, uint16_t NumberReg, uint16_t *RegID)
+/**
+  * @brief  Requests the value of one or more registers via the MCP interface.
+  *
+  * @param[in]  pHandle    Pointer to an MCP_Handle_t structure.
+  * @param[in]  NumberReg  Number of registers to read.
+  * @param[in]  RegID      Pointer to an array of register IDs to be read.
+  *
+  * @retval MCP_NULL_POINTER_ERROR      If pHandle or RegID is NULL.
+  * @retval MCP_TRANSPORT_LAYER_ERROR   If the transmission buffer could not be acquired.
+  * @retval MCP_SUCCESS                 If the register request was successfully sent.
+  *
+  * @note  The MCP handle must be initialized before calling this function.
+  */
+MCP_RetVal_t MCP_GetRegister(MCP_Handle_t *pHandle, uint16_t NumberReg, uint16_t *RegID)
 {
-  bool result = true;
-  if (ASPEP_getBuffer((void **) &pSupHandle->txBuffer))
-  {
-    uint16_t *txData = (uint16_t *) pSupHandle->txBuffer;
-    txData += 1; //for header MCP
-    uint16_t i;
+  MCP_RetVal_t retVal = MCP_NULL_POINTER_ERROR;
 
-    for (i = 0; i < NumberReg; i++)
+  if (NULL != pHandle && NULL != RegID)
+  {
+    retVal = MCP_TRANSPORT_LAYER_ERROR;
+
+    if (ASPEP_SUCCESS == ASPEP_CTRL_GetTxBuffer((void **) &pHandle->txBuffer))
     {
-      *txData = (uint16_t) * RegID;
-      RegID += 1;
-      txData += 1; //shift buffer
-      pSupHandle->txLength += MCP_ID_SIZE;
+      uint16_t *txData = (uint16_t *) pHandle->txBuffer;
+      txData += 1;
+
+      uint16_t i;
+      for (i = 0; i < NumberReg; i++)
+      {
+        *txData = (uint16_t) * RegID;
+        RegID += 1;
+        txData += 1;
+        pHandle->txLength += MCP_ID_SIZE;
+      }
+
+      MCP_SendPacket(pHandle, GET_DATA_ELEMENT);
+
+      retVal = MCP_SUCCESS;
     }
-
-    MCP_SendPacket(pSupHandle, GET_DATA_ELEMENT);
   }
 
-  else
-  {
-    result = false;
-  }
-  return result;
+  return retVal;
 }
 
-/*add MCP Header to buffer*/
+
 static void MCP_SendPacket(MCP_Handle_t *pHandle, uint16_t command)
 {
   pHandle->LastCmdSent = (MCP_Cmd_Type_def) command;
@@ -338,97 +520,190 @@ static void MCP_SendPacket(MCP_Handle_t *pHandle, uint16_t command)
   *txData = motorID | command << 3;
   pHandle->txLength += MCP_HEADER_SIZE;
 
-  ASPEP_SendPacket(pHandle->txBuffer, pHandle->txLength);
+  ASPEP_CTRL_SendPacket(pHandle->txBuffer, pHandle->txLength);
 
   pHandle->txLength = 0;
 }
 
-void MCP_SetAsyncs(MCP_Handle_t *p_MCP_Handle, uint16_t *RegisterID, uint8_t *RegisterValBuff, uint8_t HFNum)
+/**
+  * @brief  Enables asynchronous telemetry transmission for specified registers.
+  *
+  * @param[in]  pHandle           Pointer to the MCP handle structure.
+  * @param[in]  pRegisterIDBuff   Pointer to a buffer containing the list of register IDs to enable.
+  * @param[in]  numOfRegisterID   Number of register IDs in the buffer.
+  *
+  * @retval MCP_NULL_POINTER_ERROR  If pHandle or pRegisterIDBuff is NULL.
+  * @retval MCP_ERROR               If numOfRegisterID exceeds the allowed maximum.
+  * @retval MCP_SUCCESS             If the configuration was successfully sent.
+  *
+  * @note  The MCP handle must be initialized before calling this function.
+  */
+MCP_RetVal_t MCP_EnableAsyncTelemetries(MCP_Handle_t *pHandle, uint16_t *pRegisterIDBuff, uint8_t numOfRegisterID)
 {
   uint16_t size;
-  uint8_t i = 0;
-  MCPA_handle.MaxBuffSize = MCP_MAX_ASYNC_BUFF_SIZE - 2 * HFNum;
-  MCPA_handle.HFNum = HFNum;
-  uint8_t *RegValBuff = (uint8_t *) RegisterValBuff;
+  uint8_t *RegValBuff = &(pHandle->asyncHandle.confBuff[0]);
+  uint16_t RegID = (uint16_t) MC_REG_ASYNC_UARTA;
+  MCP_RetVal_t retVal = MCP_NULL_POINTER_ERROR;
 
-  uint16_t RegID[1];
-  RegID[0] = (uint16_t) MC_REG_ASYNC_UARTA;
-
-  size = 7 + 2 * HFNum; //payload size, 16 bits
-  *RegValBuff = (uint8_t) size;
-  RegValBuff += 1;
-  *RegValBuff = (uint8_t)(size >> 8);
-  RegValBuff += 1;
-
-  *RegValBuff = (uint8_t) MCPA_handle.MaxBuffSize;
-  RegValBuff += 1;
-  *RegValBuff = (uint8_t)(MCPA_handle.MaxBuffSize >> 8);
-  RegValBuff += 1;
-
-  *RegValBuff = MCPA_handle.HFRate;
-  RegValBuff += 1;
-
-  *RegValBuff = HFNum;
-  RegValBuff += 1;
-
-  *RegValBuff = MCPA_handle.MFRate;
-  RegValBuff += 1;
-
-  *RegValBuff = MCPA_handle.MFNum;
-  RegValBuff += 1;
-
-  for (i = 0; i < HFNum; i++)
+  if (NULL != pHandle &&
+      NULL != pRegisterIDBuff)
   {
-    *RegValBuff = (uint8_t) * RegisterID;
-    RegValBuff += 1;
-    *RegValBuff = (uint8_t)(*RegisterID >> 8);
-    RegValBuff += 1;
-    RegisterID += 1;
+    retVal = MCP_ERROR;
+
+    if (numOfRegisterID <= TX_ENABLE_ASYNC_MAX_REGISTER)
+    {
+
+      pHandle->asyncHandle.MaxBuffSize = ASPEP_CTRL_RX_SYNC_PAYLOAD_MAX - sizeof(uint16_t) * numOfRegisterID;
+      pHandle->asyncHandle.HFNum = numOfRegisterID;
+      size = TX_ENABLE_ASYNC_HEADER_BYTE_DIM + (sizeof(uint16_t) * numOfRegisterID);
+
+      /* Copy size into TX buffer */
+      *RegValBuff = (uint8_t) size;
+      RegValBuff += 1;
+      *RegValBuff = (uint8_t)(size >> 8);
+      RegValBuff += 1;
+
+      /* Copy MaxBuffSize into TX buffer */
+      *RegValBuff = (uint8_t) pHandle->asyncHandle.MaxBuffSize;
+      RegValBuff += 1;
+      *RegValBuff = (uint8_t)(pHandle->asyncHandle.MaxBuffSize >> 8);
+      RegValBuff += 1;
+
+      /* Copy HFRate into TX buffer */
+      *RegValBuff = pHandle->asyncHandle.HFRate;
+      RegValBuff += 1;
+
+      /* Copy numOfRegisterID into TX buffer */
+      *RegValBuff = numOfRegisterID;
+      RegValBuff += 1;
+
+      /* Copy MFRate into TX buffer */
+      *RegValBuff = pHandle->asyncHandle.MFRate;
+      RegValBuff += 1;
+
+      /* Copy MFNum into TX buffer */
+      *RegValBuff = pHandle->asyncHandle.MFNum;
+      RegValBuff += 1;
+
+      /* Copy registerID into TX buffer */
+      uint8_t registerIDByteDim = sizeof(uint16_t) * numOfRegisterID;
+      memcpy(RegValBuff, pRegisterIDBuff, sizeof(uint16_t) * numOfRegisterID);
+      RegValBuff += registerIDByteDim;
+
+      /* Copy Mark into TX buffer */
+      *RegValBuff = pHandle->asyncHandle.Mark;
+      pHandle->asyncHandle.Mark++;
+
+      retVal = MCP_SetRegister(pHandle, 1, &RegID, pHandle->asyncHandle.confBuff);
+    }
   }
 
-  if (1)
+  return retVal;
+}
+
+/**
+  * @brief  Disables asynchronous telemetry transmission.
+  *
+  * @param[in] pHandle  Pointer to the MCP handle structure.
+  *
+  * @retval MCP_NULL_POINTER_ERROR  If pHandle is NULL.
+  * @retval MCP_SUCCESS             If the disable request was successfully sent.
+  *
+  * @note  The MCP handle must be initialized before calling this function.
+  */
+MCP_RetVal_t MCP_DisableAsyncTelemetries(MCP_Handle_t *pHandle)
+{
+  MCP_RetVal_t retVal = MCP_NULL_POINTER_ERROR;
+
+  if (NULL != pHandle)
   {
-    *RegValBuff = MCPA_handle.Mark;
-    MCPA_handle.Mark ++;
-  }
-  else
-  {
+    uint8_t *RegValBuff = &pHandle->asyncHandle.confBuff[0];
+
+    uint16_t RegID = MC_REG_ASYNC_UARTA;
     *RegValBuff = 0;
+
+    retVal = MCP_SetRegister(pHandle, 1, &RegID, pHandle->asyncHandle.confBuff);
   }
 
-  MCP_SetRegister(p_MCP_Handle, 1, RegID, RegisterValBuff);
+  return retVal;
 }
 
-void MCP_DisableAsyncs(MCP_Handle_t *p_MCP_Handle, uint8_t *RegisterValBuff)
+/**
+  * @brief Registers a callback for delivering synchronous MCP packets.
+  *
+  * Associates a user-defined callback function with the MCP handle to process
+  * received synchronous MCP packets.
+  *
+  * @param[in]  pHandle                      Pointer to the MCP handle structure.
+  * @param[in]  mcp_delivered_sync_packet_cb Callback function to deliver synchronous MCP packets.
+  *
+  * @retval     MCP_SUCCESS                  Callback registered successfully.
+  * @retval     MCP_NULL_POINTER_ERROR       Null pointer provided for handle or callback.
+  */
+MCP_RetVal_t MCP_RegisterDeliveredSyncPacketCb(MCP_Handle_t *pHandle,
+                                               MCP_DeliverSyncPacket mcp_delivered_sync_packet_cb)
 {
-  uint8_t *RegValBuff = (uint8_t *) RegisterValBuff;
+  MCP_RetVal_t retVal = MCP_NULL_POINTER_ERROR;
 
-  uint16_t RegID[1];
-  RegID[0] = (uint16_t) MC_REG_ASYNC_UARTA;
-
-  *RegValBuff = 0;
-
-  MCP_SetRegister(p_MCP_Handle, 1, RegID, RegisterValBuff);
-}
-
-
-void MCP_RegisterDeliveredSyncPacketCb(MCP_Handle_t *pHandle, MCP_DeliverPacket mcp_delivered_sync_packet_cb)
-{
-  pHandle->fDeliverPacket = mcp_delivered_sync_packet_cb;
-}
-
-void MCP_RegisterConnectCompletedCb(MCP_Handle_t *pHandle, MCP_Connected mcp_connect_completed_cb)
-{
-  if (NULL != pHandle && NULL != mcp_connect_completed_cb)
+  if (NULL != pHandle && NULL != mcp_delivered_sync_packet_cb)
   {
-    pHandle->fConnected = mcp_connect_completed_cb;
+    pHandle->fDeliverPacket = mcp_delivered_sync_packet_cb;
+
+    retVal = MCP_SUCCESS;
   }
+
+  return retVal;
 }
 
-void MCP_RegisterDeliveredAsyncPacketCb(MCP_Handle_t *pHandle, MCP_DeliverAsync mcp_delivered_async_packet_cb)
+/**
+  * @brief Registers a callback for delivering asynchronous MCP packets.
+  *
+  * Associates a user-defined callback function with the MCP handle to process
+  * received asynchronous MCP packets.
+  *
+  * @param[in] pHandle                        Pointer to the MCP handle structure.
+  * @param[in] mcp_delivered_async_packet_cb  Callback function to deliver asynchronous MCP packets.
+  *
+  * @retval    MCP_SUCCESS                    Callback registered successfully.
+  * @retval    MCP_NULL_POINTER_ERROR         Null pointer provided for handle or callback.
+  */
+MCP_RetVal_t MCP_RegisterDeliveredAsyncPacketCb(MCP_Handle_t *pHandle, MCP_DeliverAsync mcp_delivered_async_packet_cb)
 {
+  MCP_RetVal_t retVal = MCP_NULL_POINTER_ERROR;
+
   if (NULL != pHandle && NULL != mcp_delivered_async_packet_cb)
   {
     pHandle->fDeliverAsync = mcp_delivered_async_packet_cb;
+
+    retVal = MCP_SUCCESS;
   }
+
+  return retVal;
 }
+
+/**
+  * @brief Registers a callback for MCP connection status changes.
+  *
+  * Associates a user-defined callback function with the MCP handle to be notified
+  * when the connection status changes.
+  *
+  * @param[in] pHandle                  Pointer to the MCP handle structure.
+  * @param[in] mcp_connect_completed_cb  Callback function to handle connection status changes.
+  *
+  * @retval    MCP_SUCCESS              Callback registered successfully.
+  * @retval    MCP_NULL_POINTER_ERROR   Null pointer provided for handle or callback.
+  */
+MCP_RetVal_t MCP_RegisterConnectCompletedCb(MCP_Handle_t *pHandle, MCP_Connected mcp_connect_completed_cb)
+{
+  MCP_RetVal_t retVal = MCP_NULL_POINTER_ERROR;
+
+  if (NULL != pHandle && NULL != mcp_connect_completed_cb)
+  {
+    pHandle->fConnected = mcp_connect_completed_cb;
+
+    retVal = MCP_SUCCESS;
+  }
+
+  return retVal;
+}
+

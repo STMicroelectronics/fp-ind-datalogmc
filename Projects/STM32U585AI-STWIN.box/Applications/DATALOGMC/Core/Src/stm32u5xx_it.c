@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "fx_stm32_sd_driver.h"
+#include "aspep_ctrl.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -454,6 +455,27 @@ void GPDMA1_Channel14_IRQHandler(void)
   /* USER CODE END GPDMA1_Channel14_IRQn 1 */
 }
 
+void GPDMA1_Channel15_IRQHandler(void)
+{
+  /* USER CODE BEGIN GPDMA1_Channel15_IRQn 0 */
+
+  /* USER CODE END GPDMA1_Channel15_IRQn 0 */
+  UASPEP_CTRL_DMA_Rx_Handler();
+  /* USER CODE BEGIN GPDMA1_Channel15_IRQn 1 */
+
+  /* USER CODE END GPDMA1_Channel15_IRQn 1 */
+}
+
+void USART3_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART3_IRQn 0 */
+  UASPEP_CTRL_Usart_Handler();
+  /* USER CODE END USART3_IRQn 0 */
+
+  /* USER CODE BEGIN USART3_IRQn 1 */
+
+  /* USER CODE END USART3_IRQn 1 */
+}
 
 void SPI2_IRQHandler(void)
 {
