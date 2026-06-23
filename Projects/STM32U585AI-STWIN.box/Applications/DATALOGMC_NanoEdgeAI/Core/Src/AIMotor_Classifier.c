@@ -22,7 +22,6 @@
   */
 
 #include "AIMotor_Classifier.h"
-#include "knowledge_ncc.h"
 #include "services/sysdebug.h"
 
 
@@ -38,8 +37,8 @@ typedef struct _AI_MotorControl_ClassifierClass
   /**
     * INeaiNcc_Model_t class virtual table.
     */
-  INeaiNcc_Model_vtbl vtbl;
 
+  INeaiNcc_Model_vtbl vtbl;
   /**
     * Neai ncc axis number
     */
@@ -55,10 +54,6 @@ typedef struct _AI_MotorControl_ClassifierClass
     */
   uint32_t class_number;
 
-  /**
-    * Neai ncc knowledge
-    */
-  float_t const *p_knowledge;
 
 } AI_MotorControl_ClassifierClass_t;
 
@@ -79,23 +74,21 @@ static const AI_MotorControl_ClassifierClass_t sTheClass =
   /**
     * Neai ncc axis number
     */
-  AXIS_NUMBER_NCC,
+  NEAI_INPUT_AXIS_NUMBER,
 
   /**
     * Neai ncc data input user dimension
     */
-  DATA_INPUT_USER_NCC,
+  NEAI_INPUT_SIGNAL_LENGTH,
 
   /**
     * Neai ncc class number
     */
-  CLASS_NUMBER_NCC,
+  NEAI_NUMBER_OF_CLASSES,
 
-  /**
-    * Neai ncc knowledge
-    */
-  knowledge_ncc
 };
+
+
 
 
 /**
@@ -130,24 +123,23 @@ void Motor_Classifier_Init(INeaiNcc_Model_t *_this)
   p_obj->Super.axis_number = sTheClass.axis_number;
   p_obj->Super.class_number = sTheClass.class_number;
   p_obj->Super.data_input_user_dim = sTheClass.data_input_user_dim;
-  p_obj->Super.p_knowledge = sTheClass.p_knowledge;
 }
 
 
 /* IAI_Network virtual functions definition */
 /********************************************/
 
-uint8_t ANeai_Classification_vtblInit_ncc(INeaiNcc_Model_t *_this, const float_t knowledge_buffer[])
+uint8_t ANeai_Classification_vtblInit_ncc(INeaiNcc_Model_t *_this)
 {
   UNUSED(_this);
-  return neai_classification_init_ncc(knowledge_buffer);
+  return neai_classification_init();
 }
 
 uint8_t ANeai_Classification_vtbl_ncc(INeaiNcc_Model_t *_this, float_t data_input[], float_t output_buffer[],
                                       uint16_t *id_class)
 {
   UNUSED(_this);
-  return neai_classification_ncc(data_input, output_buffer, id_class);
+  return neai_classification(data_input, output_buffer, (int*)id_class);
 }
 
 /* Private function definition */

@@ -3183,7 +3183,7 @@
                 <group>
                     <name>Lib</name>
                     <file>
-                        <name>$PROJ_DIR$\..\NanoEdgeAI\GCC\Lib\libneai_ncc.a</name>
+                        <name>$PROJ_DIR$\..\NanoEdgeAI\GCC\Lib\libneai.a</name>
                     </file>
                 </group>
             </group>

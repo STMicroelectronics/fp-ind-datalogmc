@@ -957,8 +957,8 @@ sys_error_code_t DatalogAppTask_ActuatorListenerOnNewDataReady_vtbl(IEventListen
     /* Get pointer to Payload */
     float_t *p_payload_f = (float_t *)EMD_Data(p_evt->p_data);
 
-    uint8_t class = (uint8_t)p_payload_f[1] - 1;
-    float_t probabilities = p_payload_f[1 + (uint8_t)p_payload_f[1]];
+    uint8_t class = (uint8_t)p_payload_f[1];
+    float_t probabilities = p_payload_f[2 + (uint8_t)p_payload_f[1]];
 
     uint8_t ai_payload_buff_u8[AI_PAYLOAD_BUFF_DIM];
 

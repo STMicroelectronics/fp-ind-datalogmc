@@ -1403,19 +1403,9 @@
 			<locationURI>PARENT-1-PROJECT_LOC/mcp/Src/mcp.c</locationURI>
 		</link>
 		<link>
-			<name>User/NanoEdgeAI/Inc/NanoEdgeAI_ncc.h</name>
+			<name>User/NanoEdgeAI/Inc/NanoEdgeAI.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/NanoEdgeAI/GCC/Inc/NanoEdgeAI_ncc.h</locationURI>
-		</link>
-		<link>
-			<name>User/NanoEdgeAI/Inc/knowledge_ncc.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/NanoEdgeAI/GCC/Inc/knowledge_ncc.h</locationURI>
-		</link>
-		<link>
-			<name>User/NanoEdgeAI/Lib/libneai_ncc.a</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/NanoEdgeAI/GCC/Lib/libneai_ncc.a</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/NanoEdgeAI/GCC/Inc/NanoEdgeAI.h</locationURI>
 		</link>
 		<link>
 			<name>User/USBX/App/PCDDriver.c</name>
