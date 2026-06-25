@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32U585AIIx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32U5xx_DFP.2.2.1</PackID>
+          <PackID>Keil.STM32U5xx_DFP.3.2.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000-0x200BFFFF) IROM(0x08000000-0x81FFFFF) CLOCK(8000000) FPU3(SFPU) CPUTYPE("Cortex-M33") ELITTLE TZ DSP</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -331,8 +331,8 @@
             <useXO>0</useXO>
             <v6Lang>5</v6Lang>
             <v6LangP>3</v6LangP>
-            <vShortEn>1</vShortEn>
-            <vShortWch>1</vShortWch>
+            <vShortEn>0</vShortEn>
+            <vShortWch>0</vShortWch>
             <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
@@ -810,9 +810,9 @@
           <GroupName>Application/NanoEdgeAI</GroupName>
           <Files>
             <File>
-              <FileName>libneai_ncc.a</FileName>
+              <FileName>libneai.a</FileName>
               <FileType>4</FileType>
-              <FilePath>..\NanoEdgeAI\Keil\Lib\libneai_ncc.a</FilePath>
+              <FilePath>..\NanoEdgeAI\Keil\Lib\libneai.a</FilePath>
             </File>
           </Files>
         </Group>
@@ -1057,7 +1057,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Drivers/BSP/STINW.box</GroupName>
+          <GroupName>Drivers/BSP/STWIN.box</GroupName>
           <Files>
             <File>
               <FileName>STWIN.box_debug_pins.c</FileName>
@@ -3989,7 +3989,7 @@
         <TargetCommonOption>
           <Device>STM32U585AIIx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32U5xx_DFP.2.2.1</PackID>
+          <PackID>Keil.STM32U5xx_DFP.3.2.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IROM(0x08000000-0x81FFFFF) IRAM(0x20000000-0x200BFFFF) CLOCK(8000000) FPU3(SFPU) CPUTYPE("Cortex-M33") ELITTLE TZ DSP</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -4287,7 +4287,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -4304,8 +4304,8 @@
             <useXO>0</useXO>
             <v6Lang>5</v6Lang>
             <v6LangP>3</v6LangP>
-            <vShortEn>1</vShortEn>
-            <vShortWch>1</vShortWch>
+            <vShortEn>0</vShortEn>
+            <vShortWch>0</vShortWch>
             <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
@@ -4783,9 +4783,9 @@
           <GroupName>Application/NanoEdgeAI</GroupName>
           <Files>
             <File>
-              <FileName>libneai_ncc.a</FileName>
+              <FileName>libneai.a</FileName>
               <FileType>4</FileType>
-              <FilePath>..\NanoEdgeAI\Keil\Lib\libneai_ncc.a</FilePath>
+              <FilePath>..\NanoEdgeAI\Keil\Lib\libneai.a</FilePath>
             </File>
           </Files>
         </Group>
@@ -5030,7 +5030,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Drivers/BSP/STINW.box</GroupName>
+          <GroupName>Drivers/BSP/STWIN.box</GroupName>
           <Files>
             <File>
               <FileName>STWIN.box_debug_pins.c</FileName>
